@@ -37,7 +37,7 @@
     "sinon": "^19.0.2",
     "turbo": "^2.2.3",
     "typescript": "^5.6.3",
-    "vitest": "^2.1.4"
+    "vitest": "^2.1.5"
   },
   "engines": {
     "npm": ">=10.9.0",
