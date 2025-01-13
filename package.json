@@ -24,7 +24,7 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@types/sinon": "^17.0.3",
     "@vitest/coverage-v8": "^2.1.4",
-    "eslint": "^8.57.1",
+    "eslint": "^9.18.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.31.0",
