@@ -16,8 +16,10 @@ Without a reduced test case, your issue may be closed.
 - Run tests (`yarn test` from the root).
 - Commit changes.
 - `cd packages/shuffle`
-- `npm version major|minor|patch`.
-- `npm publish`
+- `yarn version major|minor|patch`.
+- `yarn npm publish`
+- `git add .`
+- `git commit -m "Release v0.0.0"`
 - `git push && git push --tags`
 - Create a [new release](https://github.com/glen-cheney/Shuffle/releases/new) on GitHub.
 

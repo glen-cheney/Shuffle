@@ -6,6 +6,7 @@ sidebar_position: 15
 
 For a more detailed changelog, visit [the latest releases](https://github.com/glen-cheney/Shuffle/releases) on GitHub.
 
+- `v6.1.2` 2025-06-01 - Update dev dependencies and old username links.
 - `v6.1.1` 2024-07-07 - Update `"exports"` field in package.json to include `"types"`.
 - `v6.1.0` 2022-07-07 - Add `sideEffects: false` and [exports-map](https://webpack.js.org/guides/package-exports/) to the `package.json`.
 - `v6.0.0` 2022-02-14 - Drop IE 11, remove misspelled `delimeter` option, remove `matches-selector` package.
