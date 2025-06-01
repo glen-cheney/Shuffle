@@ -16,4 +16,4 @@ View the [Shuffle collection](https://codepen.io/collection/AWGLbd) on CodePen.
 
 ## Releases
 
-[See the latest release](https://github.com/Vestride/Shuffle/releases)
+[See the latest release](https://github.com/glen-cheney/Shuffle/releases)

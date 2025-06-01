@@ -22,7 +22,7 @@ export default {
       {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          editUrl: 'https://github.com/Vestride/Shuffle/tree/main/apps/website/docs/',
+          editUrl: 'https://github.com/glen-cheney/Shuffle/tree/main/apps/website/docs/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -59,7 +59,7 @@ export default {
           position: 'right',
         },
         {
-          href: 'https://github.com/Vestride/Shuffle',
+          href: 'https://github.com/glen-cheney/Shuffle',
           label: 'GitHub',
           position: 'right',
         },
@@ -99,7 +99,7 @@ export default {
           items: [
             {
               label: 'GitHub',
-              href: 'https://github.com/Vestride/Shuffle',
+              href: 'https://github.com/glen-cheney/Shuffle',
             },
             {
               label: 'CodePen template',

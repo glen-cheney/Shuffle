@@ -35,14 +35,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/Vestride/Shuffle.git"
+    "url": "git://github.com/glen-cheney/Shuffle.git"
   },
   "author": "Glen Cheney <cheney.glen@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Vestride/Shuffle/issues"
+    "url": "https://github.com/glen-cheney/Shuffle/issues"
   },
-  "homepage": "https://github.com/Vestride/Shuffle",
+  "homepage": "https://github.com/glen-cheney/Shuffle",
   "files": [
     "dist",
     "src",
