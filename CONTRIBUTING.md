@@ -19,7 +19,7 @@ Without a reduced test case, your issue may be closed.
 - `npm version major|minor|patch`.
 - `npm publish`
 - `git push && git push --tags`
-- Create a [new release](https://github.com/Vestride/Shuffle/releases/new) on GitHub.
+- Create a [new release](https://github.com/glen-cheney/Shuffle/releases/new) on GitHub.
 
 ## Running locally
 

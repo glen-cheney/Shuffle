@@ -46,6 +46,6 @@ Bootstrap 4 uses flexbox for grids, so your main shuffle container element must 
 
 :::info Didn't find an answer?
 
-Try browsing the [CodePen collection](https://codepen.io/collection/AWGLbd) or searching the issues [on GitHub](https://github.com/Vestride/Shuffle/issues).
+Try browsing the [CodePen collection](https://codepen.io/collection/AWGLbd) or searching the issues [on GitHub](https://github.com/glen-cheney/Shuffle/issues).
 
 :::

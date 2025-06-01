@@ -1,6 +1,6 @@
 // Type definitions for Shuffle 6.0.0
-// Project: https://github.com/Vestride/Shuffle
-// Definitions by: Glen Cheney <https://github.com/Vestride>
+// Project: https://github.com/glen-cheney/Shuffle
+// Definitions by: Glen Cheney <https://github.com/glen-cheney>
 
 import { TinyEmitter } from 'tiny-emitter';
 
