@@ -5314,9 +5314,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/coverage-v8@npm:^3.2.2":
-  version: 3.2.2
-  resolution: "@vitest/coverage-v8@npm:3.2.2"
+"@vitest/coverage-v8@npm:^3.2.3":
+  version: 3.2.3
+  resolution: "@vitest/coverage-v8@npm:3.2.3"
   dependencies:
     "@ampproject/remapping": "npm:^2.3.0"
     "@bcoe/v8-coverage": "npm:^1.0.2"
@@ -5332,12 +5332,12 @@ __metadata:
     test-exclude: "npm:^7.0.1"
     tinyrainbow: "npm:^2.0.0"
   peerDependencies:
-    "@vitest/browser": 3.2.2
-    vitest: 3.2.2
+    "@vitest/browser": 3.2.3
+    vitest: 3.2.3
   peerDependenciesMeta:
     "@vitest/browser":
       optional: true
-  checksum: 10c0/d807f006ab9d4d3fb78c34586ab057a8e588746430b2d3ab07cfb972b5fabe65fde7033a9718ee598d0e3001085fa83edee76ff3f03a05e50a8879beee3ae37a
+  checksum: 10c0/b0b3c90bab5cda8cbb7568aae9dec3a6440c40b9cdd03475f0ad5aa6089b4ce3dc25ac4cd1ca6d973a21aab1d8676005e2feb82a2d71ca8fb6d1c742dd031589
   languageName: node
   linkType: hard
 
@@ -15379,7 +15379,7 @@ __metadata:
     "@rollup/plugin-node-resolve": "npm:^16.0.1"
     "@rollup/plugin-terser": "npm:^0.4.4"
     "@types/sinon": "npm:^17.0.4"
-    "@vitest/coverage-v8": "npm:^3.2.2"
+    "@vitest/coverage-v8": "npm:^3.2.3"
     eslint: "npm:^8.57.1"
     eslint-config-airbnb: "npm:^19.0.4"
     eslint-config-prettier: "npm:^10.1.5"
