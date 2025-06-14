@@ -106,7 +106,7 @@ class Shuffle extends TinyEmitter {
     // doesn't see the first layout. Set them now that the first layout is done.
     // First, however, a synchronous layout must be caused for the previous
     // styles to be applied without transitions.
-    this.element.offsetWidth; // eslint-disable-line no-unused-expressions
+    this.element.offsetWidth;
     this.setItemTransitions(this.items);
     this.element.style.transition = `height ${this.options.speed}ms ${this.options.easing}`;
   }
@@ -616,10 +616,6 @@ class Shuffle extends TinyEmitter {
       return;
     }
 
-    // The reason ESLint disables this is because for..of generates a lot of extra
-    // code using Babel, but Shuffle no longer supports browsers that old, so
-    // nothing to worry about.
-    // eslint-disable-next-line no-restricted-syntax
     for (const entry of entries) {
       if (Math.round(entry.contentRect.width) !== Math.round(this.containerWidth)) {
         // If there was already an animation waiting, cancel it.
@@ -893,7 +889,7 @@ class Shuffle extends TinyEmitter {
     });
 
     // Cause layout so that the styles above are applied.
-    this.element.offsetWidth; // eslint-disable-line no-unused-expressions
+    this.element.offsetWidth;
 
     // Add transition to each item.
     this.setItemTransitions(items);
@@ -1104,7 +1100,7 @@ class Shuffle extends TinyEmitter {
     callback();
 
     // Cause forced synchronous layout.
-    elements[0].offsetWidth; // eslint-disable-line no-unused-expressions
+    elements[0].offsetWidth;
 
     // Put the duration back
     elements.forEach((element, i) => {
