@@ -1,3 +1,4 @@
+import React from 'react';
 import styles from './CodePenEmbed.module.css';
 
 const author = 'Glen Cheney';
@@ -12,6 +13,7 @@ export function CodePenEmbed({ penTitle, penId, penUser }) {
         title={penTitle}
         src={`https://codepen.io/${penUser}/embed/${penId}?default-tab=result`}
         loading="eager"
+        // eslint-disable-next-line react/no-unknown-property
         allowtransparency="true"
         allowFullScreen
       >
