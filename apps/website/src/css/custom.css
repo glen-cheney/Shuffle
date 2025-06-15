@@ -19,3 +19,7 @@
   --ifm-color-primary-lightest: #32e3c0;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+html[class*='docs-doc-id-demos\/'] .container [class*='docItemCol'] {
+  max-width: none !important;
+}
