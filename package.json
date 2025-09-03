@@ -17,17 +17,17 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@babel/core": "^7.28.0",
-    "@babel/preset-env": "^7.28.0",
+    "@babel/core": "^7.28.3",
+    "@babel/preset-env": "^7.28.3",
     "@eslint/eslintrc": "^3.3.1",
-    "@eslint/js": "^9.31.0",
+    "@eslint/js": "^9.34.0",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-terser": "^0.4.4",
     "@types/sinon": "^17.0.4",
     "@vitest/coverage-v8": "^3.2.4",
-    "eslint": "^9.31.0",
+    "eslint": "^9.34.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
@@ -38,8 +38,8 @@
     "prettier": "^3.6.2",
     "rollup": "^4.43.0",
     "sinon": "^21.0.0",
-    "turbo": "^2.5.5",
-    "typescript": "^5.8.3",
+    "turbo": "^2.5.6",
+    "typescript": "^5.9.2",
     "vitest": "^3.2.4"
   },
   "engines": {
