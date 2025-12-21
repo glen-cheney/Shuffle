@@ -11,7 +11,7 @@ export default defineConfig([
   eslintJs.configs.recommended,
   pluginImport.flatConfigs.recommended,
   pluginReact.configs.flat.recommended,
-  pluginReactHooks.configs['recommended-latest'],
+  pluginReactHooks.configs.flat.recommended,
   pluginJsxA11y.flatConfigs.recommended,
   {
     plugins: {

@@ -10,7 +10,6 @@ export default {
   url: 'https://shuffle.js.org/',
   baseUrl: '/',
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.png',
   organizationName: 'Vestride',
   projectName: 'Shuffle',
@@ -33,6 +32,12 @@ export default {
       },
     ],
   ],
+
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    }
+  },
 
   themeConfig: {
     colorMode: {
