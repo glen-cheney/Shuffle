@@ -1,10 +1,23 @@
-import Point from './point';
-import Classes from './classes';
+import { Point } from './point';
+import { Classes } from './classes';
+import { InlineCssStyles, ShuffleItemCss } from './types';
 
 let id = 0;
 
-class ShuffleItem {
-  constructor(element, isRTL) {
+export class ShuffleItem {
+  id: number;
+  element: HTMLElement;
+  isRTL: boolean;
+  isVisible: boolean;
+  isHidden: boolean;
+  scale: number = 1;
+  point: Point = new Point();
+
+  // Static properties
+  static Css: ShuffleItemCss;
+  static Scale: Record<string, number>;
+
+  constructor(element: HTMLElement, isRTL?: boolean) {
     id += 1;
     this.id = id;
     this.element = element;
@@ -12,7 +25,7 @@ class ShuffleItem {
     /**
      * Set correct direction of item
      */
-    this.isRTL = isRTL;
+    this.isRTL = Boolean(isRTL);
 
     /**
      * Used to separate items for layout and shrink.
@@ -39,7 +52,7 @@ class ShuffleItem {
     this.isVisible = false;
     this.element.classList.remove(Classes.VISIBLE);
     this.element.classList.add(Classes.HIDDEN);
-    this.element.setAttribute('aria-hidden', true);
+    this.element.setAttribute('aria-hidden', 'true');
   }
 
   init() {
@@ -50,28 +63,30 @@ class ShuffleItem {
     this.point = new Point();
   }
 
-  addClasses(classes) {
-    classes.forEach((className) => {
+  addClasses(classes: string[]) {
+    for (const className of classes) {
       this.element.classList.add(className);
-    });
+    }
   }
 
-  removeClasses(classes) {
-    classes.forEach((className) => {
+  removeClasses(classes: string[]) {
+    for (const className of classes) {
       this.element.classList.remove(className);
-    });
+    }
   }
 
-  applyCss(obj) {
-    Object.keys(obj).forEach((key) => {
-      this.element.style[key] = obj[key];
-    });
+  applyCss(obj: InlineCssStyles) {
+    for (const [key, value] of Object.entries(obj)) {
+      // @ts-expect-error shrug
+      this.element.style[key] = String(value);
+    }
   }
 
   dispose() {
     this.removeClasses([Classes.HIDDEN, Classes.VISIBLE, Classes.SHUFFLE_ITEM]);
 
     this.element.removeAttribute('style');
+    // @ts-expect-error nullifying for garbage collection
     this.element = null;
   }
 }
@@ -115,5 +130,3 @@ ShuffleItem.Scale = {
   VISIBLE: 1,
   HIDDEN: 0.001,
 };
-
-export default ShuffleItem;

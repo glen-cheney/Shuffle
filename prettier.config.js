@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   printWidth: 120,
   trailingComma: 'all',
   semi: true,

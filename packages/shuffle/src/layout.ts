@@ -1,17 +1,15 @@
-import Point from './point';
-import Rect from './rect';
-import arrayMax from './array-max';
-import arrayMin from './array-min';
+import { Point } from './point';
+import { Rect } from './rect';
 
 /**
  * Determine the number of columns an items spans.
- * @param {number} itemWidth Width of the item.
- * @param {number} columnWidth Width of the column (includes gutter).
- * @param {number} columns Total number of columns
- * @param {number} threshold A buffer value for the size of the column to fit.
- * @return {number}
+ * @param itemWidth Width of the item.
+ * @param columnWidth Width of the column (includes gutter).
+ * @param columns Total number of columns.
+ * @param threshold A buffer value for the size of the column to fit.
+ * @return The column span.
  */
-export function getColumnSpan(itemWidth, columnWidth, columns, threshold) {
+export function getColumnSpan(itemWidth: number, columnWidth: number, columns: number, threshold: number): number {
   let columnSpan = itemWidth / columnWidth;
 
   // If the difference between the rounded column span number and the
@@ -28,11 +26,12 @@ export function getColumnSpan(itemWidth, columnWidth, columns, threshold) {
 
 /**
  * Retrieves the column set to use for placement.
- * @param {number} columnSpan The number of columns this current item spans.
- * @param {number} columns The total columns in the grid.
- * @return {Array.<number>} An array of numbers representing the column set.
+ * @param positions The position array.
+ * @param columnSpan The number of columns this current item spans.
+ * @param columns The total columns in the grid.
+ * @return An array of numbers representing the column set.
  */
-export function getAvailablePositions(positions, columnSpan, columns) {
+export function getAvailablePositions(positions: Array<number>, columnSpan: number, columns: number): Array<number> {
   // The item spans only one column.
   if (columnSpan === 1) {
     return positions;
@@ -65,7 +64,7 @@ export function getAvailablePositions(positions, columnSpan, columns) {
   // For how many possible positions for this item there are.
   for (let i = 0; i <= columns - columnSpan; i++) {
     // Find the bigger value for each place it could fit.
-    available.push(arrayMax(positions.slice(i, i + columnSpan)));
+    available.push(Math.max(...positions.slice(i, i + columnSpan)));
   }
 
   return available;
@@ -74,13 +73,12 @@ export function getAvailablePositions(positions, columnSpan, columns) {
 /**
  * Find index of short column, the first from the left where this item will go.
  *
- * @param {Array.<number>} positions The array to search for the smallest number.
- * @param {number} buffer Optional buffer which is very useful when the height
- *     is a percentage of the width.
- * @return {number} Index of the short column.
+ * @param positions The array to search for the smallest number.
+ * @param buffer Optional buffer which is very useful when the height is a percentage of the width.
+ * @return Index of the short column.
  */
-export function getShortColumn(positions, buffer) {
-  const minPosition = arrayMin(positions);
+export function getShortColumn(positions: Array<number>, buffer: number): number {
+  const minPosition = Math.min(...positions);
   for (let i = 0, len = positions.length; i < len; i++) {
     if (positions[i] >= minPosition - buffer && positions[i] <= minPosition + buffer) {
       return i;
@@ -90,17 +88,34 @@ export function getShortColumn(positions, buffer) {
   return 0;
 }
 
+interface ItemPositionParams {
+  /** Object with width and height. */
+  itemSize: { width: number; height: number };
+  /** Positions of the other current items. */
+  positions: Array<number>;
+  /** The column width or row height. */
+  gridSize: number;
+  /** The total number of columns or rows. */
+  total: number;
+  /** Buffer value for the column to fit. */
+  threshold: number;
+  /** Vertical buffer for the height of items. */
+  buffer: number;
+}
+
 /**
  * Determine the location of the next item, based on its size.
- * @param {Object} itemSize Object with width and height.
- * @param {Array.<number>} positions Positions of the other current items.
- * @param {number} gridSize The column width or row height.
- * @param {number} total The total number of columns or rows.
- * @param {number} threshold Buffer value for the column to fit.
- * @param {number} buffer Vertical buffer for the height of items.
- * @return {Point}
+ * @param params Object with itemSize, positions, gridSize, total, threshold, and buffer.
+ * @return The point position for the item.
  */
-export function getItemPosition({ itemSize, positions, gridSize, total, threshold, buffer }) {
+export function getItemPosition({
+  itemSize,
+  positions,
+  gridSize,
+  total,
+  threshold,
+  buffer,
+}: ItemPositionParams): Point {
   const span = getColumnSpan(itemSize.width, gridSize, total, threshold);
   const setY = getAvailablePositions(positions, span, total);
   const shortColumnIndex = getShortColumn(setY, buffer);
@@ -123,17 +138,17 @@ export function getItemPosition({ itemSize, positions, gridSize, total, threshol
  * This method attempts to center items. This method could potentially be slow
  * with a large number of items because it must place items, then check every
  * previous item to ensure there is no overlap.
- * @param {Array.<Rect>} itemRects Item data objects.
- * @param {number} containerWidth Width of the containing element.
- * @return {Array.<Point>}
+ * @param itemRects Item data objects.
+ * @param containerWidth Width of the containing element.
+ * @return An array of centered points.
  */
-export function getCenteredPositions(itemRects, containerWidth) {
-  const rowMap = {};
+export function getCenteredPositions(itemRects: Array<Rect>, containerWidth: number): Array<Point> {
+  const rowMap: Record<number, Array<Rect>> = {};
 
   // Populate rows by their offset because items could jump between rows like:
   // a   c
   //  bbb
-  itemRects.forEach((itemRect) => {
+  for (const itemRect of itemRects) {
     if (rowMap[itemRect.top]) {
       // Push the point to the last row array.
       rowMap[itemRect.top].push(itemRect);
@@ -141,16 +156,15 @@ export function getCenteredPositions(itemRects, containerWidth) {
       // Start of a new row.
       rowMap[itemRect.top] = [itemRect];
     }
-  });
+  }
 
   // For each row, find the end of the last item, then calculate
   // the remaining space by dividing it by 2. Then add that
   // offset to the x position of each point.
-  let rects = [];
-  const rows = [];
-  const centeredRows = [];
-  Object.keys(rowMap).forEach((key) => {
-    const itemRects = rowMap[key];
+  let rects: Array<Rect> = [];
+  const rows: Array<Array<Rect>> = [];
+  const centeredRows: Array<Array<Rect>> = [];
+  for (const itemRects of Object.values(rowMap)) {
     rows.push(itemRects);
     const lastItem = itemRects[itemRects.length - 1];
     const end = lastItem.left + lastItem.width;
@@ -159,7 +173,7 @@ export function getCenteredPositions(itemRects, containerWidth) {
     let finalRects = itemRects;
     let canMove = false;
     if (offset > 0) {
-      const newRects = [];
+      const newRects: Array<Rect> = [];
       canMove = itemRects.every((r) => {
         const newRect = new Rect(r.left + offset, r.top, r.width, r.height, r.id);
 
@@ -180,7 +194,7 @@ export function getCenteredPositions(itemRects, containerWidth) {
     // placement for this row will not overlap previous rows (row-spanning
     // elements could be in the way).
     if (!canMove) {
-      let intersectingRect;
+      let intersectingRect: Rect;
       const hasOverlap = itemRects.some((itemRect) =>
         rects.some((r) => {
           const intersects = Rect.intersects(itemRect, r);
@@ -200,7 +214,7 @@ export function getCenteredPositions(itemRects, containerWidth) {
 
     rects = rects.concat(finalRects);
     centeredRows.push(finalRects);
-  });
+  }
 
   // Reduce array of arrays to a single array of points.
   // https://stackoverflow.com/a/10865042/373422

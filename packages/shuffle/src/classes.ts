@@ -1,4 +1,4 @@
-export default {
+export const Classes = {
   BASE: 'shuffle',
   SHUFFLE_ITEM: 'shuffle-item',
   VISIBLE: 'shuffle-item--visible',

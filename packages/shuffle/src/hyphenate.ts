@@ -1,9 +1,9 @@
 /**
  * Hyphenates a javascript style string to a css one. For example:
  * MozBoxSizing -> -moz-box-sizing.
- * @param {string} str The string to hyphenate.
- * @return {string} The hyphenated string.
+ * @param str The string to hyphenate.
+ * @return The hyphenated string.
  */
-export default function hyphenate(str) {
+export function hyphenate(str: string): string {
   return str.replace(/([A-Z])/g, (str, m1) => `-${m1.toLowerCase()}`);
 }

@@ -1,7 +1,7 @@
-import getNumber from './get-number';
+import { getNumber } from './get-number';
 
-let value = null;
-export default () => {
+let value: boolean | null = null;
+export function testComputedSize() {
   if (value !== null) {
     return value;
   }
@@ -18,4 +18,4 @@ export default () => {
   element.removeChild(e);
 
   return value;
-};
+}

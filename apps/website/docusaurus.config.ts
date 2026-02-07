@@ -36,7 +36,7 @@ export default {
   markdown: {
     hooks: {
       onBrokenMarkdownLinks: 'warn',
-    }
+    },
   },
 
   themeConfig: {
