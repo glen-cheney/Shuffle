@@ -23,7 +23,6 @@ import { getNumberStyle } from './get-number-style';
 import { sorter } from './sorter';
 import { onTransitionEnd, cancelTransitionEnd } from './on-transition-end';
 import { getItemPosition, getColumnSpan, getAvailablePositions, getShortColumn, getCenteredPositions } from './layout';
-import { hyphenate } from './hyphenate';
 
 // Re-export types for backward compatibility
 export type {
@@ -389,7 +388,7 @@ class Shuffle extends TinyEmitter {
 
     // Allow users to transition other properties if they exist in the `before`
     // css mapping of the shuffle item.
-    const cssProps = Object.keys(ShuffleItem.Css.HIDDEN.before).map((k) => hyphenate(k));
+    const cssProps = Object.keys(ShuffleItem.Css.HIDDEN.before);
     const properties = positionProps.concat(cssProps).join();
 
     for (const item of items) {
