@@ -17,14 +17,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@babel/core": "^7.28.5",
-    "@babel/preset-env": "^7.28.5",
     "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^9.39.2",
-    "@rollup/plugin-babel": "^6.1.0",
-    "@rollup/plugin-commonjs": "^29.0.0",
-    "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-terser": "^0.4.4",
     "@types/sinon": "^21.0.0",
     "@vitest/coverage-v8": "^4.0.16",
     "eslint": "^9.39.2",
@@ -36,9 +30,9 @@
     "globals": "^16.5.0",
     "jsdom": "^27.3.0",
     "prettier": "^3.7.4",
-    "rollup": "^4.54.0",
     "sinon": "^21.0.1",
-    "turbo": "^2.7.1",
+    "tsdown": "^0.20.3",
+    "turbo": "^2.8.3",
     "typescript": "^5.9.3",
     "vitest": "^4.0.16"
   },
