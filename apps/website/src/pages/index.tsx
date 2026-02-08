@@ -6,7 +6,7 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import styles from './index.module.css';
 import HomepageFeatures from '../components/HomepageFeatures';
 
-function Logo() {
+const Logo: React.FC = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -91,9 +91,9 @@ function Logo() {
       />
     </svg>
   );
-}
+};
 
-function HomepageHeader() {
+const HomepageHeader: React.FC = () => {
   const { siteConfig } = useDocusaurusContext();
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
@@ -109,16 +109,17 @@ function HomepageHeader() {
       </div>
     </header>
   );
-}
+};
 
-export default function Home() {
-  const { siteConfig } = useDocusaurusContext();
+const Home: React.FC = () => {
   return (
-    <Layout title="Home" description={siteConfig.tagline}>
+    <Layout>
       <HomepageHeader />
       <main>
         <HomepageFeatures />
       </main>
     </Layout>
   );
-}
+};
+
+export default Home;

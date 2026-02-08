@@ -34,7 +34,14 @@ const features = [
   },
 ];
 
-function Feature({ Svg, SvgDark, title, description }) {
+interface FeatureProps {
+  Svg: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  SvgDark: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  title: string;
+  description: JSX.Element;
+}
+
+const Feature: React.FC<FeatureProps> = ({ Svg, SvgDark, title, description }) => {
   return (
     <div className={clsx('col col--4')}>
       <div className="text--center">
@@ -47,9 +54,9 @@ function Feature({ Svg, SvgDark, title, description }) {
       </div>
     </div>
   );
-}
+};
 
-export default function HomepageFeatures() {
+const HomepageFeatures: React.FC = () => {
   return (
     <section className={clsx(styles.features, 'padding-vert--lg')}>
       <div className="container">
@@ -62,4 +69,6 @@ export default function HomepageFeatures() {
       </div>
     </section>
   );
-}
+};
+
+export default HomepageFeatures;

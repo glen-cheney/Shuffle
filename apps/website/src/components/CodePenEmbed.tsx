@@ -3,7 +3,13 @@ import styles from './CodePenEmbed.module.css';
 
 const author = 'Glen Cheney';
 
-export function CodePenEmbed({ penTitle, penId, penUser }) {
+interface CodePenEmbedProps {
+  penTitle: string;
+  penId: string;
+  penUser: string;
+}
+
+export const CodePenEmbed: React.FC<CodePenEmbedProps> = ({ penTitle, penId, penUser }) => {
   return (
     <div>
       <iframe
@@ -14,6 +20,7 @@ export function CodePenEmbed({ penTitle, penId, penUser }) {
         src={`https://codepen.io/${penUser}/embed/${penId}?default-tab=result`}
         loading="eager"
         // eslint-disable-next-line react/no-unknown-property
+        // @ts-expect-error
         allowtransparency="true"
         allowFullScreen
       >
@@ -22,4 +29,4 @@ export function CodePenEmbed({ penTitle, penId, penUser }) {
       </iframe>
     </div>
   );
-}
+};

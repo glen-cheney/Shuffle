@@ -2689,7 +2689,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@docusaurus/module-type-aliases@npm:3.9.2":
+"@docusaurus/module-type-aliases@npm:3.9.2, @docusaurus/module-type-aliases@npm:^3.9.2":
   version: 3.9.2
   resolution: "@docusaurus/module-type-aliases@npm:3.9.2"
   dependencies:
@@ -3020,6 +3020,13 @@ __metadata:
     fs-extra: "npm:^11.1.1"
     tslib: "npm:^2.6.0"
   checksum: 10c0/543ee40933a8805357575c14d4fc8f8d504f6464796f5fa27ec13d8b0cec669617961edb206d5b74ba1d776d9486656fefdb1c777e2908cb1752ee6fbe28686c
+  languageName: node
+  linkType: hard
+
+"@docusaurus/tsconfig@npm:^3.9.2":
+  version: 3.9.2
+  resolution: "@docusaurus/tsconfig@npm:3.9.2"
+  checksum: 10c0/d46241cb488d60f785710ee24980aad394423eaf5f76b64b0d47158fcbe19dd68a886898db83b1b65de18dfeb6c27d78adc8f8c4451d1ac29cc9da009ed15cd4
   languageName: node
   linkType: hard
 
@@ -15060,6 +15067,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "shuffle-monorepo@workspace:."
   dependencies:
+    "@docusaurus/module-type-aliases": "npm:^3.9.2"
+    "@docusaurus/tsconfig": "npm:^3.9.2"
+    "@docusaurus/types": "npm:^3.9.2"
     "@eslint/eslintrc": "npm:^3.3.3"
     "@eslint/js": "npm:^9.39.2"
     "@types/sinon": "npm:^21.0.0"
