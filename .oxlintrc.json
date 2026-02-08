@@ -1,0 +1,90 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "typescript", "unicorn", "oxc", "import", "react", "jsx-a11y", "promise"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "warn",
+    "style": "warn",
+    "restriction": "warn",
+    "pedantic": "warn"
+  },
+  "rules": {
+    // Style
+    "eslint/capitalized-comments": "off",
+    "eslint/func-style": "off",
+    "eslint/id-length": ["warn", { "exceptions": ["i", "x", "y"] }],
+    "eslint/init-declarations": "off",
+    "eslint/max-params": "off",
+    "eslint/no-continue": "off",
+    "eslint/no-magic-numbers": "off",
+    "eslint/no-ternary": "off",
+    "eslint/sort-imports": "off",
+    "eslint/sort-keys": "off",
+    "import/exports-last": "off",
+    "import/group-exports": "off",
+    "import/no-named-export": "off",
+    "import/prefer-default-export": "off",
+    "promise/prefer-await-to-callbacks": "off",
+    "react/jsx-max-depth": "off",
+    "unicorn/no-null": "off",
+    "unicorn/no-array-method-this-argument": "off", // false positive with `filter` method on Shuffle.
+    "unicorn/no-array-callback-reference": "off", // false positive with `filter` method on Shuffle.
+
+    // Restriction
+    "eslint/no-undefined": "off",
+    "oxc/no-async-await": "off",
+    "oxc/no-optional-chaining": "off",
+    "oxc/no-rest-spread-properties": "off",
+    "typescript/no-non-null-assertion": "off",
+    "typescript/explicit-function-return-type": "off",
+    "import/no-relative-parent-imports": "off",
+    "react/jsx-filename-extension": ["error", { "extensions": [".tsx"] }],
+    "react/no-multi-comp": "off",
+    "typescript/no-explicit-any": "error",
+    "eslint/class-methods-use-this": ["warn", { "exceptMethods": ["getTransformedPositions"] }],
+    "typescript/explicit-module-boundary-types": "off", // Using isolatedDeclarations instead
+
+    // Pedantic
+    "eslint/max-lines-per-function": "off",
+    "eslint/max-lines": "off",
+    "eslint/max-statements": "off",
+    "import/max-dependencies": "off",
+    "unicorn/prefer-query-selector": "off",
+    "typescript/strict-boolean-expressions": "off"
+  },
+  "overrides": [
+    {
+      "files": ["*.test.{ts,tsx}"],
+      "plugins": ["vitest"]
+    }
+  ],
+  "settings": {
+    "jsx-a11y": {
+      "polymorphicPropName": null,
+      "components": {},
+      "attributes": {}
+    },
+    "react": {
+      "formComponents": [],
+      "linkComponents": [],
+      "version": null,
+      "componentWrapperFunctions": []
+    },
+    "jsdoc": {
+      "ignorePrivate": false,
+      "ignoreInternal": false,
+      "ignoreReplacesDocs": true,
+      "overrideReplacesDocs": true,
+      "augmentsExtendsReplacesDocs": false,
+      "implementsReplacesDocs": false,
+      "exemptDestructuredRootsFromChecks": false,
+      "tagNamePreference": {}
+    }
+  },
+  "env": {
+    "builtin": true
+  },
+  "globals": {},
+  "ignorePatterns": []
+}

@@ -4,6 +4,7 @@ import { themes } from 'prism-react-renderer';
 
 const { github: lightCodeTheme, dracula: darkCodeTheme } = themes;
 
+// oxlint-disable-next-line import/no-default-export
 export default {
   title: 'Shuffle.js',
   tagline: 'Categorize, sort, and filter a responsive grid of items',

@@ -31,7 +31,7 @@ export function getColumnSpan(itemWidth: number, columnWidth: number, columns: n
  * @param columns The total columns in the grid.
  * @return An array of numbers representing the column set.
  */
-export function getAvailablePositions(positions: Array<number>, columnSpan: number, columns: number): Array<number> {
+export function getAvailablePositions(positions: number[], columnSpan: number, columns: number): number[] {
   // The item spans only one column.
   if (columnSpan === 1) {
     return positions;
@@ -62,7 +62,7 @@ export function getAvailablePositions(positions: Array<number>, columnSpan: numb
   const available = [];
 
   // For how many possible positions for this item there are.
-  for (let i = 0; i <= columns - columnSpan; i++) {
+  for (let i = 0; i <= columns - columnSpan; i += 1) {
     // Find the bigger value for each place it could fit.
     available.push(Math.max(...positions.slice(i, i + columnSpan)));
   }
@@ -77,9 +77,9 @@ export function getAvailablePositions(positions: Array<number>, columnSpan: numb
  * @param buffer Optional buffer which is very useful when the height is a percentage of the width.
  * @return Index of the short column.
  */
-export function getShortColumn(positions: Array<number>, buffer: number): number {
+export function getShortColumn(positions: number[], buffer: number): number {
   const minPosition = Math.min(...positions);
-  for (let i = 0, len = positions.length; i < len; i++) {
+  for (let i = 0, len = positions.length; i < len; i += 1) {
     if (positions[i] >= minPosition - buffer && positions[i] <= minPosition + buffer) {
       return i;
     }
@@ -92,7 +92,7 @@ interface ItemPositionParams {
   /** Object with width and height. */
   itemSize: { width: number; height: number };
   /** Positions of the other current items. */
-  positions: Array<number>;
+  positions: number[];
   /** The column width or row height. */
   gridSize: number;
   /** The total number of columns or rows. */
@@ -127,7 +127,7 @@ export function getItemPosition({
   // e.g. before the update the columns could be [250, 0, 0, 0] for an item
   // which spans 2 columns. After it would be [250, itemHeight, itemHeight, 0].
   const setHeight = setY[shortColumnIndex] + itemSize.height;
-  for (let i = 0; i < span; i++) {
+  for (let i = 0; i < span; i += 1) {
     positions[shortColumnIndex + i] = setHeight;
   }
 
@@ -142,43 +142,50 @@ export function getItemPosition({
  * @param containerWidth Width of the containing element.
  * @return An array of centered points.
  */
-export function getCenteredPositions(itemRects: Array<Rect>, containerWidth: number): Array<Point> {
-  const rowMap: Record<number, Array<Rect>> = {};
+export function getCenteredPositions(itemRects: Rect[], containerWidth: number): Point[] {
+  const rowMap: Record<number, Rect[]> = {};
 
   // Populate rows by their offset because items could jump between rows like:
   // a   c
   //  bbb
   for (const itemRect of itemRects) {
-    if (rowMap[itemRect.top]) {
-      // Push the point to the last row array.
-      rowMap[itemRect.top].push(itemRect);
-    } else {
+    if (rowMap[itemRect.top] === undefined) {
       // Start of a new row.
       rowMap[itemRect.top] = [itemRect];
+    } else {
+      // Push the point to the last row array.
+      rowMap[itemRect.top].push(itemRect);
     }
   }
 
   // For each row, find the end of the last item, then calculate
   // the remaining space by dividing it by 2. Then add that
   // offset to the x position of each point.
-  let rects: Array<Rect> = [];
-  const rows: Array<Array<Rect>> = [];
-  const centeredRows: Array<Array<Rect>> = [];
+  const rects: Rect[] = [];
+  const rows: Rect[][] = [];
+  const centeredRows: Rect[][] = [];
   for (const itemRects of Object.values(rowMap)) {
     rows.push(itemRects);
-    const lastItem = itemRects[itemRects.length - 1];
+    const lastItem = itemRects.at(-1)!;
     const end = lastItem.left + lastItem.width;
     const offset = Math.round((containerWidth - end) / 2);
 
     let finalRects = itemRects;
     let canMove = false;
     if (offset > 0) {
-      const newRects: Array<Rect> = [];
-      canMove = itemRects.every((r) => {
-        const newRect = new Rect(r.left + offset, r.top, r.width, r.height, r.id);
+      const newRects: Rect[] = [];
+      // oxlint-disable-next-line no-loop-func
+      canMove = itemRects.every((comparisonRect) => {
+        const newRect = new Rect(
+          comparisonRect.left + offset,
+          comparisonRect.top,
+          comparisonRect.width,
+          comparisonRect.height,
+          comparisonRect.id,
+        );
 
         // Check all current rects to make sure none overlap.
-        const noOverlap = !rects.some((r) => Rect.intersects(newRect, r));
+        const noOverlap = !rects.some((rectangle) => Rect.intersects(newRect, rectangle));
 
         newRects.push(newRect);
         return noOverlap;
@@ -195,11 +202,12 @@ export function getCenteredPositions(itemRects: Array<Rect>, containerWidth: num
     // elements could be in the way).
     if (!canMove) {
       let intersectingRect: Rect;
+      // oxlint-disable-next-line no-loop-func
       const hasOverlap = itemRects.some((itemRect) =>
-        rects.some((r) => {
-          const intersects = Rect.intersects(itemRect, r);
+        rects.some((comparisonRect) => {
+          const intersects = Rect.intersects(itemRect, comparisonRect);
           if (intersects) {
-            intersectingRect = r;
+            intersectingRect = comparisonRect;
           }
           return intersects;
         }),
@@ -212,7 +220,7 @@ export function getCenteredPositions(itemRects: Array<Rect>, containerWidth: num
       }
     }
 
-    rects = rects.concat(finalRects);
+    rects.push(...finalRects);
     centeredRows.push(finalRects);
   }
 
@@ -222,6 +230,6 @@ export function getCenteredPositions(itemRects: Array<Rect>, containerWidth: num
   // Remove the wrapper object with index, map to a Point.
   return centeredRows
     .flat()
-    .sort((a, b) => a.id - b.id)
+    .toSorted((rowA, rowB) => rowA.id - rowB.id)
     .map((itemRect) => new Point(itemRect.left, itemRect.top));
 }

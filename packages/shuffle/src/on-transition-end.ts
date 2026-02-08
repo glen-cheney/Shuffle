@@ -1,3 +1,4 @@
+// oxlint-disable promise/prefer-await-to-callbacks
 type TransitionEventCallback = (event: TransitionEvent) => void;
 
 interface Transition {

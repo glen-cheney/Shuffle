@@ -10,27 +10,30 @@ export class Rect {
    * https://github.com/google/closure-library/blob/master/closure/goog/math/rect.js
    * @param x Left.
    * @param y Top.
-   * @param w Width.
-   * @param h Height.
+   * @param width Width.
+   * @param height Height.
    * @param id Identifier.
    */
-  constructor(x: number, y: number, w: number, h: number, id: number) {
+  constructor(x: number, y: number, width: number, height: number, id: number) {
     this.id = id;
     this.left = x;
     this.top = y;
-    this.width = w;
-    this.height = h;
+    this.width = width;
+    this.height = height;
   }
 
   /**
    * Returns whether two rectangles intersect.
-   * @param a A rectangle.
-   * @param b A rectangle.
+   * @param rectA A rectangle.
+   * @param rectB A rectangle.
    * @return Whether a and b intersect.
    */
-  static intersects(a: Rect, b: Rect): boolean {
+  static intersects(rectA: Rect, rectB: Rect): boolean {
     return (
-      a.left < b.left + b.width && b.left < a.left + a.width && a.top < b.top + b.height && b.top < a.top + a.height
+      rectA.left < rectB.left + rectB.width &&
+      rectB.left < rectA.left + rectA.width &&
+      rectA.top < rectB.top + rectB.height &&
+      rectB.top < rectA.top + rectA.height
     );
   }
 }

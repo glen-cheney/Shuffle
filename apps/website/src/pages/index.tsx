@@ -1,102 +1,100 @@
 import React from 'react';
-import clsx from 'clsx';
+import cx from 'clsx';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import styles from './index.module.css';
-import HomepageFeatures from '../components/HomepageFeatures';
+import HomepageFeatures from '../components/homepage-features';
 
-const Logo: React.FC = () => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fillRule="evenodd"
-      strokeLinejoin="round"
-      strokeMiterlimit="1.414"
-      clipRule="evenodd"
-      viewBox="0 0 32 32"
-      width="100"
-      height="100"
-      className={styles.logo}
-    >
-      <rect
-        className={clsx(styles.rect, styles.rect1)}
-        id="shuffle-rect-1"
-        x="2"
-        y="2"
-        width="8"
-        height="18"
-        fill="#2DCB71"
-        vectorEffect="non-scaling-stroke"
-      />
-      <rect
-        className={clsx(styles.rect, styles.rect2)}
-        id="shuffle-rect-2"
-        x="12"
-        y="2"
-        width="8"
-        height="8"
-        fill="#9B59B5"
-        vectorEffect="non-scaling-stroke"
-      />
-      <rect
-        className={clsx(styles.rect, styles.rect3)}
-        id="shuffle-rect-3"
-        x="22"
-        y="2"
-        width="8"
-        height="12"
-        fill="#F39B11"
-        vectorEffect="non-scaling-stroke"
-      />
-      <rect
-        className={clsx(styles.rect, styles.rect4)}
-        id="shuffle-rect-4"
-        x="2"
-        y="22"
-        width="8"
-        height="8"
-        fill="#E74B3B"
-        vectorEffect="non-scaling-stroke"
-      />
-      <rect
-        className={clsx(styles.rect, styles.rect5)}
-        id="shuffle-rect-5"
-        x="12"
-        y="12"
-        width="8"
-        height="8"
-        fill="#3397DB"
-        vectorEffect="non-scaling-stroke"
-      />
-      <rect
-        className={clsx(styles.rect, styles.rect6)}
-        id="shuffle-rect-6"
-        x="22"
-        y="16"
-        width="8"
-        height="4"
-        fill="#1ABB9B"
-        vectorEffect="non-scaling-stroke"
-      />
-      <rect
-        className={clsx(styles.rect, styles.rect7)}
-        id="shuffle-rect-7"
-        x="12"
-        y="22"
-        width="18"
-        height="8"
-        fill="#33495D"
-        vectorEffect="non-scaling-stroke"
-      />
-    </svg>
-  );
-};
+const Logo: React.FC = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fillRule="evenodd"
+    strokeLinejoin="round"
+    strokeMiterlimit="1.414"
+    clipRule="evenodd"
+    viewBox="0 0 32 32"
+    width="100"
+    height="100"
+    className={styles.logo}
+  >
+    <rect
+      className={cx(styles.rect, styles.rect1)}
+      id="shuffle-rect-1"
+      x="2"
+      y="2"
+      width="8"
+      height="18"
+      fill="#2DCB71"
+      vectorEffect="non-scaling-stroke"
+    />
+    <rect
+      className={cx(styles.rect, styles.rect2)}
+      id="shuffle-rect-2"
+      x="12"
+      y="2"
+      width="8"
+      height="8"
+      fill="#9B59B5"
+      vectorEffect="non-scaling-stroke"
+    />
+    <rect
+      className={cx(styles.rect, styles.rect3)}
+      id="shuffle-rect-3"
+      x="22"
+      y="2"
+      width="8"
+      height="12"
+      fill="#F39B11"
+      vectorEffect="non-scaling-stroke"
+    />
+    <rect
+      className={cx(styles.rect, styles.rect4)}
+      id="shuffle-rect-4"
+      x="2"
+      y="22"
+      width="8"
+      height="8"
+      fill="#E74B3B"
+      vectorEffect="non-scaling-stroke"
+    />
+    <rect
+      className={cx(styles.rect, styles.rect5)}
+      id="shuffle-rect-5"
+      x="12"
+      y="12"
+      width="8"
+      height="8"
+      fill="#3397DB"
+      vectorEffect="non-scaling-stroke"
+    />
+    <rect
+      className={cx(styles.rect, styles.rect6)}
+      id="shuffle-rect-6"
+      x="22"
+      y="16"
+      width="8"
+      height="4"
+      fill="#1ABB9B"
+      vectorEffect="non-scaling-stroke"
+    />
+    <rect
+      className={cx(styles.rect, styles.rect7)}
+      id="shuffle-rect-7"
+      x="12"
+      y="22"
+      width="18"
+      height="8"
+      fill="#33495D"
+      vectorEffect="non-scaling-stroke"
+    />
+  </svg>
+);
 
 const HomepageHeader: React.FC = () => {
   const { siteConfig } = useDocusaurusContext();
   return (
-    <header className={clsx('hero hero--primary', styles.heroBanner)}>
+    <header className={cx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
         <Logo />
         <h1 className="hero__title">{siteConfig.title}</h1>
@@ -111,15 +109,14 @@ const HomepageHeader: React.FC = () => {
   );
 };
 
-const Home: React.FC = () => {
-  return (
-    <Layout>
-      <HomepageHeader />
-      <main>
-        <HomepageFeatures />
-      </main>
-    </Layout>
-  );
-};
+const Home: React.FC = () => (
+  <Layout>
+    <HomepageHeader />
+    <main>
+      <HomepageFeatures />
+    </main>
+  </Layout>
+);
 
+// oxlint-disable-next-line import/no-default-export
 export default Home;

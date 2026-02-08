@@ -113,10 +113,11 @@ export interface SortOptions {
   reverse?: boolean;
 
   // Sorting function which gives you the element each shuffle item is using by default.
+  // oxlint-disable-next-line typescript/no-explicit-any
   by?: ((element: HTMLElement) => any) | null;
 
   // Custom sort function.
-  compare?: ((a: ShuffleItem, b: ShuffleItem) => number) | null;
+  compare?: ((itemA: ShuffleItem, itemB: ShuffleItem) => number) | null;
 
   // If true, this will skip the sorting and return a randomized order in the array.
   randomize?: boolean;
@@ -125,9 +126,7 @@ export interface SortOptions {
   key?: keyof ShuffleItem;
 }
 
-export interface InlineCssStyles {
-  [property: string]: string | number;
-}
+export type InlineCssStyles = Record<string, string | number>;
 
 export interface ShuffleItemCss {
   INITIAL: InlineCssStyles;
@@ -157,10 +156,10 @@ export interface LayoutEventType {
   type: 'shuffle:layout';
 }
 
-export type ShuffleEventMap = {
+export interface ShuffleEventMap {
   'shuffle:removed': RemovedEventType & { shuffle: Shuffle };
   'shuffle:layout': LayoutEventType & { shuffle: Shuffle };
-};
+}
 
 /**
  * Union of all event data types.
@@ -178,3 +177,14 @@ export type ShuffleEventCallback = (data: ShuffleEventData) => void;
  * Union of event types (without the shuffle property).
  */
 export type ShuffleEventType = RemovedEventType | LayoutEventType;
+
+export interface FilterSet {
+  visible: ShuffleItem[];
+  hidden: ShuffleItem[];
+}
+
+export interface QueueItem {
+  item: ShuffleItem;
+  styles: InlineCssStyles;
+  callback: () => void;
+}

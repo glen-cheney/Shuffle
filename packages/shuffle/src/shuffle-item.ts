@@ -1,6 +1,6 @@
 import { Point } from './point';
 import { Classes } from './classes';
-import { InlineCssStyles, ShuffleItemCss } from './types';
+import type { InlineCssStyles, ShuffleItemCss } from './types';
 
 let id = 0;
 
@@ -10,7 +10,7 @@ export class ShuffleItem {
   isRTL: boolean;
   isVisible: boolean;
   isHidden: boolean;
-  scale: number = 1;
+  scale = 1;
   point: Point = new Point();
 
   // Static properties
@@ -41,21 +41,21 @@ export class ShuffleItem {
     this.isHidden = false;
   }
 
-  show() {
+  show(): void {
     this.isVisible = true;
     this.element.classList.remove(Classes.HIDDEN);
     this.element.classList.add(Classes.VISIBLE);
     this.element.removeAttribute('aria-hidden');
   }
 
-  hide() {
+  hide(): void {
     this.isVisible = false;
     this.element.classList.remove(Classes.VISIBLE);
     this.element.classList.add(Classes.HIDDEN);
     this.element.setAttribute('aria-hidden', 'true');
   }
 
-  init() {
+  init(): void {
     this.addClasses([Classes.SHUFFLE_ITEM, Classes.VISIBLE]);
     this.applyCss(ShuffleItem.Css.INITIAL);
     this.applyCss(this.isRTL ? ShuffleItem.Css.DIRECTION.rtl : ShuffleItem.Css.DIRECTION.ltr);
@@ -63,26 +63,26 @@ export class ShuffleItem {
     this.point = new Point();
   }
 
-  addClasses(classes: string[]) {
+  addClasses(classes: string[]): void {
     for (const className of classes) {
       this.element.classList.add(className);
     }
   }
 
-  removeClasses(classes: string[]) {
+  removeClasses(classes: string[]): void {
     for (const className of classes) {
       this.element.classList.remove(className);
     }
   }
 
-  applyCss(obj: InlineCssStyles) {
+  applyCss(obj: InlineCssStyles): void {
     for (const [key, value] of Object.entries(obj)) {
       // @ts-expect-error shrug
       this.element.style[key] = String(value);
     }
   }
 
-  dispose() {
+  dispose(): void {
     this.removeClasses([Classes.HIDDEN, Classes.VISIBLE, Classes.SHUFFLE_ITEM]);
 
     this.element.removeAttribute('style');

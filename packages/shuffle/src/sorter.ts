@@ -8,15 +8,15 @@ import type { SortOptions } from './types';
  * @param array Array to shuffle.
  * @return Randomly sorted array.
  */
-function randomize<T>(array: T[]): T[] {
-  let n = array.length;
+function randomize<Item>(array: Item[]): Item[] {
+  let count = array.length;
 
-  while (n) {
-    n -= 1;
-    const i = Math.floor(Math.random() * (n + 1));
-    const temp = array[i];
-    array[i] = array[n];
-    array[n] = temp;
+  while (count) {
+    count -= 1;
+    const index = Math.floor(Math.random() * (count + 1));
+    const temp = array[index];
+    array[index] = array[count];
+    array[count] = temp;
   }
 
   return array;
@@ -46,12 +46,13 @@ const defaults = {
  * @param options Sorting options.
  * @return The sorted array.
  */
+// oxlint-disable-next-line max-lines-per-function, max-statements
 export function sorter(arr: ShuffleItem[], options?: SortOptions | null): ShuffleItem[] {
   const opts = { ...defaults, ...options };
-  const original = Array.from(arr);
+  const original = [...arr];
   let revert = false;
 
-  if (!arr.length) {
+  if (arr.length === 0) {
     return [];
   }
 
@@ -63,16 +64,21 @@ export function sorter(arr: ShuffleItem[], options?: SortOptions | null): Shuffl
   // If we don't have opts.by, default to DOM order
   if (typeof opts.by === 'function') {
     const sortBy = opts.by;
-    arr.sort((a, b) => {
+    // oxlint-disable-next-line max-statements
+    arr.sort((itemA, itemB) => {
       // Exit early if we already know we want to revert
       if (revert) {
         return 0;
       }
 
+      const itemAValue = itemA[opts.key];
+      const itemBValue = itemB[opts.key];
       // @ts-expect-error the key is dynamic, but we know it will be a valid key of ShuffleItem
-      const valA = sortBy(a[opts.key]);
-      // @ts-expect-error
-      const valB = sortBy(b[opts.key]);
+      // oxlint-disable-next-line typescript/no-unsafe-assignment
+      const valA = sortBy(itemAValue);
+      // @ts-expect-error dynamic key
+      // oxlint-disable-next-line typescript/no-unsafe-assignment
+      const valB = sortBy(itemBValue);
 
       // If both values are undefined, use the DOM order
       if (valA === undefined && valB === undefined) {

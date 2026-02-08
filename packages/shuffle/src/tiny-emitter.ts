@@ -1,39 +1,42 @@
+// oxlint-disable typescript/no-unsafe-assignment, typescript/no-unsafe-function-type, typescript/ban-types, typescript/no-explicit-any
 /**
  * @fileoverview copy of `tiny-emitter` on npm, but converted to ESM
  */
 
 export class TinyEmitter {
-  e?: Record<string, Array<{ fn: Function & { _?: Function }; ctx?: any }>>;
+  handlers?: Record<string, { fn: Function & { onceCb?: Function }; ctx?: any }[]>;
 
   on(event: string, callback: Function, ctx?: any): this {
-    var e = this.e || (this.e = {});
+    const handlers = this.handlers ?? (this.handlers = {});
 
-    (e[event] || (e[event] = [])).push({
+    (handlers[event] || (handlers[event] = [])).push({
       fn: callback,
-      ctx: ctx,
+      ctx,
     });
 
     return this;
   }
 
   once(event: string, callback: Function, ctx?: any): this {
-    var self = this;
+    // oxlint-disable-next-line typescript/no-this-alias, unicorn/no-this-assignment
+    const self = this;
     function listener() {
       self.off(event, listener);
+      // oxlint-disable-next-line prefer-rest-params
       callback.apply(ctx, arguments);
     }
 
-    listener._ = callback;
+    listener.onceCb = callback;
     return this.on(event, listener, ctx);
   }
 
   emit(event: string, ...args: any[]): this {
-    var data = args;
-    var evtArr = ((this.e || (this.e = {}))[event] || []).slice();
-    var i = 0;
-    var len = evtArr.length;
+    const data = args;
+    const evtArr = [...((this.handlers ?? (this.handlers = {}))[event] || [])];
+    let i = 0;
+    const len = evtArr.length;
 
-    for (i; i < len; i++) {
+    for (i; i < len; i += 1) {
       evtArr[i].fn.apply(evtArr[i].ctx, data);
     }
 
@@ -41,13 +44,15 @@ export class TinyEmitter {
   }
 
   off(event: string, callback?: Function): this {
-    var e = this.e || (this.e = {});
-    var evts = e[event];
-    var liveEvents = [];
+    const handlers = this.handlers ?? (this.handlers = {});
+    const evts = handlers[event];
+    const liveEvents = [];
 
     if (evts && callback) {
-      for (var i = 0, len = evts.length; i < len; i++) {
-        if (evts[i].fn !== callback && evts[i].fn._ !== callback) liveEvents.push(evts[i]);
+      for (let i = 0, len = evts.length; i < len; i += 1) {
+        if (evts[i].fn !== callback && evts[i].fn.onceCb !== callback) {
+          liveEvents.push(evts[i]);
+        }
       }
     }
 
@@ -55,7 +60,12 @@ export class TinyEmitter {
     // Suggested by https://github.com/lazd
     // Ref: https://github.com/scottcorgan/tiny-emitter/commit/c6ebfaa9bc973b33d110a84a307742b7cf94c953#commitcomment-5024910
 
-    liveEvents.length ? (e[event] = liveEvents) : delete e[event];
+    if (liveEvents.length > 0) {
+      handlers[event] = liveEvents;
+    } else {
+      // oxlint-disable-next-line typescript/no-dynamic-delete
+      delete handlers[event];
+    }
 
     return this;
   }

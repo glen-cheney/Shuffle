@@ -13,7 +13,7 @@ import { testComputedSize } from './computed-size';
 export function getNumberStyle(
   element: Element,
   style: keyof CSSStyleDeclaration,
-  styles: CSSStyleDeclaration = window.getComputedStyle(element, null),
+  styles: CSSStyleDeclaration = globalThis.getComputedStyle(element, null),
 ): number {
   let value = getNumber(styles[style]);
 

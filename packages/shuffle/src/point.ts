@@ -16,11 +16,11 @@ export class Point {
 
   /**
    * Whether two points are equal.
-   * @param a Point A.
-   * @param b Point B.
+   * @param pointA Point A.
+   * @param pointB Point B.
    * @return Whether the points are equal.
    */
-  static equals(a: Point, b: Point): boolean {
-    return a.x === b.x && a.y === b.y;
+  static equals(pointA: Point, pointB: Point): boolean {
+    return pointA.x === pointB.x && pointA.y === pointB.y;
   }
 }

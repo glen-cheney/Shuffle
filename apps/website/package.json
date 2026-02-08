@@ -11,7 +11,7 @@
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
-    "lint": "eslint src --ext=\".js,.jsx\"",
+    "lint": "oxlint --type-aware",
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids"
   },

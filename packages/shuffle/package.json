@@ -26,11 +26,11 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsdown",
-    "test": "npm run test:unit && npm run type-check",
+    "test": "npm run test:unit && npm run lint",
     "test:unit": "vitest",
     "test:watch": "vitest --watch",
-    "lint": "eslint src",
-    "type-check": "tsc --noEmit",
+    "lint": "oxlint --type-aware",
+    "type-check": "oxlint --type-aware --type-check",
     "watch": "tsdown --watch"
   },
   "repository": {

@@ -1,7 +1,7 @@
 import React from 'react';
-import clsx from 'clsx';
+import cx from 'clsx';
 
-import styles from './HomepageFeatures.module.css';
+import styles from './homepage-features.module.css';
 import responsiveSvg from '../../static/img/undraw-responsive-design.svg';
 import findSvg from '../../static/img/undraw-find-things.svg';
 import browsersSvg from '../../static/img/undraw-browsers.svg';
@@ -41,34 +41,31 @@ interface FeatureProps {
   description: JSX.Element;
 }
 
-const Feature: React.FC<FeatureProps> = ({ Svg, SvgDark, title, description }) => {
-  return (
-    <div className={clsx('col col--4')}>
-      <div className="text--center">
-        <SvgDark className={clsx(styles.featureSvg, styles.featureSvgDark)} />
-        <Svg className={clsx(styles.featureSvg, styles.featureSvgLight)} />
-      </div>
-      <div className="text--center padding-horiz--md">
-        <h3>{title}</h3>
-        <p>{description}</p>
+const Feature: React.FC<FeatureProps> = ({ Svg, SvgDark, title, description }) => (
+  <div className={cx('col col--4')}>
+    <div className="text--center">
+      <SvgDark className={cx(styles.featureSvg, styles.featureSvgDark)} />
+      <Svg className={cx(styles.featureSvg, styles.featureSvgLight)} />
+    </div>
+    <div className="text--center padding-horiz--md">
+      <h3>{title}</h3>
+      <p>{description}</p>
+    </div>
+  </div>
+);
+
+const HomepageFeatures: React.FC = () => (
+  <section className={cx(styles.features, 'padding-vert--lg')}>
+    <div className="container">
+      <div className="row">
+        {features.map((props) => (
+          // oxlint-disable-next-line react/jsx-props-no-spreading
+          <Feature key={props.title} {...props} />
+        ))}
       </div>
     </div>
-  );
-};
+  </section>
+);
 
-const HomepageFeatures: React.FC = () => {
-  return (
-    <section className={clsx(styles.features, 'padding-vert--lg')}>
-      <div className="container">
-        <div className="row">
-          {features.map((props) => (
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            <Feature key={props.title} {...props} />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
-
+// oxlint-disable-next-line import/no-default-export
 export default HomepageFeatures;

@@ -1,6 +1,5 @@
 # TODOs
 
-- Finish TS migration
 - Ask AI to check for all changes to create changelog.
 - Use private fields
 - Use a real demo on the homepage
