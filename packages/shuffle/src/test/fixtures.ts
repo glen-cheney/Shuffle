@@ -1,4 +1,5 @@
-export const regular = `
+export const fixtures = {
+  regular: `
 <div id="regular">
   <div class="item" data-age="21" id="item1" data-groups='["design", "red"]'>Person 1</div>
   <div class="item" data-age="50" id="item2" data-groups='["design", "blue"]'>Person 2</div>
@@ -11,9 +12,9 @@ export const regular = `
   <div class="item" data-age="28" id="item9" data-groups='["design", "red"]'>Person 9</div>
   <div class="item" data-age="25" id="item10" data-groups='["technology", "black"]'>Person 10</div>
 </div>
-`;
+`,
 
-export const delimiter = `
+  delimiter: `
 <div id="delimiter">
   <div class="item" id="item1" data-groups='design,red'>Person 1</div>
   <div class="item" id="item2" data-groups='design,blue'>Person 2</div>
@@ -26,4 +27,5 @@ export const delimiter = `
   <div class="item" id="item9" data-groups='design,red'>Person 9</div>
   <div class="item" id="item10" data-groups='technology,black'>Person 10</div>
 </div>
-`;
+`,
+};

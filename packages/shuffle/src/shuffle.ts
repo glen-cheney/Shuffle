@@ -21,7 +21,7 @@ import { Classes } from './classes';
 import { getNumberStyle } from './get-number-style';
 import { sorter } from './sorter';
 import { onTransitionEnd, cancelTransitionEnd } from './on-transition-end';
-import { getItemPosition, getColumnSpan, getAvailablePositions, getShortColumn, getCenteredPositions } from './layout';
+import { getItemPosition, getCenteredPositions } from './layout';
 import { disposeItems, initItems, styleImmediately, toggleFilterClasses } from './helpers';
 
 // Re-export types for backward compatibility
@@ -1188,13 +1188,6 @@ class Shuffle extends TinyEmitter {
 
   static Point: typeof Point = Point;
   static Rect: typeof Rect = Rect;
-
-  // Expose for testing. Hack at your own risk.
-  static __sorter: typeof sorter = sorter;
-  static __getColumnSpan: typeof getColumnSpan = getColumnSpan;
-  static __getAvailablePositions: typeof getAvailablePositions = getAvailablePositions;
-  static __getShortColumn: typeof getShortColumn = getShortColumn;
-  static __getCenteredPositions: typeof getCenteredPositions = getCenteredPositions;
 }
 
 // oxlint-disable-next-line import/no-default-export

@@ -10,6 +10,10 @@
     "pedantic": "warn"
   },
   "rules": {
+    // Suspicious
+    "typescript/no-unsafe-type-assertion": "off",
+    "import/no-named-as-default-member": "off",
+
     // Style
     "eslint/capitalized-comments": "off",
     "eslint/func-style": "off",
@@ -21,70 +25,49 @@
     "eslint/no-ternary": "off",
     "eslint/sort-imports": "off",
     "eslint/sort-keys": "off",
+    "import/consistent-type-specifier-style": "off",
     "import/exports-last": "off",
     "import/group-exports": "off",
     "import/no-named-export": "off",
     "import/prefer-default-export": "off",
+    "promise/avoid-new": "off",
     "promise/prefer-await-to-callbacks": "off",
     "react/jsx-max-depth": "off",
-    "unicorn/no-null": "off",
-    "unicorn/no-array-method-this-argument": "off", // false positive with `filter` method on Shuffle.
     "unicorn/no-array-callback-reference": "off", // false positive with `filter` method on Shuffle.
+    "unicorn/no-array-method-this-argument": "off", // false positive with `filter` method on Shuffle.
+    "unicorn/no-null": "off",
 
     // Restriction
+    "eslint/class-methods-use-this": ["warn", { "exceptMethods": ["getTransformedPositions"] }],
     "eslint/no-undefined": "off",
+    "import/no-relative-parent-imports": "off",
     "oxc/no-async-await": "off",
     "oxc/no-optional-chaining": "off",
     "oxc/no-rest-spread-properties": "off",
-    "typescript/no-non-null-assertion": "off",
-    "typescript/explicit-function-return-type": "off",
-    "import/no-relative-parent-imports": "off",
     "react/jsx-filename-extension": ["error", { "extensions": [".tsx"] }],
     "react/no-multi-comp": "off",
-    "typescript/no-explicit-any": "error",
-    "eslint/class-methods-use-this": ["warn", { "exceptMethods": ["getTransformedPositions"] }],
+    "typescript/explicit-function-return-type": "off",
     "typescript/explicit-module-boundary-types": "off", // Using isolatedDeclarations instead
+    "typescript/no-explicit-any": "error",
+    "typescript/no-non-null-assertion": "off",
+    "typescript/promise-function-async": "off",
 
     // Pedantic
     "eslint/max-lines-per-function": "off",
     "eslint/max-lines": "off",
     "eslint/max-statements": "off",
     "import/max-dependencies": "off",
-    "unicorn/prefer-query-selector": "off",
-    "typescript/strict-boolean-expressions": "off"
+    "typescript/strict-boolean-expressions": "off",
+    "unicorn/prefer-query-selector": "off"
   },
   "overrides": [
     {
       "files": ["*.test.{ts,tsx}"],
-      "plugins": ["vitest"]
+      "plugins": ["vitest"],
+      "rules": {
+        "vitest/prefer-to-be-falsy": "off",
+        "vitest/prefer-to-be-truthy": "off"
+      }
     }
-  ],
-  "settings": {
-    "jsx-a11y": {
-      "polymorphicPropName": null,
-      "components": {},
-      "attributes": {}
-    },
-    "react": {
-      "formComponents": [],
-      "linkComponents": [],
-      "version": null,
-      "componentWrapperFunctions": []
-    },
-    "jsdoc": {
-      "ignorePrivate": false,
-      "ignoreInternal": false,
-      "ignoreReplacesDocs": true,
-      "overrideReplacesDocs": true,
-      "augmentsExtendsReplacesDocs": false,
-      "implementsReplacesDocs": false,
-      "exemptDestructuredRootsFromChecks": false,
-      "tagNamePreference": {}
-    }
-  },
-  "env": {
-    "builtin": true
-  },
-  "globals": {},
-  "ignorePatterns": []
+  ]
 }

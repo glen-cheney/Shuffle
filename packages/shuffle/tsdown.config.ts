@@ -1,6 +1,6 @@
-import { defineConfig } from 'tsdown';
+import { defineConfig, type UserConfig } from 'tsdown';
 
-export default defineConfig({
+const config: UserConfig = defineConfig({
   entry: './src/shuffle.ts',
   format: 'esm',
   target: ['node24', 'es2024'],
@@ -9,3 +9,6 @@ export default defineConfig({
   dts: true,
   exports: true,
 });
+
+// oxlint-disable-next-line import/no-default-export
+export default config;

@@ -4,7 +4,5 @@
 - Use private fields
 - Use a real demo on the homepage
 - Switch prettier with oxfmt
-- Switch ESLint with type-aware oxlint
 - New simplified entry point that uses CSS `grid-lanes` (with view transitions?).
-- Split up tests into smaller ones
 - Migrate to Vitest browser mode

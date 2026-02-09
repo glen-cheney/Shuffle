@@ -48,6 +48,11 @@ const defaults = {
  */
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export function sorter(arr: ShuffleItem[], options?: SortOptions | null): ShuffleItem[] {
+  // Handle invalid input gracefully
+  if (!Array.isArray(arr)) {
+    return [];
+  }
+
   const opts = { ...defaults, ...options };
   const original = [...arr];
   let revert = false;
