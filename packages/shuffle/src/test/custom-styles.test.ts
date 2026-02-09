@@ -24,8 +24,7 @@ describe('shuffle custom styles', () => {
       expect(element.style.opacity).toBe('0');
     }
 
-    instance.value._layout(instance.value.items);
-    instance.value._processQueue();
+    instance.value.update();
 
     for (const { element } of instance.value.items) {
       expect(element.style.opacity).toBe('1');

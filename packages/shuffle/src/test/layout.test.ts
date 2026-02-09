@@ -1,8 +1,8 @@
-import { describe, expect } from 'vitest';
+import { describe, expect, vi } from 'vitest';
 
+import { test, childrenToArray } from './test-utils';
 import Shuffle from '../shuffle';
 import { getAvailablePositions, getCenteredPositions, getColumnSpan } from '../layout';
-import { test, childrenToArray } from './test-utils';
 
 describe('shuffle layout', () => {
   test('should be 3 columns with gutters', ({ fixture, instance }) => {
@@ -33,19 +33,20 @@ describe('shuffle layout', () => {
       child.style.height = '150px';
     }
 
-    instance.value = new Shuffle(fixture, {
-      columnWidth(containerWidth) {
-        expect(containerWidth).toBe(1000);
-        return 300;
-      },
-
-      gutterWidth() {
-        return 50;
-      },
+    const columnWidth = vi.fn((containerWidth: number) => {
+      expect(containerWidth).toBe(1000);
+      return 300;
     });
 
-    expect(instance.value._getGutterSize(1000)).toBe(50);
-    expect(instance.value._getColumnSize(1000, 50)).toBe(350);
+    const gutterWidth = vi.fn(() => 50);
+
+    instance.value = new Shuffle(fixture, {
+      columnWidth,
+      gutterWidth,
+    });
+
+    expect(columnWidth).toHaveBeenCalled();
+    expect(gutterWidth).toHaveBeenCalled();
     expect(instance.value.colWidth).toBe(350);
     expect(instance.value.cols).toBe(3);
     expect(instance.value.positions).toEqual([600, 450, 450]);
@@ -64,19 +65,20 @@ describe('shuffle layout', () => {
     children[5].style.width = '600px';
     children[6].style.width = '900px';
 
-    instance.value = new Shuffle(fixture, {
-      columnWidth(containerWidth) {
-        expect(containerWidth).toBe(1200);
-        return 300;
-      },
-
-      gutterWidth() {
-        return 0;
-      },
+    const columnWidth = vi.fn((containerWidth: number) => {
+      expect(containerWidth).toBe(1200);
+      return 300;
     });
 
-    expect(instance.value._getGutterSize(1200)).toBe(0);
-    expect(instance.value._getColumnSize(1200, 0)).toBe(300);
+    const gutterWidth = vi.fn(() => 0);
+
+    instance.value = new Shuffle(fixture, {
+      columnWidth,
+      gutterWidth,
+    });
+
+    expect(columnWidth).toHaveBeenCalled();
+    expect(gutterWidth).toHaveBeenCalled();
     expect(instance.value.colWidth).toBe(300);
     expect(instance.value.cols).toBe(4);
     expect(instance.value.positions).toEqual([40, 40, 30, 30]);
@@ -150,8 +152,9 @@ describe('shuffle layout', () => {
   test('should reset columns', ({ fixture, instance }) => {
     instance.value = new Shuffle(fixture);
 
-    // instance.cols will be > 0 in real browsers.
-    instance.value._resetCols();
+    instance.value.items = [];
+    instance.value.sortedItems = [];
+    instance.value.update({ recalculateSizes: false });
 
     const positions = Array.from({ length: instance.value.cols });
     for (let i = 0; i < instance.value.cols; i += 1) {

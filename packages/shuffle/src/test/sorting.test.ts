@@ -1,7 +1,7 @@
 import { describe, expect } from 'vitest';
 
-import Shuffle, { type SortOptions } from '../shuffle';
 import { test } from './test-utils';
+import Shuffle, { type SortOptions } from '../shuffle';
 
 describe('shuffle sorting', () => {
   test('can initialize sorted', ({ fixture, instance }) => {

@@ -20,8 +20,8 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Lint files
-        run: yarn run lint
+      - name: Lint & type-check
+        run: yarn run type-check
 
       - name: Build library and website
         run: yarn run build

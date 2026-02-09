@@ -1,7 +1,7 @@
 import { describe, expect } from 'vitest';
 
-import Shuffle from '../shuffle';
 import { test, childrenToArray } from './test-utils';
+import Shuffle from '../shuffle';
 
 describe('shuffle items', () => {
   describe('removing elements', () => {

@@ -1,7 +1,7 @@
 import { describe, expect, vi } from 'vitest';
 
+import { test, childrenToArray, createResizeObserverEntry, triggerResize } from './test-utils';
 import Shuffle from '../shuffle';
-import { test, childrenToArray, createResizeObserverEntry } from './test-utils';
 
 describe('shuffle lifecycle', () => {
   test('should destroy properly', ({ fixture, instance }) => {
@@ -25,19 +25,19 @@ describe('shuffle lifecycle', () => {
   test('should not update or shuffle when disabled or destroyed', ({ fixture, instance }) => {
     instance.value = new Shuffle(fixture);
     const update = vi.spyOn(instance.value, 'update');
-    const _filter = vi.spyOn(instance.value, '_filter');
+    const initialFilter = instance.value.lastFilter;
 
     instance.value.disable();
 
     instance.value.filter('design');
 
-    expect(_filter).not.toHaveBeenCalled();
+    expect(instance.value.lastFilter).toBe(initialFilter);
     expect(update).not.toHaveBeenCalled();
 
     instance.value.enable(false);
 
     instance.value.destroy();
-    instance.value._handleResizeCallback([createResizeObserverEntry(instance.value.containerWidth + 1)]);
+    triggerResize([createResizeObserverEntry(instance.value.containerWidth + 1)]);
     expect(update).not.toHaveBeenCalled();
   });
 
@@ -45,7 +45,7 @@ describe('shuffle lifecycle', () => {
     instance.value = new Shuffle(fixture);
     const update = vi.spyOn(instance.value, 'update');
 
-    instance.value._handleResizeCallback([createResizeObserverEntry(instance.value.containerWidth)]);
+    triggerResize([createResizeObserverEntry(instance.value.containerWidth)]);
 
     expect(update).not.toHaveBeenCalled();
   });
@@ -54,7 +54,7 @@ describe('shuffle lifecycle', () => {
     instance.value = new Shuffle(fixture);
     const update = vi.spyOn(instance.value, 'update');
 
-    instance.value._handleResizeCallback([createResizeObserverEntry(instance.value.containerWidth + 1)]);
+    triggerResize([createResizeObserverEntry(instance.value.containerWidth + 1)]);
 
     await vi.waitFor(() => {
       expect(update).toHaveBeenCalled();

@@ -20,7 +20,7 @@ import type {
 import { Classes } from './classes';
 import { getNumberStyle } from './get-number-style';
 import { sorter } from './sorter';
-import { onTransitionEnd, cancelTransitionEnd } from './on-transition-end';
+import { createTransitionManager, type TransitionManager } from './transition-manager';
 import { getItemPosition, getCenteredPositions } from './layout';
 import { disposeItems, initItems, styleImmediately, toggleFilterClasses } from './helpers';
 
@@ -68,10 +68,10 @@ class Shuffle extends TinyEmitter {
   colWidth!: number;
   containerWidth!: number;
   positions!: number[];
-  _transitions: string[];
-  _queue: QueueItem[];
-  _rafId: number | null;
-  _resizeObserver: ResizeObserver | null = null;
+  #transitionManager: TransitionManager;
+  #queue: QueueItem[];
+  #rafId: number | null;
+  #resizeObserver: ResizeObserver | null = null;
 
   /**
    * Categorize, sort, and filter a responsive grid of items.
@@ -90,11 +90,11 @@ class Shuffle extends TinyEmitter {
     this.isEnabled = true;
     this.isDestroyed = false;
     this.isInitialized = false;
-    this._transitions = [];
+    this.#transitionManager = createTransitionManager();
     this.isTransitioning = false;
-    this._queue = [];
+    this.#queue = [];
 
-    const el = this._getElementOption(element);
+    const el = this.#getElementOption(element);
 
     if (!el) {
       throw new TypeError('Shuffle needs to be initialized with an element.');
@@ -104,10 +104,10 @@ class Shuffle extends TinyEmitter {
     this.id = `shuffle_${id}`;
     id += 1;
 
-    this.items = this._getItems();
+    this.items = this.#getItems();
     this.sortedItems = this.items;
 
-    this.sizer = this._getElementOption(this.options.sizer);
+    this.sizer = this.#getElementOption(this.options.sizer);
 
     // Add class and invalidate styles
     this.element.classList.add(Shuffle.Classes.BASE);
@@ -131,24 +131,19 @@ class Shuffle extends TinyEmitter {
     const containerWidth = Shuffle.getSize(this.element).width;
 
     // Add styles to the container if it doesn't have them.
-    this._validateStyles(containerCss);
+    this.#validateStyles(containerCss);
 
     // We already got the container's width above, no need to cause another
     // reflow getting it again... Calculate the number of columns there will be
-    this._setColumns(containerWidth);
+    this.#setColumns(containerWidth);
 
     // Kick off!
     this.filter(this.options.group, this.options.initialSort);
 
     // Bind resize events
-    this._rafId = null;
-    // This is true for all supported browsers, but just to be safe, avoid throwing
-    // an error if ResizeObserver is not present. You can manually add a window resize
-    // event and call `update()` if ResizeObserver is missing, or use Shuffle v5.
-    if ('ResizeObserver' in globalThis) {
-      this._resizeObserver = new ResizeObserver(this._handleResizeCallback.bind(this));
-      this._resizeObserver.observe(this.element);
-    }
+    this.#rafId = null;
+    this.#resizeObserver = new ResizeObserver(this.#handleResizeCallback.bind(this));
+    this.#resizeObserver.observe(this.element);
 
     // The shuffle items haven't had transitions set on them yet so the user
     // doesn't see the first layout. Set them now that the first layout is done.
@@ -204,9 +199,8 @@ class Shuffle extends TinyEmitter {
    * Retrieve an element from an option.
    * @param option The option to check.
    * @return The plain element or null.
-   * @private
    */
-  _getElementOption(option?: ElementOption | null): HTMLElement | null {
+  #getElementOption(option?: ElementOption | null): HTMLElement | null {
     // If column width is a string, treat is as a selector and search for the
     // sizer element within the outermost container
     if (typeof option === 'string') {
@@ -230,9 +224,8 @@ class Shuffle extends TinyEmitter {
   /**
    * Ensures the shuffle container has the css styles it needs applied to it.
    * @param styles Key value pairs for position and overflow.
-   * @private
    */
-  _validateStyles(styles: CSSStyleDeclaration): void {
+  #validateStyles(styles: CSSStyleDeclaration): void {
     // Position cannot be static.
     if (styles.position === 'static') {
       this.element.style.position = 'relative';
@@ -249,10 +242,9 @@ class Shuffle extends TinyEmitter {
    * @param category Category to filter by. If it's given, the last category will be used to filter the items.
    * @param collection Optionally filter a collection. Defaults to all the items.
    * @return Object with visible and hidden arrays.
-   * @private
    */
-  _filter(category: FilterArg = this.lastFilter, collection: ShuffleItem[] = this.items): FilterSet {
-    const set = this._getFilteredSets(category, collection);
+  #filter(category: FilterArg = this.lastFilter, collection: ShuffleItem[] = this.items): FilterSet {
+    const set = this.#getFilteredSets(category, collection);
 
     // Individually add/remove hidden/visible classes
     toggleFilterClasses(set);
@@ -273,9 +265,8 @@ class Shuffle extends TinyEmitter {
    * Returns an object containing the visible and hidden elements.
    * @param category Category or function to filter by.
    * @param items A collection of items to filter.
-   * @private
    */
-  _getFilteredSets(category: FilterArg, items: ShuffleItem[]): FilterSet {
+  #getFilteredSets(category: FilterArg, items: ShuffleItem[]): FilterSet {
     let visible: ShuffleItem[] = [];
     const hidden: ShuffleItem[] = [];
 
@@ -287,7 +278,7 @@ class Shuffle extends TinyEmitter {
       // whether to hide it or not.
     } else {
       for (const item of items) {
-        if (this._doesPassFilter(category, item.element)) {
+        if (this.#doesPassFilter(category, item.element)) {
           visible.push(item);
         } else {
           hidden.push(item);
@@ -306,9 +297,8 @@ class Shuffle extends TinyEmitter {
    * @param category Category or function to filter by.
    * @param element An element to test.
    * @return Whether it passes the category/filter.
-   * @private
    */
-  _doesPassFilter(category: FilterArg, element: HTMLElement): boolean {
+  #doesPassFilter(category: FilterArg, element: HTMLElement): boolean {
     if (typeof category === 'function') {
       return category.call(element, element, this);
     }
@@ -334,10 +324,9 @@ class Shuffle extends TinyEmitter {
 
   /**
    * Updates the visible item count.
-   * @private
    */
-  _updateItemCount(): void {
-    this.visibleItems = this._getFilteredItems().length;
+  #updateItemCount(): void {
+    this.visibleItems = this.#getFilteredItems().length;
   }
 
   /**
@@ -365,7 +354,7 @@ class Shuffle extends TinyEmitter {
     }
   }
 
-  _getItems(): ShuffleItem[] {
+  #getItems(): ShuffleItem[] {
     return (
       // oxlint-disable-next-line unicorn/prefer-spread `children` doesn't have `Symbol.iterator`
       Array.from(this.element.children)
@@ -379,7 +368,7 @@ class Shuffle extends TinyEmitter {
    * Combine the current items array with a new one and sort it by DOM order.
    * @param items Items to track.
    */
-  _mergeNewItems(items: ShuffleItem[]): ShuffleItem[] {
+  #mergeNewItems(items: ShuffleItem[]): ShuffleItem[] {
     // oxlint-disable-next-line unicorn/prefer-spread `children` doesn't have `Symbol.iterator`
     const children = Array.from(this.element.children);
     return sorter([...this.items, ...items], {
@@ -389,11 +378,11 @@ class Shuffle extends TinyEmitter {
     });
   }
 
-  _getFilteredItems(): ShuffleItem[] {
+  #getFilteredItems(): ShuffleItem[] {
     return this.items.filter((item) => item.isVisible);
   }
 
-  _getConcealedItems(): ShuffleItem[] {
+  #getConcealedItems(): ShuffleItem[] {
     return this.items.filter((item) => !item.isVisible);
   }
 
@@ -401,9 +390,8 @@ class Shuffle extends TinyEmitter {
    * Returns the column size, based on column width and sizer options.
    * @param containerWidth Size of the parent container.
    * @param gutterSize Size of the gutters.
-   * @private
    */
-  _getColumnSize(containerWidth: number, gutterSize: number): number {
+  #getColumnSize(containerWidth: number, gutterSize: number): number {
     let size;
 
     // If the columnWidth property is a function, then the grid is fluid
@@ -438,9 +426,8 @@ class Shuffle extends TinyEmitter {
   /**
    * Returns the gutter size, based on gutter width and sizer options.
    * @param containerWidth Size of the parent container.
-   * @private
    */
-  _getGutterSize(containerWidth: number): number {
+  #getGutterSize(containerWidth: number): number {
     if (typeof this.options.gutterWidth === 'function') {
       return this.options.gutterWidth(containerWidth);
     }
@@ -460,9 +447,9 @@ class Shuffle extends TinyEmitter {
    * Calculate the number of columns to be used. Gets css if using sizer element.
    * @param containerWidth Optionally specify a container width if it's already available.
    */
-  _setColumns(containerWidth: number = Shuffle.getSize(this.element).width): void {
-    const gutter = this._getGutterSize(containerWidth);
-    const columnWidth = this._getColumnSize(containerWidth, gutter);
+  #setColumns(containerWidth: number = Shuffle.getSize(this.element).width): void {
+    const gutter = this.#getGutterSize(containerWidth);
+    const columnWidth = this.#getColumnSize(containerWidth, gutter);
     let calculatedColumns = (containerWidth + gutter) / columnWidth;
     // TypeScript doesn't like comparing undefined to a number, but JS allows it
     // and always returns `false`.
@@ -482,15 +469,14 @@ class Shuffle extends TinyEmitter {
   /**
    * Adjust the height of the grid
    */
-  _setContainerSize(): void {
-    this.element.style.height = `${this._getContainerSize()}px`;
+  #setContainerSize(): void {
+    this.element.style.height = `${this.#getContainerSize()}px`;
   }
 
   /**
    * Based on the column heights, it returns the biggest one.
-   * @private
    */
-  _getContainerSize(): number {
+  #getContainerSize(): number {
     return Math.max(...this.positions);
   }
 
@@ -498,15 +484,14 @@ class Shuffle extends TinyEmitter {
    * Get the clamped stagger amount.
    * @param index Index of the item to be staggered.
    */
-  _getStaggerAmount(index: number): number {
+  #getStaggerAmount(index: number): number {
     return Math.min(index * this.options.staggerAmount!, this.options.staggerAmountMax!);
   }
 
   /**
    * Zeros out the y columns array, which is used to determine item placement.
-   * @private
    */
-  _resetCols(): void {
+  #resetCols(): void {
     let i = this.cols;
     this.positions = [];
     while (i) {
@@ -519,8 +504,8 @@ class Shuffle extends TinyEmitter {
    * Loops through each item that should be shown and calculates the x, y position.
    * @param items Array of items that will be shown/layed out in order in their array.
    */
-  _layout(items: ShuffleItem[]): void {
-    const itemPositions = this._getNextPositions(items);
+  #layout(items: ShuffleItem[]): void {
+    const itemPositions = this.#getNextPositions(items);
 
     let count = 0;
     for (let i = 0; i < items.length; i += 1) {
@@ -544,9 +529,9 @@ class Shuffle extends TinyEmitter {
       // Clone the object so that the `before` object isn't modified when the
       // transition delay is added.
       const styles = this.getStylesForTransition(item, ShuffleItem.Css.VISIBLE.before);
-      styles.transitionDelay = `${this._getStaggerAmount(count)}ms`;
+      styles.transitionDelay = `${this.#getStaggerAmount(count)}ms`;
 
-      this._queue.push({
+      this.#queue.push({
         item,
         styles,
         callback,
@@ -560,15 +545,14 @@ class Shuffle extends TinyEmitter {
    * Return an array of Point instances representing the future positions of
    * each item.
    * @param items Array of sorted shuffle items.
-   * @private
    */
-  _getNextPositions(items: ShuffleItem[]): Point[] {
+  #getNextPositions(items: ShuffleItem[]): Point[] {
     // If position data is going to be changed, add the item's size to the
     // transformer to allow for calculations.
     if (this.options.isCentered) {
       const itemsData = items.map((item, i) => {
         const itemSize = Shuffle.getSize(item.element, true);
-        const point = this._getItemPosition(itemSize);
+        const point = this.#getItemPosition(itemSize);
         return new Rect(point.x, point.y, itemSize.width, itemSize.height, i);
       });
 
@@ -577,15 +561,14 @@ class Shuffle extends TinyEmitter {
 
     // If no transforms are going to happen, simply return an array of the
     // future points of each item.
-    return items.map((item) => this._getItemPosition(Shuffle.getSize(item.element, true)));
+    return items.map((item) => this.#getItemPosition(Shuffle.getSize(item.element, true)));
   }
 
   /**
    * Determine the location of the next item, based on its size.
    * @param itemSize Object with width and height.
-   * @private
    */
-  _getItemPosition(itemSize: { width: number; height: number }): Point {
+  #getItemPosition(itemSize: { width: number; height: number }): Point {
     return getItemPosition({
       itemSize,
       positions: this.positions,
@@ -609,9 +592,8 @@ class Shuffle extends TinyEmitter {
   /**
    * Hides the elements that don't match our filter.
    * @param collection Collection to shrink.
-   * @private
    */
-  _shrink(collection: ShuffleItem[] = this._getConcealedItems()): void {
+  #shrink(collection: ShuffleItem[] = this.#getConcealedItems()): void {
     let count = 0;
     for (const item of collection) {
       const callback = () => {
@@ -634,9 +616,9 @@ class Shuffle extends TinyEmitter {
       item.isHidden = true;
 
       const styles = this.getStylesForTransition(item, ShuffleItem.Css.HIDDEN.before);
-      styles.transitionDelay = `${this._getStaggerAmount(count)}ms`;
+      styles.transitionDelay = `${this.#getStaggerAmount(count)}ms`;
 
-      this._queue.push({
+      this.#queue.push({
         item,
         styles,
         callback,
@@ -650,7 +632,7 @@ class Shuffle extends TinyEmitter {
    * Resize handler.
    * @param entries
    */
-  _handleResizeCallback(entries: ResizeObserverEntry[]): void {
+  #handleResizeCallback(entries: ResizeObserverEntry[]): void {
     // If shuffle is disabled, destroyed, don't do anything.
     // You can still manually force a shuffle update with shuffle.update({ force: true }).
     if (!this.isEnabled || this.isDestroyed) {
@@ -660,9 +642,9 @@ class Shuffle extends TinyEmitter {
     for (const entry of entries) {
       if (Math.round(entry.contentRect.width) !== Math.round(this.containerWidth)) {
         // If there was already an animation waiting, cancel it.
-        cancelAnimationFrame(this._rafId!);
+        cancelAnimationFrame(this.#rafId!);
         // Offload updating the DOM until the browser is ready.
-        this._rafId = requestAnimationFrame(() => {
+        this.#rafId = requestAnimationFrame(() => {
           this.update();
         });
       }
@@ -703,17 +685,15 @@ class Shuffle extends TinyEmitter {
    * @param itemCallback Callback for the item.
    * @param done Callback to notify `parallel` that this one is done.
    */
-  _whenTransitionDone(
+  #whenTransitionDone(
     element: HTMLElement,
     itemCallback: () => void,
     done: (err: null, evt: TransitionEvent) => void,
   ): void {
-    const id = onTransitionEnd(element, (evt) => {
+    this.#transitionManager.waitForTransition(element, (evt) => {
       itemCallback();
       done(null, evt);
     });
-
-    this._transitions.push(id);
   }
 
   /**
@@ -721,74 +701,76 @@ class Shuffle extends TinyEmitter {
    * when (if) the transition finishes.
    * @param opts Transition object.
    */
-  _getTransitionFunction(opts: QueueItem): (done: (err: null, evt: TransitionEvent) => void) => void {
+  #getTransitionFunction(opts: QueueItem): (done: (err: null, evt: TransitionEvent) => void) => void {
     return (done) => {
       opts.item.applyCss(opts.styles);
-      this._whenTransitionDone(opts.item.element, opts.callback, done);
+      this.#whenTransitionDone(opts.item.element, opts.callback, done);
     };
   }
 
   /**
    * Execute the styles gathered in the style queue. This applies styles to elements,
    * triggering transitions.
-   * @private
    */
-  _processQueue(): void {
+  #processQueue(): void {
     if (this.isTransitioning) {
-      this._cancelMovement();
+      this.#cancelMovement();
     }
 
     const hasSpeed = typeof this.options.speed === 'number' && this.options.speed > 0;
-    const hasQueue = this._queue.length > 0;
+    const hasQueue = this.#queue.length > 0;
 
     if (hasQueue && hasSpeed && this.isInitialized) {
-      this._startTransitions(this._queue);
+      this.#startTransitions(this.#queue);
     } else if (hasQueue) {
-      styleImmediately(this._queue);
-      this.emit(Shuffle.EventType.LAYOUT, { type: Shuffle.EventType.LAYOUT, shuffle: this });
+      styleImmediately(this.#queue);
+      this.emit(Shuffle.EventType.LAYOUT, {
+        type: Shuffle.EventType.LAYOUT,
+        shuffle: this,
+      });
 
       // A call to layout happened, but none of the newly visible items will
       // change position or the transition duration is zero, which will not trigger
       // the transitionend event.
     } else {
-      this.emit(Shuffle.EventType.LAYOUT, { type: Shuffle.EventType.LAYOUT, shuffle: this });
+      this.emit(Shuffle.EventType.LAYOUT, {
+        type: Shuffle.EventType.LAYOUT,
+        shuffle: this,
+      });
     }
 
     // Remove everything in the style queue
-    this._queue.length = 0;
+    this.#queue.length = 0;
   }
 
   /**
    * Wait for each transition to finish, the emit the layout event.
    * Array of transition objects.
    */
-  _startTransitions(transitions: QueueItem[]): void {
+  #startTransitions(transitions: QueueItem[]): void {
     // Set flag that shuffle is currently in motion.
     this.isTransitioning = true;
 
     // Create an array of functions to be called.
-    const callbacks = transitions.map((obj) => this._getTransitionFunction(obj));
+    const callbacks = transitions.map((obj) => this.#getTransitionFunction(obj));
 
-    parallel(callbacks, this._movementFinished.bind(this));
+    parallel(callbacks, this.#movementFinished.bind(this));
   }
 
-  _cancelMovement(): void {
+  #cancelMovement(): void {
     // Remove the transition end event for each listener.
-    for (const transition of this._transitions) {
-      cancelTransitionEnd(transition);
-    }
-
-    // Reset the array.
-    this._transitions.length = 0;
+    this.#transitionManager.cancelAll();
 
     // Show it's no longer active.
     this.isTransitioning = false;
   }
 
-  _movementFinished(): void {
-    this._transitions.length = 0;
+  #movementFinished(): void {
     this.isTransitioning = false;
-    this.emit(Shuffle.EventType.LAYOUT, { type: Shuffle.EventType.LAYOUT, shuffle: this });
+    this.emit(Shuffle.EventType.LAYOUT, {
+      type: Shuffle.EventType.LAYOUT,
+      shuffle: this,
+    });
   }
 
   /**
@@ -806,13 +788,13 @@ class Shuffle extends TinyEmitter {
       category = Shuffle.ALL_ITEMS;
     }
 
-    this._filter(category);
+    this.#filter(category);
 
     // Shrink each hidden item
-    this._shrink();
+    this.#shrink();
 
     // How many visible elements?
-    this._updateItemCount();
+    this.#updateItemCount();
 
     // Update transforms on visible elements so they will animate to their new positions.
     this.sort(sortOptions);
@@ -827,19 +809,19 @@ class Shuffle extends TinyEmitter {
       return;
     }
 
-    this._resetCols();
+    this.#resetCols();
 
-    const items = sorter(this._getFilteredItems(), sortOptions);
+    const items = sorter(this.#getFilteredItems(), sortOptions);
     this.sortedItems = items;
 
-    this._layout(items);
+    this.#layout(items);
 
-    // `_layout` always happens after `_shrink`, so it's safe to process the style
+    // `#layout` always happens after `#shrink`, so it's safe to process the style
     // queue here with styles from the shrink method.
-    this._processQueue();
+    this.#processQueue();
 
     // Adjust the height of the container.
-    this._setContainerSize();
+    this.#setContainerSize();
 
     this.lastSort = sortOptions;
   }
@@ -851,10 +833,16 @@ class Shuffle extends TinyEmitter {
    * @param options.force By default, `update` does nothing if the instance is disabled. Setting this
    *    to true forces the update to happen regardless.
    */
-  update({ recalculateSizes = true, force = false }: { recalculateSizes?: boolean; force?: boolean } = {}): void {
+  update({
+    recalculateSizes = true,
+    force = false,
+  }: {
+    recalculateSizes?: boolean;
+    force?: boolean;
+  } = {}): void {
     if (this.isEnabled || force) {
       if (recalculateSizes) {
-        this._setColumns();
+        this.#setColumns();
       }
 
       // Layout items
@@ -885,15 +873,15 @@ class Shuffle extends TinyEmitter {
     initItems(items);
 
     // Determine which items will go with the current filter.
-    this._resetCols();
+    this.#resetCols();
 
-    const allItems = this._mergeNewItems(items);
+    const allItems = this.#mergeNewItems(items);
     const sortedItems = sorter(allItems, this.lastSort);
-    const allSortedItemsSet = this._filter(this.lastFilter, sortedItems);
+    const allSortedItemsSet = this.#filter(this.lastFilter, sortedItems);
 
     // Layout all items again so that new items get positions.
     // Synchronously apply positions.
-    const itemPositions = this._getNextPositions(allSortedItemsSet.visible);
+    const itemPositions = this.#getNextPositions(allSortedItemsSet.visible);
     for (let i = 0; i < allSortedItemsSet.visible.length; i += 1) {
       const item = allSortedItemsSet.visible[i];
       if (items.includes(item)) {
@@ -917,7 +905,7 @@ class Shuffle extends TinyEmitter {
     this.setItemTransitions(items);
 
     // Update the list of items.
-    this.items = this._mergeNewItems(items);
+    this.items = this.#mergeNewItems(items);
 
     // Update layout/visibility of new and old items.
     this.filter(this.lastFilter);
@@ -963,7 +951,11 @@ class Shuffle extends TinyEmitter {
         element.remove();
       }
 
-      this.emit(Shuffle.EventType.REMOVED, { type: Shuffle.EventType.REMOVED, shuffle: this, collection });
+      this.emit(Shuffle.EventType.REMOVED, {
+        type: Shuffle.EventType.REMOVED,
+        shuffle: this,
+        collection,
+      });
     };
 
     // Hide collection first.
@@ -972,14 +964,14 @@ class Shuffle extends TinyEmitter {
       hidden: oldItems,
     });
 
-    this._shrink(oldItems);
+    this.#shrink(oldItems);
 
     this.sort();
 
     // Update the list of items here because `remove` could be called again
     // with an item that is in the process of being removed.
     this.items = this.items.filter((item) => !oldItems.includes(item));
-    this._updateItemCount();
+    this.#updateItemCount();
 
     this.once(Shuffle.EventType.LAYOUT, handleLayout);
   }
@@ -1003,7 +995,7 @@ class Shuffle extends TinyEmitter {
     this.isInitialized = false;
 
     // Find new items in the DOM.
-    this.items = this._getItems();
+    this.items = this.#getItems();
 
     // Set initial styles on the new items.
     initItems(this.items);
@@ -1022,10 +1014,10 @@ class Shuffle extends TinyEmitter {
    * Destroys shuffle, removes events, styles, and classes
    */
   destroy(): void {
-    this._cancelMovement();
-    if (this._resizeObserver) {
-      this._resizeObserver.unobserve(this.element);
-      this._resizeObserver = null;
+    this.#cancelMovement();
+    if (this.#resizeObserver) {
+      this.#resizeObserver.unobserve(this.element);
+      this.#resizeObserver = null;
     }
 
     // Reset container styles
@@ -1037,7 +1029,6 @@ class Shuffle extends TinyEmitter {
 
     this.items.length = 0;
     this.sortedItems.length = 0;
-    this._transitions.length = 0;
 
     // Null DOM references
     this.sizer = null;

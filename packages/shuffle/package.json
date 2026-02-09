@@ -26,8 +26,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsdown",
-    "test": "npm run test:unit && npm run lint",
-    "test:unit": "vitest",
+    "test": "vitest run",
     "test:watch": "vitest --watch",
     "lint": "oxlint --type-aware",
     "type-check": "oxlint --type-aware --type-check",

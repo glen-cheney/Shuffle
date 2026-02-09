@@ -1,7 +1,7 @@
 import { describe, expect } from 'vitest';
 
-import Shuffle from '../shuffle';
 import { test } from './test-utils';
+import Shuffle from '../shuffle';
 
 describe('shuffle init', () => {
   test('should have default options', ({ fixture, instance }) => {
@@ -44,15 +44,22 @@ describe('shuffle init', () => {
   });
 
   test('can get an element option', ({ fixture, instance }) => {
-    instance.value = new Shuffle(fixture);
-    const first = fixture.firstElementChild;
+    const first = fixture.firstElementChild as HTMLElement;
 
-    expect(instance.value._getElementOption(first)).toBe(first);
-    expect(instance.value._getElementOption('#item1')).toBe(first);
-    expect(instance.value._getElementOption('#hello-world')).toBeNull();
-    expect(instance.value._getElementOption(null)).toBeNull();
-    expect(instance.value._getElementOption()).toBeNull();
+    instance.value = new Shuffle(fixture, { sizer: first });
+    expect(instance.value.sizer).toBe(first);
+
+    instance.value = new Shuffle(fixture, { sizer: '#item1' });
+    expect(instance.value.sizer).toBe(first);
+
+    instance.value = new Shuffle(fixture, { sizer: '#hello-world' });
+    expect(instance.value.sizer).toBeNull();
+
+    instance.value = new Shuffle(fixture, { sizer: null });
+    expect(instance.value.sizer).toBeNull();
+
     // @ts-expect-error not an allowed type.
-    expect(instance.value._getElementOption(() => first)).toBeNull();
+    instance.value = new Shuffle(fixture, { sizer: () => first });
+    expect(instance.value.sizer).toBeNull();
   });
 });

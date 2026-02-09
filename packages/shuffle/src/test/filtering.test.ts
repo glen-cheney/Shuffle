@@ -1,7 +1,7 @@
 import { describe, expect } from 'vitest';
 
-import Shuffle from '../shuffle';
 import { test, createTest, getById, toHtmlElement } from './test-utils';
+import Shuffle from '../shuffle';
 
 describe('shuffle filtering', () => {
   describe('regular fixture', () => {
@@ -66,31 +66,56 @@ describe('shuffle filtering', () => {
     });
 
     test('can test elements against filters', ({ fixture, instance }) => {
-      instance.value = new Shuffle(fixture);
+      instance.value = new Shuffle(fixture, { speed: 0 });
 
       const first = toHtmlElement(fixture.firstElementChild);
-      expect(instance.value._doesPassFilter('design', first)).toBe(true);
-      expect(instance.value._doesPassFilter('black', first)).toBe(false);
 
-      expect(
-        instance.value._doesPassFilter((element) => {
-          expect(element).toBeDefined();
-          return element.dataset.age === '21';
-        }, first),
-      ).toBe(true);
+      instance.value.filter('design');
+      // First item is in the "design" group, so it should be visible.
+      expect(first.classList.contains(Shuffle.Classes.VISIBLE)).toBe(true);
 
-      expect(instance.value._doesPassFilter((element) => element.dataset.age === '22', first)).toBe(false);
+      instance.value.filter('black');
+      // First item is not black, so it should be hidden.
+      expect(first.classList.contains(Shuffle.Classes.HIDDEN)).toBe(true);
+
+      instance.value.filter((element) => {
+        expect(element).toBeDefined();
+        return element.dataset.age === '21';
+      });
+      // First item has age 21, so it matches the filter and should be visible.
+      expect(first.classList.contains(Shuffle.Classes.VISIBLE)).toBe(true);
+
+      instance.value.filter((element) => element.dataset.age === '22');
+      // First item has age 21, not 22, so it should be hidden.
+      expect(first.classList.contains(Shuffle.Classes.HIDDEN)).toBe(true);
 
       // Arrays.
-      expect(instance.value._doesPassFilter(['design'], first)).toBe(true);
-      expect(instance.value._doesPassFilter(['red'], first)).toBe(true);
-      expect(instance.value._doesPassFilter(['design', 'black'], first)).toBe(true);
+      instance.value.filter(['design']);
+      // First item is in the "design" group, so it should be visible.
+      expect(first.classList.contains(Shuffle.Classes.VISIBLE)).toBe(true);
+
+      instance.value.filter(['red']);
+      // First item is red, so it should be visible.
+      expect(first.classList.contains(Shuffle.Classes.VISIBLE)).toBe(true);
+
+      instance.value.filter(['design', 'black']);
+      // First item is in design group (ANY mode allows items matching any filter), so it should be visible.
+      expect(first.classList.contains(Shuffle.Classes.VISIBLE)).toBe(true);
 
       // Change filter mode.
       instance.value.options.filterMode = Shuffle.FilterMode.ALL;
-      expect(instance.value._doesPassFilter(['design'], first)).toBe(true);
-      expect(instance.value._doesPassFilter(['design', 'red'], first)).toBe(true);
-      expect(instance.value._doesPassFilter(['design', 'black'], first)).toBe(false);
+
+      instance.value.filter(['design']);
+      // First item is in the "design" group, so it should be visible.
+      expect(first.classList.contains(Shuffle.Classes.VISIBLE)).toBe(true);
+
+      instance.value.filter(['design', 'red']);
+      // First item is in design group AND is red (ALL mode requires matching all filters), so it should be visible.
+      expect(first.classList.contains(Shuffle.Classes.VISIBLE)).toBe(true);
+
+      instance.value.filter(['design', 'black']);
+      // First item is in design but not black (ALL mode requires matching all filters), so it should be hidden.
+      expect(first.classList.contains(Shuffle.Classes.HIDDEN)).toBe(true);
     });
   });
 
