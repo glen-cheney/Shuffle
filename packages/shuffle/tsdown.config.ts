@@ -7,7 +7,6 @@ const config: UserConfig = defineConfig({
   outDir: './dist',
   sourcemap: true,
   dts: true,
-  exports: true,
 });
 
 // oxlint-disable-next-line import/no-default-export

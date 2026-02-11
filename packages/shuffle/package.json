@@ -16,10 +16,13 @@
   ],
   "type": "module",
   "exports": {
-    ".": "./dist/shuffle.mjs",
+    ".": {
+      "types": "./dist/shuffle.d.mts",
+      "default": "./dist/shuffle.mjs"
+    },
     "./package.json": "./package.json"
   },
-  "types": "./dist/index.d.mts",
+  "types": "./dist/shuffle.d.mts",
   "files": [
     "dist"
   ],

@@ -10,7 +10,7 @@ npm install shufflejs
 
 [All found here][homepage]
 
-### Usage (with ES6)
+### Usage
 
 ```js
 import Shuffle from 'shufflejs';
