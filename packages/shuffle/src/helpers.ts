@@ -1,4 +1,4 @@
-import type { ShuffleItem } from './shuffle-item';
+import { ShuffleItem } from './shuffle-item';
 import type { FilterSet, QueueItem } from './types';
 
 /**
@@ -87,4 +87,13 @@ export function styleImmediately(objects: QueueItem[]): void {
       }
     });
   }
+}
+export function applyHiddenState(item: ShuffleItem): void {
+  item.scale = ShuffleItem.Scale.HIDDEN;
+  item.isHidden = true;
+  item.applyCss(ShuffleItem.Css.HIDDEN.before);
+  item.applyCss(ShuffleItem.Css.HIDDEN.after);
+}
+export function arrayUnique<Item>(items: Item[]): Item[] {
+  return [...new Set(items)];
 }

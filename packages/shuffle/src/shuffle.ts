@@ -22,7 +22,14 @@ import { getNumberStyle } from './get-number-style';
 import { sorter } from './sorter';
 import { createTransitionManager, type TransitionManager } from './transition-manager';
 import { getItemPosition, getCenteredPositions } from './layout';
-import { disposeItems, initItems, styleImmediately, toggleFilterClasses } from './helpers';
+import {
+  applyHiddenState,
+  arrayUnique,
+  disposeItems,
+  initItems,
+  styleImmediately,
+  toggleFilterClasses,
+} from './helpers';
 
 // Re-export types for backward compatibility
 export type {
@@ -34,17 +41,6 @@ export type {
   ShuffleEventData,
   ShuffleEventCallback,
 };
-
-function arrayUnique<Item>(items: Item[]): Item[] {
-  return [...new Set(items)];
-}
-
-function applyHiddenState(item: ShuffleItem) {
-  item.scale = ShuffleItem.Scale.HIDDEN;
-  item.isHidden = true;
-  item.applyCss(ShuffleItem.Css.HIDDEN.before);
-  item.applyCss(ShuffleItem.Css.HIDDEN.after);
-}
 
 // Used for unique instance variables
 let id = 0;
@@ -204,7 +200,7 @@ class Shuffle extends TinyEmitter {
     // If column width is a string, treat is as a selector and search for the
     // sizer element within the outermost container
     if (typeof option === 'string') {
-      return this.element.querySelector(option);
+      return this.element ? this.element.querySelector(option) : document.querySelector(option);
     }
 
     // Check for an element

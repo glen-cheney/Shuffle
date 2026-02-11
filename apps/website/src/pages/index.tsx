@@ -5,6 +5,7 @@ import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import styles from './index.module.css';
 import HomepageFeatures from '../components/homepage-features';
+import { HomepageDemo } from '../components/homepage-demo';
 
 const Logo: React.FC = () => (
   <svg
@@ -114,6 +115,7 @@ const Home: React.FC = () => (
     <HomepageHeader />
     <main>
       <HomepageFeatures />
+      <HomepageDemo />
     </main>
   </Layout>
 );
