@@ -1,5 +1,4 @@
-import type { ShuffleOptions } from './shuffle';
-import type { FilterModeOptions, ShuffleEventMap } from './types';
+import type { FilterModeOptions, ShuffleEventMap, ShuffleOptions } from './types';
 
 export const Classes = {
   BASE: 'shuffle',
