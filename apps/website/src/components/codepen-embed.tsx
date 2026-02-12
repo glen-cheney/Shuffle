@@ -14,14 +14,10 @@ export const CodePenEmbed: React.FC<CodePenEmbedProps> = ({ penTitle, penId, pen
     <iframe
       height={500}
       className={styles.iframe}
-      scrolling="no"
       title={penTitle}
       src={`https://codepen.io/${penUser}/embed/${penId}?default-tab=result`}
       loading="eager"
-      sandbox="allow-same-origin allow-forms"
-      // @ts-expect-error this is what I copied from CodePen?
-      // oxlint-disable-next-line react/no-unknown-property
-      allowtransparency="true"
+      sandbox="allow-forms allow-scripts"
       allowFullScreen
     >
       See the Pen <a href={`https://codepen.io/${penUser}/pen/${penId}`}>{penTitle}</a> by {author} (

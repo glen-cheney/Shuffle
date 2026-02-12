@@ -201,7 +201,7 @@ export const HomepageDemo: React.FC = () => {
 
                 <div className={styles.pictureItemDetails}>
                   <figcaption className={styles.pictureItemTitle}>
-                    <a href={item.url} target="_blank" rel="noopener">
+                    <a href={item.url} target="_blank" rel="noopener noreferrer">
                       {item.title}
                     </a>
                   </figcaption>

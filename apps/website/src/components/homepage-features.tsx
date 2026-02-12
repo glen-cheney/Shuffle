@@ -38,7 +38,7 @@ interface FeatureProps {
   Svg: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   SvgDark: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   title: string;
-  description: JSX.Element;
+  description: React.JSX.Element;
 }
 
 const Feature: React.FC<FeatureProps> = ({ Svg, SvgDark, title, description }) => (

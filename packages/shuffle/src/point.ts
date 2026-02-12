@@ -1,4 +1,4 @@
-import { getNumber } from './get-number';
+import { getNumber } from './helpers';
 
 export class Point {
   x: number;

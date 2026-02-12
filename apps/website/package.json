@@ -12,6 +12,7 @@
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
     "lint": "oxlint --type-aware",
+    "type-check": "oxlint --type-aware --type-check",
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids"
   },

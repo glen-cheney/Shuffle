@@ -2,7 +2,7 @@ import { TinyEmitter } from './tiny-emitter';
 import { parallel } from './parallel';
 import { Point } from './point';
 import { Rect } from './rect';
-import { ShuffleItem } from './shuffle-item';
+import { ShuffleItem, applyHiddenState, disposeItems, initItems, toggleFilterClasses } from './shuffle-item';
 import type {
   ElementOption,
   FilterArg,
@@ -17,19 +17,11 @@ import type {
   SortOptions,
 } from './types';
 
-import { Classes } from './classes';
-import { getNumberStyle } from './get-number-style';
+import { ALL_ITEMS, Classes, DEFAULT_OPTIONS, EventType, FILTER_ATTRIBUTE_KEY, FilterMode } from './constants';
+import { arrayUnique, getNumberStyle, getSize, styleImmediately } from './helpers';
 import { sorter } from './sorter';
 import { createTransitionManager, type TransitionManager } from './transition-manager';
 import { getItemPosition, getCenteredPositions } from './layout';
-import {
-  applyHiddenState,
-  arrayUnique,
-  disposeItems,
-  initItems,
-  styleImmediately,
-  toggleFilterClasses,
-} from './helpers';
 
 // Re-export types for backward compatibility
 export type {
@@ -1038,141 +1030,14 @@ class Shuffle extends TinyEmitter {
     this.isEnabled = false;
   }
 
-  /**
-   * Returns the outer width of an element, optionally including its margins.
-   *
-   * There are a few different methods for getting the width of an element, none of
-   * which work perfectly for all Shuffle's use cases.
-   *
-   * 1. getBoundingClientRect() `left` and `right` properties.
-   *   - Accounts for transform scaled elements, making it useless for Shuffle
-   *   elements which have shrunk.
-   * 2. The `offsetWidth` property.
-   *   - This value stays the same regardless of the elements transform property,
-   *   however, it does not return subpixel values.
-   * 3. getComputedStyle()
-   *   - This works great Chrome, Firefox, Safari, but IE<=11 does not include
-   *   padding and border when box-sizing: border-box is set, requiring a feature
-   *   test and extra work to add the padding back for IE and other browsers which
-   *   follow the W3C spec here.
-   *
-   * @param element The element.
-   * @param includeMargins Whether to include margins.
-   * @return The width and height.
-   */
-  static getSize(element: HTMLElement, includeMargins = false): { width: number; height: number } {
-    // Store the styles so that they can be used by others without asking for it again.
-    const styles = globalThis.getComputedStyle(element, null);
-    let width = getNumberStyle(element, 'width', styles);
-    let height = getNumberStyle(element, 'height', styles);
-
-    if (includeMargins) {
-      const marginLeft = getNumberStyle(element, 'marginLeft', styles);
-      const marginRight = getNumberStyle(element, 'marginRight', styles);
-      const marginTop = getNumberStyle(element, 'marginTop', styles);
-      const marginBottom = getNumberStyle(element, 'marginBottom', styles);
-      width += marginLeft + marginRight;
-      height += marginTop + marginBottom;
-    }
-
-    return {
-      width,
-      height,
-    };
-  }
-
+  static getSize: typeof getSize = getSize;
   static ShuffleItem: typeof ShuffleItem = ShuffleItem;
-  static ALL_ITEMS = 'all';
-  static FILTER_ATTRIBUTE_KEY = 'groups';
-
-  /** @enum {string} */
-  static EventType = {
-    LAYOUT: 'shuffle:layout',
-    REMOVED: 'shuffle:removed',
-  } as const;
-
-  /** @enum {string} */
-  static Classes: {
-    readonly BASE: 'shuffle';
-    readonly SHUFFLE_ITEM: 'shuffle-item';
-    readonly VISIBLE: 'shuffle-item--visible';
-    readonly HIDDEN: 'shuffle-item--hidden';
-  } = Classes;
-
-  /** @enum {string} */
-  static FilterMode = {
-    ANY: 'any',
-    ALL: 'all',
-  } as const;
-
-  // Overridable options
-  static options: ShuffleOptions = {
-    // Initial filter group.
-    group: Shuffle.ALL_ITEMS,
-
-    // Transition/animation speed (milliseconds).
-    speed: 250,
-
-    // CSS easing function to use.
-    easing: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
-
-    // e.g. '.picture-item'.
-    itemSelector: '*',
-
-    // Element or selector string. Use an element to determine the size of columns
-    // and gutters.
-    sizer: null,
-
-    // A static number or function that tells the plugin how wide the gutters
-    // between columns are (in pixels).
-    gutterWidth: 0,
-
-    // A static number or function that returns a number which tells the plugin
-    // how wide the columns are (in pixels).
-    columnWidth: 0,
-
-    // If your group is not json, and is comma delimited, you could set delimiter
-    // to ','.
-    delimiter: null,
-
-    // Useful for percentage based heights when they might not always be exactly
-    // the same (in pixels).
-    buffer: 0,
-
-    // Reading the width of elements isn't precise enough and can cause columns to
-    // jump between values.
-    columnThreshold: 0.01,
-
-    // Shuffle can be initialized with a sort object. It is the same object
-    // given to the sort method.
-    initialSort: null,
-
-    // Transition delay offset for each item in milliseconds.
-    staggerAmount: 15,
-
-    // Maximum stagger delay in milliseconds.
-    staggerAmountMax: 150,
-
-    // Whether to use transforms or absolute positioning.
-    useTransforms: true,
-
-    // Affects using an array with filter. e.g. `filter(['one', 'two'])`. With "any",
-    // the element passes the test if any of its groups are in the array. With "all",
-    // the element only passes if all groups are in the array.
-    // Note, this has no effect if you supply a custom filter function.
-    filterMode: Shuffle.FilterMode.ANY,
-
-    // Attempt to center grid items in each row.
-    isCentered: false,
-
-    // Attempt to align grid items to right.
-    isRTL: false,
-
-    // Whether to round pixel values used in translate(x, y). This usually avoids
-    // blurriness.
-    roundTransforms: true,
-  };
-
+  static ALL_ITEMS: string = ALL_ITEMS;
+  static FILTER_ATTRIBUTE_KEY: string = FILTER_ATTRIBUTE_KEY;
+  static EventType: typeof EventType = EventType;
+  static Classes: typeof Classes = Classes;
+  static FilterMode: typeof FilterMode = FilterMode;
+  static options: typeof DEFAULT_OPTIONS = DEFAULT_OPTIONS;
   static Point: typeof Point = Point;
   static Rect: typeof Rect = Rect;
 }

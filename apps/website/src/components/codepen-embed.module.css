@@ -2,6 +2,7 @@
   width: 100%;
   height: max(400px, 100vh - 225px);
   border: 0;
+  overflow: hidden;
 }
 
 .codepen {

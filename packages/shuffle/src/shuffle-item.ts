@@ -1,6 +1,6 @@
 import { Point } from './point';
-import { Classes } from './classes';
-import type { InlineCssStyles, ShuffleItemCss } from './types';
+import { Classes } from './constants';
+import type { FilterSet, InlineCssStyles, ShuffleItemCss } from './types';
 
 let id = 0;
 
@@ -130,3 +130,44 @@ ShuffleItem.Scale = {
   VISIBLE: 1,
   HIDDEN: 0.001,
 };
+
+/**
+ * Toggles the visible and hidden class names.
+ * @param Object with visible and hidden arrays.
+ */
+export function toggleFilterClasses({ visible, hidden }: FilterSet): void {
+  for (const item of visible) {
+    item.show();
+  }
+
+  for (const item of hidden) {
+    item.hide();
+  }
+}
+
+/**
+ * Set the initial css for each item
+ * @param items Set to initialize.
+ */
+export function initItems(items: ShuffleItem[]): void {
+  for (const item of items) {
+    item.init();
+  }
+}
+
+/**
+ * Remove element reference and styles.
+ * @param items Set to dispose.
+ */
+export function disposeItems(items: ShuffleItem[]): void {
+  for (const item of items) {
+    item.dispose();
+  }
+}
+
+export function applyHiddenState(item: ShuffleItem): void {
+  item.scale = ShuffleItem.Scale.HIDDEN;
+  item.isHidden = true;
+  item.applyCss(ShuffleItem.Css.HIDDEN.before);
+  item.applyCss(ShuffleItem.Css.HIDDEN.after);
+}

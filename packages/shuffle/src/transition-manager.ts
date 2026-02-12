@@ -1,4 +1,3 @@
-// oxlint-disable promise/prefer-await-to-callbacks
 type TransitionEventCallback = (event: TransitionEvent) => void;
 
 interface Transition {
@@ -8,12 +7,11 @@ interface Transition {
 
 export class TransitionManager {
   #transitions: Record<string, Transition | null> = {};
-  #eventName: keyof HTMLElementEventMap = 'transitionend';
   #count = 0;
 
   #uniqueId(): string {
     this.#count += 1;
-    return `${this.#eventName}${this.#count}`;
+    return `transitionend${this.#count}`;
   }
 
   waitForTransition(element: HTMLElement, callback: TransitionEventCallback): string {
@@ -25,7 +23,7 @@ export class TransitionManager {
       }
     };
 
-    element.addEventListener(this.#eventName, listener as EventListener);
+    element.addEventListener('transitionend', listener as EventListener);
     this.#transitions[id] = { element, listener };
 
     return id;
@@ -34,7 +32,7 @@ export class TransitionManager {
   cancelTransition(id: string): boolean {
     const entry = this.#transitions[id];
     if (entry) {
-      entry.element.removeEventListener(this.#eventName, entry.listener as EventListener);
+      entry.element.removeEventListener('transitionend', entry.listener as EventListener);
       this.#transitions[id] = null;
       return true;
     }
