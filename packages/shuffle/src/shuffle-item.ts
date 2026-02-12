@@ -13,10 +13,6 @@ export class ShuffleItem {
   scale = 1;
   point: Point = new Point();
 
-  // Static properties
-  static Css: ShuffleItemCss;
-  static Scale: Record<string, number>;
-
   constructor(element: HTMLElement, isRTL?: boolean) {
     id += 1;
     this.id = id;
@@ -89,47 +85,47 @@ export class ShuffleItem {
     // @ts-expect-error nullifying for garbage collection
     this.element = null;
   }
-}
 
-ShuffleItem.Css = {
-  INITIAL: {
-    position: 'absolute',
-    top: 0,
-    visibility: 'visible',
-    willChange: 'transform',
-  },
-  DIRECTION: {
-    ltr: {
-      left: 0,
-    },
-    rtl: {
-      right: 0,
-    },
-  },
-  VISIBLE: {
-    before: {
-      opacity: 1,
+  static Css: ShuffleItemCss = {
+    INITIAL: {
+      position: 'absolute',
+      top: 0,
       visibility: 'visible',
+      willChange: 'transform',
     },
-    after: {
-      transitionDelay: '',
+    DIRECTION: {
+      ltr: {
+        left: 0,
+      },
+      rtl: {
+        right: 0,
+      },
     },
-  },
-  HIDDEN: {
-    before: {
-      opacity: 0,
+    VISIBLE: {
+      before: {
+        opacity: 1,
+        visibility: 'visible',
+      },
+      after: {
+        transitionDelay: '',
+      },
     },
-    after: {
-      visibility: 'hidden',
-      transitionDelay: '',
+    HIDDEN: {
+      before: {
+        opacity: 0,
+      },
+      after: {
+        visibility: 'hidden',
+        transitionDelay: '',
+      },
     },
-  },
-};
+  };
 
-ShuffleItem.Scale = {
-  VISIBLE: 1,
-  HIDDEN: 0.001,
-};
+  static Scale = {
+    VISIBLE: 1,
+    HIDDEN: 0.001,
+  };
+}
 
 /**
  * Toggles the visible and hidden class names.

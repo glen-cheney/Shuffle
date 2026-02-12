@@ -768,7 +768,7 @@ class Shuffle extends TinyEmitter {
       return;
     }
 
-    if (!category || (category && category.length === 0)) {
+    if (!category || category.length === 0) {
       // oxlint-disable-next-line no-param-reassign
       category = Shuffle.ALL_ITEMS;
     }
