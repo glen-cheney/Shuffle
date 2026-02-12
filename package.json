@@ -13,6 +13,7 @@
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
     "test:coverage": "turbo run test -- --coverage",
+    "test:browser": "turbo run test --filter=shufflejs -- --watch --no-browser.headless",
     "type-check": "turbo run type-check",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""

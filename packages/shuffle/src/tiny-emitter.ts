@@ -1,4 +1,4 @@
-// oxlint-disable typescript/no-unsafe-assignment, typescript/no-unsafe-function-type, typescript/ban-types, typescript/no-explicit-any
+// oxlint-disable typescript/no-unsafe-function-type, typescript/ban-types, typescript/no-explicit-any, typescript/no-unsafe-assignment
 /**
  * @fileoverview copy of `tiny-emitter` on npm, but converted to ESM
  */

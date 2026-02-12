@@ -46,7 +46,6 @@ const defaults = {
  * @param options Sorting options.
  * @return The sorted array.
  */
-// oxlint-disable-next-line max-lines-per-function, max-statements
 export function sorter(arr: ShuffleItem[], options?: SortOptions | null): ShuffleItem[] {
   // Handle invalid input gracefully
   if (!Array.isArray(arr)) {
@@ -69,7 +68,6 @@ export function sorter(arr: ShuffleItem[], options?: SortOptions | null): Shuffl
   // If we don't have opts.by, default to DOM order
   if (typeof opts.by === 'function') {
     const sortBy = opts.by;
-    // oxlint-disable-next-line max-statements
     arr.sort((itemA, itemB) => {
       // Exit early if we already know we want to revert
       if (revert) {

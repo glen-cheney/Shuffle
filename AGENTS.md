@@ -11,7 +11,7 @@ It uses [Turbo](https://turbo.build/) for orchestration (see [`turbo.json`](turb
 
 ## Common Development Commands
 
-Run these from the **root directory**:
+Always run commands from the **root directory**:
 
 ```bash
 # Install all dependencies (do this first)
@@ -47,6 +47,8 @@ yarn turbo run lint --filter=shufflejs
 ```
 
 See [`turbo.json`](turbo.json) for available tasks across workspaces.
+
+**Note:** Never run commands from a nested directory.
 
 ## When in Doubt
 

@@ -9,6 +9,8 @@ interface JqueryLike {
 
 export type ElementOption = Element | HTMLElement | string | JqueryLike;
 
+export type FilterModeOptions = 'any' | 'all';
+
 export interface ShuffleOptions {
   /**
    * Useful for percentage based heights when they might not always be exactly
@@ -43,7 +45,7 @@ export interface ShuffleOptions {
    * the element passes the test if any of its groups are in the array. With "all",
    * the element only passes if all groups are in the array.
    */
-  filterMode?: string;
+  filterMode?: FilterModeOptions;
 
   /**
    * Initial filter group.

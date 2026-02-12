@@ -1,7 +1,5 @@
-import { defineConfig } from "vitest/config";
-import { playwright } from "@vitest/browser-playwright";
-
-const isCi = Boolean(process.env.CI);
+import { defineConfig } from 'vitest/config';
+import { playwright } from '@vitest/browser-playwright';
 
 export default defineConfig({
   test: {
@@ -9,8 +7,8 @@ export default defineConfig({
     browser: {
       enabled: true,
       provider: playwright(),
-      instances: [{ browser: "chromium" }],
-      headless: isCi,
+      instances: [{ browser: 'chromium' }],
+      headless: true,
     },
   },
 });

@@ -67,5 +67,4 @@ const HomepageFeatures: React.FC = () => (
   </section>
 );
 
-// oxlint-disable-next-line import/no-default-export
 export default HomepageFeatures;

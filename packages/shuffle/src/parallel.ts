@@ -1,4 +1,4 @@
-// oxlint-disable unicorn/explicit-length-check, no-param-reassign, no-plusplus, promise/prefer-await-to-callbacks
+// oxlint-disable unicorn/explicit-length-check, no-param-reassign, no-plusplus
 // Copied and converted from https://github.com/component/array-parallel/blob/f9240097cb1edf8432111d2bf6cb6eb600da34c2/index.js
 
 /**
@@ -13,7 +13,6 @@ export function parallel<ResultType>(
 ): void {
   if (!callback) {
     if (typeof context === 'function') {
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion
       callback = context as (err: Error | null, results?: ResultType[]) => void;
       context = null;
     } else {

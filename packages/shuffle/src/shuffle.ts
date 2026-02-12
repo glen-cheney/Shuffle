@@ -197,7 +197,6 @@ class Shuffle extends TinyEmitter {
 
     // Check for an element
     if (option && 'nodeType' in option && option.nodeType && option.nodeType === 1) {
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion
       return option as HTMLElement;
     }
 
@@ -293,7 +292,6 @@ class Shuffle extends TinyEmitter {
 
     // Check each element's data-groups attribute against the given category.
     const attr = element.dataset[Shuffle.FILTER_ATTRIBUTE_KEY] ?? '';
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const keys = this.options.delimiter ? attr.split(this.options.delimiter) : (JSON.parse(attr) as string[]);
 
     function testCategory(category: string): boolean {
@@ -301,7 +299,7 @@ class Shuffle extends TinyEmitter {
     }
 
     if (Array.isArray(category)) {
-      if (this.options.filterMode === Shuffle.FilterMode.ANY) {
+      if (this.options.filterMode === FilterMode.ANY) {
         return category.some(testCategory);
       }
       return category.every(testCategory);
@@ -347,7 +345,6 @@ class Shuffle extends TinyEmitter {
       // oxlint-disable-next-line unicorn/prefer-spread `children` doesn't have `Symbol.iterator`
       Array.from(this.element.children)
         .filter((el) => el.matches(this.options.itemSelector!))
-        // oxlint-disable-next-line typescript/no-unsafe-type-assertion
         .map((el) => new ShuffleItem(el as HTMLElement, this.options.isRTL))
     );
   }
@@ -928,7 +925,6 @@ class Shuffle extends TinyEmitter {
 
     const collection = arrayUnique(elements);
 
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion Oxlint doesn't understand the `Boolean` guard.
     const oldItems = collection.map((element) => this.getItemByElement(element)).filter(Boolean) as ShuffleItem[];
 
     const handleLayout = () => {
@@ -1042,5 +1038,4 @@ class Shuffle extends TinyEmitter {
   static Rect: typeof Rect = Rect;
 }
 
-// oxlint-disable-next-line import/no-default-export
 export default Shuffle;

@@ -6,7 +6,7 @@ interface Transition {
 }
 
 export class TransitionManager {
-  #transitions: Record<string, Transition | null> = {};
+  #transitions = new Map<string, Transition>();
   #count = 0;
 
   #uniqueId(): string {
@@ -24,16 +24,16 @@ export class TransitionManager {
     };
 
     element.addEventListener('transitionend', listener as EventListener);
-    this.#transitions[id] = { element, listener };
+    this.#transitions.set(id, { element, listener });
 
     return id;
   }
 
   cancelTransition(id: string): boolean {
-    const entry = this.#transitions[id];
+    const entry = this.#transitions.get(id);
     if (entry) {
       entry.element.removeEventListener('transitionend', entry.listener as EventListener);
-      this.#transitions[id] = null;
+      this.#transitions.delete(id);
       return true;
     }
 
@@ -41,10 +41,8 @@ export class TransitionManager {
   }
 
   cancelAll(): void {
-    for (const id of Object.keys(this.#transitions)) {
-      if (this.#transitions[id]) {
-        this.cancelTransition(id);
-      }
+    for (const id of this.#transitions.keys()) {
+      this.cancelTransition(id);
     }
   }
 }

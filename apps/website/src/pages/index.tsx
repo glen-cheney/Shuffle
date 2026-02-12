@@ -120,5 +120,4 @@ const Home: React.FC = () => (
   </Layout>
 );
 
-// oxlint-disable-next-line import/no-default-export
 export default Home;

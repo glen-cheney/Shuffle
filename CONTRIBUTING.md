@@ -29,3 +29,12 @@ Without a reduced test case, your issue may be closed.
 - Install dependencies with `yarn`.
 - Run `yarn watch` to rebuild, start the server, and watch for changes.
 - go to `http://localhost:3000/Shuffle/` to see it.
+
+## Running tests
+
+Tests run headless by default to avoid disruptive browser windows and to work on headless systems.
+
+**Always run commands from the root directory:**
+
+- `yarn test` - Run all tests headless
+- `yarn test:browser` - Run with visible browser for debugging

@@ -1,4 +1,5 @@
 import type { ShuffleOptions } from './shuffle';
+import type { FilterModeOptions, ShuffleEventMap } from './types';
 
 export const Classes = {
   BASE: 'shuffle',
@@ -11,15 +12,21 @@ export const ALL_ITEMS = 'all';
 
 export const FILTER_ATTRIBUTE_KEY = 'groups';
 
-export const FilterMode = {
+export const FilterMode: {
+  ANY: 'any';
+  ALL: 'all';
+} = {
   ANY: 'any',
   ALL: 'all',
-} as const;
+} satisfies Record<string, FilterModeOptions>;
 
-export const EventType = {
+export const EventType: {
+  LAYOUT: 'shuffle:layout';
+  REMOVED: 'shuffle:removed';
+} = {
   LAYOUT: 'shuffle:layout',
   REMOVED: 'shuffle:removed',
-} as const;
+} satisfies Record<string, keyof ShuffleEventMap>;
 
 export const DEFAULT_OPTIONS: ShuffleOptions = {
   // Initial filter group.

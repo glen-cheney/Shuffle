@@ -174,7 +174,6 @@ export function getCenteredPositions(itemRects: Rect[], containerWidth: number):
     let canMove = false;
     if (offset > 0) {
       const newRects: Rect[] = [];
-      // oxlint-disable-next-line no-loop-func
       canMove = itemRects.every((comparisonRect) => {
         const newRect = new Rect(
           comparisonRect.left + offset,
@@ -202,7 +201,6 @@ export function getCenteredPositions(itemRects: Rect[], containerWidth: number):
     // elements could be in the way).
     if (!canMove) {
       let intersectingRect: Rect;
-      // oxlint-disable-next-line no-loop-func
       const hasOverlap = itemRects.some((itemRect) =>
         rects.some((comparisonRect) => {
           const intersects = Rect.intersects(itemRect, comparisonRect);

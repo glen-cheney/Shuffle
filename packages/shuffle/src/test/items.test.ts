@@ -79,6 +79,7 @@ describe('shuffle items', () => {
     });
 
     test.afterEach(() => {
+      localInstance.destroy();
       items.length = 0;
     });
 

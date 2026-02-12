@@ -40,6 +40,7 @@
     // Restriction
     "eslint/class-methods-use-this": ["warn", { "exceptMethods": ["getTransformedPositions"] }],
     "eslint/no-undefined": "off",
+    "import/no-default-export": "off",
     "import/no-relative-parent-imports": "off",
     "oxc/no-async-await": "off",
     "oxc/no-optional-chaining": "off",

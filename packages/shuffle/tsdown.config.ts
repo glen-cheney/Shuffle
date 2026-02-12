@@ -9,5 +9,4 @@ const config: UserConfig = defineConfig({
   dts: true,
 });
 
-// oxlint-disable-next-line import/no-default-export
 export default config;
