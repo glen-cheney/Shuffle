@@ -3402,44 +3402,44 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@oxlint-tsgolint/darwin-arm64@npm:0.11.5":
-  version: 0.11.5
-  resolution: "@oxlint-tsgolint/darwin-arm64@npm:0.11.5"
+"@oxlint-tsgolint/darwin-arm64@npm:0.12.0":
+  version: 0.12.0
+  resolution: "@oxlint-tsgolint/darwin-arm64@npm:0.12.0"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@oxlint-tsgolint/darwin-x64@npm:0.11.5":
-  version: 0.11.5
-  resolution: "@oxlint-tsgolint/darwin-x64@npm:0.11.5"
+"@oxlint-tsgolint/darwin-x64@npm:0.12.0":
+  version: 0.12.0
+  resolution: "@oxlint-tsgolint/darwin-x64@npm:0.12.0"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@oxlint-tsgolint/linux-arm64@npm:0.11.5":
-  version: 0.11.5
-  resolution: "@oxlint-tsgolint/linux-arm64@npm:0.11.5"
+"@oxlint-tsgolint/linux-arm64@npm:0.12.0":
+  version: 0.12.0
+  resolution: "@oxlint-tsgolint/linux-arm64@npm:0.12.0"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"@oxlint-tsgolint/linux-x64@npm:0.11.5":
-  version: 0.11.5
-  resolution: "@oxlint-tsgolint/linux-x64@npm:0.11.5"
+"@oxlint-tsgolint/linux-x64@npm:0.12.0":
+  version: 0.12.0
+  resolution: "@oxlint-tsgolint/linux-x64@npm:0.12.0"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"@oxlint-tsgolint/win32-arm64@npm:0.11.5":
-  version: 0.11.5
-  resolution: "@oxlint-tsgolint/win32-arm64@npm:0.11.5"
+"@oxlint-tsgolint/win32-arm64@npm:0.12.0":
+  version: 0.12.0
+  resolution: "@oxlint-tsgolint/win32-arm64@npm:0.12.0"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@oxlint-tsgolint/win32-x64@npm:0.11.5":
-  version: 0.11.5
-  resolution: "@oxlint-tsgolint/win32-x64@npm:0.11.5"
+"@oxlint-tsgolint/win32-x64@npm:0.12.0":
+  version: 0.12.0
+  resolution: "@oxlint-tsgolint/win32-x64@npm:0.12.0"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -10605,16 +10605,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oxlint-tsgolint@npm:^0.11.5":
-  version: 0.11.5
-  resolution: "oxlint-tsgolint@npm:0.11.5"
+"oxlint-tsgolint@npm:^0.12.0":
+  version: 0.12.0
+  resolution: "oxlint-tsgolint@npm:0.12.0"
   dependencies:
-    "@oxlint-tsgolint/darwin-arm64": "npm:0.11.5"
-    "@oxlint-tsgolint/darwin-x64": "npm:0.11.5"
-    "@oxlint-tsgolint/linux-arm64": "npm:0.11.5"
-    "@oxlint-tsgolint/linux-x64": "npm:0.11.5"
-    "@oxlint-tsgolint/win32-arm64": "npm:0.11.5"
-    "@oxlint-tsgolint/win32-x64": "npm:0.11.5"
+    "@oxlint-tsgolint/darwin-arm64": "npm:0.12.0"
+    "@oxlint-tsgolint/darwin-x64": "npm:0.12.0"
+    "@oxlint-tsgolint/linux-arm64": "npm:0.12.0"
+    "@oxlint-tsgolint/linux-x64": "npm:0.12.0"
+    "@oxlint-tsgolint/win32-arm64": "npm:0.12.0"
+    "@oxlint-tsgolint/win32-x64": "npm:0.12.0"
   dependenciesMeta:
     "@oxlint-tsgolint/darwin-arm64":
       optional: true
@@ -10630,7 +10630,7 @@ __metadata:
       optional: true
   bin:
     tsgolint: bin/tsgolint.js
-  checksum: 10c0/83c510cf019cd77a31fb61dafcca90d5794869d8a296e0636a7f229858af9410f38ff9cc6617c9ae4e7bd5474884a8078a20f578b5a9bc6694f348539668e38a
+  checksum: 10c0/cbe345d08390fd02988af7ab7dd96cb40230e2f7e3c9e96f552df530fa05ac352a6ebd71d4b453f39d660c56ec018ef3a26d3bfa7d111d7204cc032ef8997308
   languageName: node
   linkType: hard
 
@@ -13132,11 +13132,11 @@ __metadata:
     "@vitest/browser-playwright": "npm:^4.0.18"
     "@vitest/coverage-v8": "npm:^4.0.18"
     oxlint: "npm:^1.46.0"
-    oxlint-tsgolint: "npm:^0.11.5"
+    oxlint-tsgolint: "npm:^0.12.0"
     playwright: "npm:^1.58.2"
     prettier: "npm:^3.8.1"
     tsdown: "npm:^0.20.3"
-    turbo: "npm:^2.8.5"
+    turbo: "npm:^2.8.7"
     typescript: "npm:^5.9.3"
     vitest: "npm:^4.0.18"
   languageName: unknown
@@ -13907,58 +13907,58 @@ __metadata:
   languageName: node
   linkType: hard
 
-"turbo-darwin-64@npm:2.8.5":
-  version: 2.8.5
-  resolution: "turbo-darwin-64@npm:2.8.5"
+"turbo-darwin-64@npm:2.8.7":
+  version: 2.8.7
+  resolution: "turbo-darwin-64@npm:2.8.7"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-darwin-arm64@npm:2.8.5":
-  version: 2.8.5
-  resolution: "turbo-darwin-arm64@npm:2.8.5"
+"turbo-darwin-arm64@npm:2.8.7":
+  version: 2.8.7
+  resolution: "turbo-darwin-arm64@npm:2.8.7"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-linux-64@npm:2.8.5":
-  version: 2.8.5
-  resolution: "turbo-linux-64@npm:2.8.5"
+"turbo-linux-64@npm:2.8.7":
+  version: 2.8.7
+  resolution: "turbo-linux-64@npm:2.8.7"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-linux-arm64@npm:2.8.5":
-  version: 2.8.5
-  resolution: "turbo-linux-arm64@npm:2.8.5"
+"turbo-linux-arm64@npm:2.8.7":
+  version: 2.8.7
+  resolution: "turbo-linux-arm64@npm:2.8.7"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-windows-64@npm:2.8.5":
-  version: 2.8.5
-  resolution: "turbo-windows-64@npm:2.8.5"
+"turbo-windows-64@npm:2.8.7":
+  version: 2.8.7
+  resolution: "turbo-windows-64@npm:2.8.7"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-windows-arm64@npm:2.8.5":
-  version: 2.8.5
-  resolution: "turbo-windows-arm64@npm:2.8.5"
+"turbo-windows-arm64@npm:2.8.7":
+  version: 2.8.7
+  resolution: "turbo-windows-arm64@npm:2.8.7"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo@npm:^2.8.5":
-  version: 2.8.5
-  resolution: "turbo@npm:2.8.5"
+"turbo@npm:^2.8.7":
+  version: 2.8.7
+  resolution: "turbo@npm:2.8.7"
   dependencies:
-    turbo-darwin-64: "npm:2.8.5"
-    turbo-darwin-arm64: "npm:2.8.5"
-    turbo-linux-64: "npm:2.8.5"
-    turbo-linux-arm64: "npm:2.8.5"
-    turbo-windows-64: "npm:2.8.5"
-    turbo-windows-arm64: "npm:2.8.5"
+    turbo-darwin-64: "npm:2.8.7"
+    turbo-darwin-arm64: "npm:2.8.7"
+    turbo-linux-64: "npm:2.8.7"
+    turbo-linux-arm64: "npm:2.8.7"
+    turbo-windows-64: "npm:2.8.7"
+    turbo-windows-arm64: "npm:2.8.7"
   dependenciesMeta:
     turbo-darwin-64:
       optional: true
@@ -13974,7 +13974,7 @@ __metadata:
       optional: true
   bin:
     turbo: bin/turbo
-  checksum: 10c0/6eaae92af681da416d29943da65c2a8b38eaf314d2125d134cd548fb832c5191ccdfc66e56fb272cc173a28dfc6674f0c0666d823366d505ae3f26b64d821173
+  checksum: 10c0/2abd178689c7a72d3c2ddd8f5ad53a0bcacc84583361b8d13bb637ebbf738c8872c1c88d65ad1591bd59644cab8d9a477c9fbcee1a4cd63a9072b3943afe5ac9
   languageName: node
   linkType: hard
 

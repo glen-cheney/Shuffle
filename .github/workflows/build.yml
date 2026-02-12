@@ -23,11 +23,11 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      - name: Lint & type-check
-        run: yarn run type-check
-
       - name: Build library and website
         run: yarn run build
+
+      - name: Lint & type-check
+        run: yarn run type-check
 
       - name: Run unit tests
         run: yarn test
