@@ -1,6 +1,6 @@
 {
   "name": "shufflejs",
-  "version": "7.0.0",
+  "version": "7.0.0-beta.1",
   "description": "Categorize, sort, and filter a responsive grid of items",
   "keywords": [
     "gallery",
@@ -44,5 +44,6 @@
   "bugs": {
     "url": "https://github.com/glen-cheney/Shuffle/issues"
   },
-  "homepage": "https://github.com/glen-cheney/Shuffle"
+  "homepage": "https://github.com/glen-cheney/Shuffle",
+  "stableVersion": "7.0.0"
 }
