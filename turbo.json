@@ -11,6 +11,9 @@
       "cache": false,
       "persistent": true
     },
+    "type-check": {
+      "cache": false
+    },
     "watch": {
       "cache": false
     }

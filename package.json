@@ -13,38 +13,29 @@
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
     "test:coverage": "turbo run test -- --coverage",
+    "test:browser": "turbo run test --filter=shufflejs -- --watch --no-browser.headless",
+    "type-check": "turbo run type-check",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@babel/core": "^7.28.5",
-    "@babel/preset-env": "^7.28.5",
-    "@eslint/eslintrc": "^3.3.3",
-    "@eslint/js": "^9.39.2",
-    "@rollup/plugin-babel": "^6.1.0",
-    "@rollup/plugin-commonjs": "^29.0.0",
-    "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-terser": "^0.4.4",
-    "@types/sinon": "^21.0.0",
-    "@vitest/coverage-v8": "^4.0.16",
-    "eslint": "^9.39.2",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "globals": "^16.5.0",
-    "jsdom": "^27.3.0",
-    "prettier": "^3.7.4",
-    "rollup": "^4.54.0",
-    "sinon": "^21.0.1",
-    "turbo": "^2.7.1",
+    "@docusaurus/module-type-aliases": "^3.9.2",
+    "@docusaurus/tsconfig": "^3.9.2",
+    "@docusaurus/types": "^3.9.2",
+    "@vitest/browser-playwright": "^4.0.18",
+    "@vitest/coverage-v8": "^4.0.18",
+    "oxlint": "^1.46.0",
+    "oxlint-tsgolint": "^0.12.0",
+    "playwright": "^1.58.2",
+    "prettier": "^3.8.1",
+    "tsdown": "^0.20.3",
+    "turbo": "^2.8.7",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.16"
+    "vitest": "^4.0.18"
   },
   "engines": {
     "npm": ">=10.9.0",
     "node": ">=24.12.0"
   },
-  "packageManager": "yarn@4.9.1"
+  "packageManager": "yarn@4.12.0"
 }

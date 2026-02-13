@@ -1,0 +1,25 @@
+{
+  // Copied in order to remove baseUrl.
+  // "extends": "@docusaurus/tsconfig",
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Docusaurus",
+  "docs": "https://docusaurus.io/docs/typescript-support",
+  "compilerOptions": {
+    "allowJs": true,
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "moduleResolution": "bundler",
+    "module": "esnext",
+    "noEmit": true,
+    // "baseUrl": ".",
+    "paths": {
+      "@site/*": ["./*"]
+    },
+    "skipLibCheck": true,
+
+    // Adding
+    "strictNullChecks": true
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "typescript", "unicorn", "oxc", "import", "react", "jsx-a11y", "promise"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "warn",
+    "style": "warn",
+    "restriction": "warn",
+    "pedantic": "warn"
+  },
+  "rules": {
+    // Suspicious
+    "typescript/no-unsafe-type-assertion": "off",
+    "import/no-named-as-default-member": "off",
+
+    // Style
+    "eslint/capitalized-comments": "off",
+    "eslint/func-style": "off",
+    "eslint/id-length": ["warn", { "exceptions": ["i", "x", "y"] }],
+    "eslint/init-declarations": "off",
+    "eslint/max-params": "off",
+    "eslint/no-continue": "off",
+    "eslint/no-magic-numbers": "off",
+    "eslint/no-ternary": "off",
+    "eslint/sort-imports": "off",
+    "eslint/sort-keys": "off",
+    "import/consistent-type-specifier-style": "off",
+    "import/exports-last": "off",
+    "import/group-exports": "off",
+    "import/no-named-export": "off",
+    "import/prefer-default-export": "off",
+    "promise/avoid-new": "off",
+    "promise/prefer-await-to-callbacks": "off",
+    "react/jsx-max-depth": "off",
+    "unicorn/no-array-callback-reference": "off", // false positive with `filter` method on Shuffle.
+    "unicorn/no-array-method-this-argument": "off", // false positive with `filter` method on Shuffle.
+    "unicorn/no-null": "off",
+
+    // Restriction
+    "eslint/class-methods-use-this": ["warn", { "exceptMethods": ["getTransformedPositions"] }],
+    "eslint/no-undefined": "off",
+    "import/no-default-export": "off",
+    "import/no-relative-parent-imports": "off",
+    "oxc/no-async-await": "off",
+    "oxc/no-optional-chaining": "off",
+    "oxc/no-rest-spread-properties": "off",
+    "react/jsx-filename-extension": ["error", { "extensions": [".tsx"] }],
+    "react/no-multi-comp": "off",
+    "typescript/explicit-function-return-type": "off",
+    "typescript/explicit-module-boundary-types": "off", // Using isolatedDeclarations instead
+    "typescript/no-explicit-any": "error",
+    "typescript/no-non-null-assertion": "off",
+    "typescript/promise-function-async": "off",
+
+    // Pedantic
+    "eslint/max-lines-per-function": "off",
+    "eslint/max-lines": "off",
+    "eslint/max-statements": "off",
+    "import/max-dependencies": "off",
+    "typescript/strict-boolean-expressions": "off",
+    "unicorn/prefer-query-selector": "off"
+  },
+  "overrides": [
+    {
+      "files": ["*.test.{ts,tsx}"],
+      "plugins": ["vitest"],
+      "rules": {
+        "vitest/prefer-to-be-falsy": "off",
+        "vitest/prefer-to-be-truthy": "off"
+      }
+    }
+  ]
+}

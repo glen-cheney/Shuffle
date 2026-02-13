@@ -1,6 +1,6 @@
 {
   "name": "shufflejs",
-  "version": "6.1.2",
+  "version": "7.0.0-beta.1",
   "description": "Categorize, sort, and filter a responsive grid of items",
   "keywords": [
     "gallery",
@@ -14,24 +14,26 @@
     "mobile",
     "tiles"
   ],
-  "main": "./dist/shuffle.js",
-  "module": "./dist/shuffle.esm.js",
-  "source": "./src/shuffle.js",
+  "type": "module",
   "exports": {
-    "types": "./index.d.ts",
-    "require": "./dist/shuffle.js",
-    "default": "./dist/shuffle.esm.js"
+    ".": {
+      "types": "./dist/shuffle.d.mts",
+      "default": "./dist/shuffle.mjs"
+    },
+    "./package.json": "./package.json"
   },
-  "types": "./index.d.ts",
+  "types": "./dist/shuffle.d.mts",
+  "files": [
+    "dist"
+  ],
   "sideEffects": false,
   "scripts": {
-    "build": "rollup --config ./rollup.config.mjs",
-    "test": "npm run test:unit && npm run type-check",
-    "test:unit": "vitest",
+    "build": "tsdown",
+    "test": "vitest run",
     "test:watch": "vitest --watch",
-    "lint": "eslint src",
-    "type-check": "tsc --project ./test/types",
-    "watch": "rollup --config ./rollup.config.mjs --watch"
+    "lint": "oxlint --type-aware",
+    "type-check": "oxlint --type-aware --type-check",
+    "watch": "tsdown --watch"
   },
   "repository": {
     "type": "git",
@@ -43,13 +45,5 @@
     "url": "https://github.com/glen-cheney/Shuffle/issues"
   },
   "homepage": "https://github.com/glen-cheney/Shuffle",
-  "files": [
-    "dist",
-    "src",
-    "index.d.ts"
-  ],
-  "dependencies": {
-    "array-parallel": "^0.1.3",
-    "tiny-emitter": "^2.1.0"
-  }
+  "stableVersion": "7.0.0"
 }
