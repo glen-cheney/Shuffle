@@ -164,17 +164,17 @@ export function getCenteredPositions(itemRects: Rect[], containerWidth: number):
   const rects: Rect[] = [];
   const rows: Rect[][] = [];
   const centeredRows: Rect[][] = [];
-  for (const itemRects of Object.values(rowMap)) {
-    rows.push(itemRects);
-    const lastItem = itemRects.at(-1)!;
+  for (const rowRect of Object.values(rowMap)) {
+    rows.push(rowRect);
+    const lastItem = rowRect.at(-1)!;
     const end = lastItem.left + lastItem.width;
     const offset = Math.round((containerWidth - end) / 2);
 
-    let finalRects = itemRects;
+    let finalRects = rowRect;
     let canMove = false;
     if (offset > 0) {
       const newRects: Rect[] = [];
-      canMove = itemRects.every((comparisonRect) => {
+      canMove = rowRect.every((comparisonRect) => {
         const newRect = new Rect(
           comparisonRect.left + offset,
           comparisonRect.top,
@@ -201,7 +201,7 @@ export function getCenteredPositions(itemRects: Rect[], containerWidth: number):
     // elements could be in the way).
     if (!canMove) {
       let intersectingRect: Rect;
-      const hasOverlap = itemRects.some((itemRect) =>
+      const hasOverlap = rowRect.some((itemRect) =>
         rects.some((comparisonRect) => {
           const intersects = Rect.intersects(itemRect, comparisonRect);
           if (intersects) {

@@ -294,8 +294,8 @@ class Shuffle extends TinyEmitter {
     const attr = element.dataset[Shuffle.FILTER_ATTRIBUTE_KEY] ?? '';
     const keys = this.options.delimiter ? attr.split(this.options.delimiter) : (JSON.parse(attr) as string[]);
 
-    function testCategory(category: string): boolean {
-      return keys.includes(category);
+    function testCategory(categoryName: string): boolean {
+      return keys.includes(categoryName);
     }
 
     if (Array.isArray(category)) {
