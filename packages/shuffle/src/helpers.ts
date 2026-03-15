@@ -59,11 +59,11 @@ export function arrayUnique<Item>(items: Item[]): Item[] {
 }
 
 const EXPECTED_WIDTH = 10;
-let value: boolean | null = null;
+let computedElementSize: boolean | null = null;
 
 export function testComputedSize(): boolean {
-  if (value !== null) {
-    return value;
+  if (computedElementSize !== null) {
+    return computedElementSize;
   }
 
   const element = document.body || document.documentElement;
@@ -73,11 +73,11 @@ export function testComputedSize(): boolean {
 
   const { width } = globalThis.getComputedStyle(div, null);
   // Fix for issue #314
-  value = Math.round(getNumber(width)) === EXPECTED_WIDTH;
+  computedElementSize = Math.round(getNumber(width)) === EXPECTED_WIDTH;
 
   div.remove();
 
-  return value;
+  return computedElementSize;
 }
 
 const DEFAULT_NUMBER = 0;
