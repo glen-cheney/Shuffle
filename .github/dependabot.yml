@@ -11,3 +11,8 @@ updates:
         update-types:
           - 'minor'
           - 'patch'
+      security-updates:
+        applies-to: security-updates
+        update-types:
+          - 'minor'
+          - 'patch'
