@@ -1,4 +1,4 @@
-// oxlint-disable eslint-plugin-react-hooks/rules-of-hooks
+// oxlint-disable eslint-plugin-react-hooks/rules-of-hooks, class-methods-use-this, no-empty-function
 import { test as baseTest, type TestAPI, vi } from 'vitest';
 import { fixtures } from './fixtures';
 import type Shuffle from '../shuffle';

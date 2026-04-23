@@ -4,35 +4,33 @@ import { Point } from './point';
 import { Rect } from './rect';
 import { ShuffleItem, applyHiddenState, disposeItems, initItems, toggleFilterClasses } from './shuffle-item';
 import type {
-  ElementOption,
-  FilterArg,
-  FilterFunction,
-  FilterSet,
   InlineCssStyles,
   QueueItem,
   ShuffleEventCallback,
   ShuffleEventData,
   ShuffleEventMap,
   ShuffleOptions,
-  SortOptions,
 } from './types';
-
-import { ALL_ITEMS, Classes, DEFAULT_OPTIONS, EventType, FILTER_ATTRIBUTE_KEY, FilterMode } from './constants';
+import type {
+  ElementOption,
+  FilterArg as CoreFilterArg,
+  FilterFunction as CoreFilterFunction,
+  FilterSet,
+  SortOptions as CoreSortOptions,
+} from './core/types';
+import { ALL_ITEMS, Classes, EventType, FILTER_ATTRIBUTE_KEY, FilterMode } from './core/constants';
+import { DEFAULT_OPTIONS } from './constants';
 import { arrayUnique, getNumberStyle, getSize, styleImmediately } from './helpers';
-import { sorter } from './sorter';
+import { matchesFilter } from './core/filter';
+import { sorter } from './core/sorter';
 import { createTransitionManager, type TransitionManager } from './transition-manager';
 import { getItemPosition, getCenteredPositions } from './layout';
 
 // Re-export types for backward compatibility
-export type {
-  SortOptions,
-  InlineCssStyles,
-  ShuffleOptions,
-  FilterFunction,
-  FilterArg,
-  ShuffleEventData,
-  ShuffleEventCallback,
-};
+export type SortOptions = CoreSortOptions<ShuffleItem>;
+export type FilterFunction = CoreFilterFunction<Shuffle>;
+export type FilterArg = CoreFilterArg<Shuffle>;
+export type { InlineCssStyles, ShuffleOptions, ShuffleEventData, ShuffleEventCallback };
 
 // Used for unique instance variables
 let id = 0;
@@ -230,7 +228,7 @@ class Shuffle extends TinyEmitter {
    * @param collection Optionally filter a collection. Defaults to all the items.
    * @return Object with visible and hidden arrays.
    */
-  #filter(category: FilterArg = this.lastFilter, collection: ShuffleItem[] = this.items): FilterSet {
+  #filter(category: FilterArg = this.lastFilter, collection: ShuffleItem[] = this.items): FilterSet<ShuffleItem> {
     const set = this.#getFilteredSets(category, collection);
 
     // Individually add/remove hidden/visible classes
@@ -253,7 +251,7 @@ class Shuffle extends TinyEmitter {
    * @param category Category or function to filter by.
    * @param items A collection of items to filter.
    */
-  #getFilteredSets(category: FilterArg, items: ShuffleItem[]): FilterSet {
+  #getFilteredSets(category: FilterArg, items: ShuffleItem[]): FilterSet<ShuffleItem> {
     let visible: ShuffleItem[] = [];
     const hidden: ShuffleItem[] = [];
 
@@ -286,26 +284,14 @@ class Shuffle extends TinyEmitter {
    * @return Whether it passes the category/filter.
    */
   #doesPassFilter(category: FilterArg, element: HTMLElement): boolean {
-    if (typeof category === 'function') {
-      return category.call(element, element, this);
-    }
-
     // Check each element's data-groups attribute against the given category.
     const attr = element.dataset[Shuffle.FILTER_ATTRIBUTE_KEY] ?? '';
     const keys = this.options.delimiter ? attr.split(this.options.delimiter) : (JSON.parse(attr) as string[]);
-
-    function testCategory(categoryName: string): boolean {
-      return keys.includes(categoryName);
-    }
-
-    if (Array.isArray(category)) {
-      if (this.options.filterMode === FilterMode.ANY) {
-        return category.some(testCategory);
-      }
-      return category.every(testCategory);
-    }
-
-    return keys.includes(category);
+    return matchesFilter(keys, category, {
+      filterMode: this.options.filterMode!,
+      element,
+      instance: this,
+    });
   }
 
   /**

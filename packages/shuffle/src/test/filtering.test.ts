@@ -27,6 +27,7 @@ describe('shuffle filtering', () => {
             expect(element.style.visibility).toBe('visible');
           }
 
+          // oxlint-disable-next-line no-use-before-define
           instance.value!.once(Shuffle.EventType.LAYOUT, third);
 
           // Filter by green.
