@@ -41,6 +41,7 @@
     // Restriction
     "eslint/class-methods-use-this": ["warn", { "exceptMethods": ["getTransformedPositions"] }],
     "eslint/no-undefined": "off",
+    "no-void": ["warn", { "allowAsStatement": true }],
     "import/no-default-export": "off",
     "import/no-relative-parent-imports": "off",
     "oxc/no-async-await": "off",
@@ -73,7 +74,8 @@
         "vitest/no-importing-vitest-globals": "off", // we do not use `globals: true`
         "vitest/prefer-to-be-falsy": "off",
         "vitest/prefer-to-be-truthy": "off",
-        "vitest/require-test-timeout": "off"
+        "vitest/require-test-timeout": "off",
+        "unicorn/prefer-spread": "off" // false positive for NodeList
       }
     }
   ]
