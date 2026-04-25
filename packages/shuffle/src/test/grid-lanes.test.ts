@@ -33,6 +33,8 @@ function mockStartViewTransition() {
     ready: Promise.resolve(),
     updateCallbackDone: Promise.resolve(),
     skipTransition: vi.fn(),
+    // oxlint-disable-next-line typescript/ban-ts-comment, typescript/prefer-ts-expect-error
+    // @ts-ignore partial mock, mismatch between oxlint-tsgolint and TypeScript lib.dom.d.ts definitions
     types: {
       forEach: vi.fn(),
     },
