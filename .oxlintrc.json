@@ -33,6 +33,7 @@
     "promise/avoid-new": "off",
     "promise/prefer-await-to-callbacks": "off",
     "react/jsx-max-depth": "off",
+    "typescript/prefer-readonly": "off",
     "unicorn/no-array-callback-reference": "off", // false positive with `filter` method on Shuffle.
     "unicorn/no-array-method-this-argument": "off", // false positive with `filter` method on Shuffle.
     "unicorn/no-null": "off",
@@ -48,6 +49,7 @@
     "react/jsx-filename-extension": ["error", { "extensions": [".tsx"] }],
     "react/no-multi-comp": "off",
     "typescript/explicit-function-return-type": "off",
+    "typescript/explicit-member-accessibility": "off",
     "typescript/explicit-module-boundary-types": "off", // Using isolatedDeclarations instead
     "typescript/no-explicit-any": "error",
     "typescript/no-non-null-assertion": "off",
@@ -58,6 +60,7 @@
     "eslint/max-lines": "off",
     "eslint/max-statements": "off",
     "import/max-dependencies": "off",
+    "typescript/prefer-readonly-parameter-types": "off",
     "typescript/strict-boolean-expressions": "off",
     "unicorn/prefer-query-selector": "off"
   },
@@ -66,9 +69,11 @@
       "files": ["*.test.{ts,tsx}"],
       "plugins": ["vitest"],
       "rules": {
+        "vitest/prefer-importing-vitest-globals": "off", // false positives on `test-utils` imports
         "vitest/no-importing-vitest-globals": "off", // we do not use `globals: true`
         "vitest/prefer-to-be-falsy": "off",
-        "vitest/prefer-to-be-truthy": "off"
+        "vitest/prefer-to-be-truthy": "off",
+        "vitest/require-test-timeout": "off"
       }
     }
   ]

@@ -20,6 +20,10 @@
       "types": "./dist/shuffle.d.mts",
       "default": "./dist/shuffle.mjs"
     },
+    "./grid-lanes": {
+      "types": "./dist/shuffle-lanes.d.mts",
+      "default": "./dist/shuffle-lanes.mjs"
+    },
     "./package.json": "./package.json"
   },
   "types": "./dist/shuffle.d.mts",

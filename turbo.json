@@ -5,7 +5,9 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", "build/**"]
     },
-    "lint": {},
+    "lint": {
+      "cache": false
+    },
     "test": {},
     "test:watch": {
       "cache": false,

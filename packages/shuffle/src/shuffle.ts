@@ -23,6 +23,7 @@ import { DEFAULT_OPTIONS } from './constants';
 import { arrayUnique, getNumberStyle, getSize, styleImmediately } from './helpers';
 import { matchesFilter } from './core/filter';
 import { sorter } from './core/sorter';
+import { resolveElementOption } from './core/resolve-element-option';
 import { createTransitionManager, type TransitionManager } from './transition-manager';
 import { getItemPosition, getCenteredPositions } from './layout';
 
@@ -80,7 +81,7 @@ class Shuffle extends TinyEmitter {
     this.isTransitioning = false;
     this.#queue = [];
 
-    const el = this.#getElementOption(element);
+    const el = resolveElementOption(element);
 
     if (!el) {
       throw new TypeError('Shuffle needs to be initialized with an element.');
@@ -93,7 +94,7 @@ class Shuffle extends TinyEmitter {
     this.items = this.#getItems();
     this.sortedItems = this.items;
 
-    this.sizer = this.#getElementOption(this.options.sizer);
+    this.sizer = resolveElementOption(this.options.sizer, this.element);
 
     // Add class and invalidate styles
     this.element.classList.add(Shuffle.Classes.BASE);
@@ -179,31 +180,6 @@ class Shuffle extends TinyEmitter {
 
   off(event: string, callback?: ShuffleEventCallback): this {
     return super.off(event, callback);
-  }
-
-  /**
-   * Retrieve an element from an option.
-   * @param option The option to check.
-   * @return The plain element or null.
-   */
-  #getElementOption(option?: ElementOption | null): HTMLElement | null {
-    // If column width is a string, treat is as a selector and search for the
-    // sizer element within the outermost container
-    if (typeof option === 'string') {
-      return this.element ? this.element.querySelector(option) : document.querySelector(option);
-    }
-
-    // Check for an element
-    if (option && 'nodeType' in option && option.nodeType && option.nodeType === 1) {
-      return option as HTMLElement;
-    }
-
-    // Check for jQuery object
-    if (option && 'jquery' in option) {
-      return option[0];
-    }
-
-    return null;
   }
 
   /**
