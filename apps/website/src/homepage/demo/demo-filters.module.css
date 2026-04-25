@@ -1,0 +1,224 @@
+/* Filter styling */
+.filterLabel {
+  display: block;
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: 4px;
+  color: var(--ifm-color-gray-800);
+}
+
+:global([data-theme='dark']) .filterLabel {
+  color: var(--ifm-color-gray-500);
+}
+
+.filtersGroup {
+  padding: 0;
+  margin: 0 0 4px;
+  border: 0;
+}
+
+@media screen and (min-width: 768px) {
+  .filtersWrap {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .flexEndAtSmall {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+.btnGroup {
+  display: flex;
+}
+
+.btnGroup .btn {
+  border-radius: 0;
+}
+
+.btnGroup .btn:first-child {
+  border-radius: 3px 0 0 3px;
+}
+
+.btnGroup .btn:not(:first-child) {
+  margin-left: -1px;
+}
+
+.btnGroup .btn:last-child {
+  border-radius: 0 3px 3px 0;
+}
+
+.btnGroup label input[type='radio'] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.75em 0.8em;
+  text-align: center;
+  border-radius: 3px;
+  border: 1px solid var(--ifm-divider-color);
+  color: var(--ifm-text-color);
+  font-size: 1rem;
+  background-color: var(--ifm-code-background);
+  transition: 0.2s ease-out;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+
+@media (-moz-touch-enabled: 0), (pointer: fine) {
+  .btn:hover {
+    color: #fff;
+    text-decoration: none;
+    background-color: var(--ifm-color-primary);
+  }
+}
+
+.btn:focus {
+  outline-width: 0;
+  box-shadow: 0 0 0 2px var(--ifm-color-primary);
+}
+
+.btn.active,
+.btn:active {
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+  color: #fff;
+  background-color: var(--ifm-color-primary);
+}
+
+.btn:focus.active {
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.3),
+    0 0 0 2px var(--ifm-color-primary-light);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+  color: var(--ifm-text-color);
+  background-color: var(--ifm-background-color);
+}
+
+.btnPrimary {
+  color: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+  background-color: rgba(26, 122, 103, 0.1);
+}
+
+@media (-moz-touch-enabled: 0), (pointer: fine) {
+  .btnPrimary:hover {
+    background-color: var(--ifm-color-primary);
+  }
+}
+
+.btnPrimary:focus {
+  box-shadow: 0 0 0 2px var(--ifm-color-primary-light);
+}
+
+.btnPrimary.active,
+.btnPrimary:active {
+  background-color: var(--ifm-color-primary);
+}
+
+.btnPrimary:focus.active {
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.3),
+    0 0 0 2px var(--ifm-color-primary-light);
+}
+
+.btnPrimary:disabled {
+  color: var(--ifm-color-primary);
+  background-color: rgba(26, 122, 103, 0.1);
+}
+
+@media screen and (max-width: 767px) {
+  .btn {
+    font-size: 0.875rem;
+  }
+}
+
+/* Textfield */
+.textfield {
+  -webkit-appearance: none;
+  box-sizing: border-box;
+  width: 100%;
+  border: 2px solid var(--ifm-color-gray-500);
+  border-radius: 4px;
+  padding: 0.5em;
+  font-size: 1rem;
+  color: var(--ifm-text-color);
+  transition: 0.15s;
+}
+
+.textfield::-webkit-input-placeholder {
+  color: var(--ifm-color-gray-500);
+  transition: 0.15s;
+}
+
+.textfield:-ms-input-placeholder {
+  color: var(--ifm-color-gray-500);
+  transition: 0.15s;
+}
+
+.textfield::-ms-input-placeholder {
+  color: var(--ifm-color-gray-500);
+  transition: 0.15s;
+}
+
+.textfield::placeholder {
+  color: var(--ifm-color-gray-500);
+  transition: 0.15s;
+}
+
+.textfield:hover {
+  outline-width: 0;
+  color: var(--ifm-text-color);
+  border-color: var(--ifm-color-primary);
+}
+
+.textfield:hover::-webkit-input-placeholder {
+  color: var(--ifm-color-primary);
+}
+
+.textfield:hover:-ms-input-placeholder {
+  color: var(--ifm-color-primary);
+}
+
+.textfield:hover::-ms-input-placeholder {
+  color: var(--ifm-color-primary);
+}
+
+.textfield:hover::placeholder {
+  color: var(--ifm-color-primary);
+}
+
+.textfield:focus {
+  outline-width: 0;
+  border-color: var(--ifm-color-primary);
+}
+
+.textfield:focus::-webkit-input-placeholder {
+  color: var(--ifm-color-primary);
+}
+
+.textfield:focus:-ms-input-placeholder {
+  color: var(--ifm-color-primary);
+}
+
+.textfield:focus::-ms-input-placeholder {
+  color: var(--ifm-color-primary);
+}
+
+.textfield:focus::placeholder {
+  color: var(--ifm-color-primary);
+}

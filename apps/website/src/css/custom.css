@@ -20,6 +20,124 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
+
 html[class*='docs-doc-id-demos\/'] .container [class*='docItemCol'] {
   max-width: none !important;
+}
+
+figure {
+  margin: 0;
+  padding: 0;
+}
+
+/* Mobile-first columns (xs breakpoint - 6 column grid) */
+.col--1-xs {
+  --ifm-col-width: calc(1 / 6 * 100%);
+}
+
+.col--2-xs {
+  --ifm-col-width: calc(2 / 6 * 100%);
+}
+
+.col--3-xs {
+  --ifm-col-width: calc(3 / 6 * 100%);
+}
+
+.col--4-xs {
+  --ifm-col-width: calc(4 / 6 * 100%);
+}
+
+.col--6-xs {
+  --ifm-col-width: calc(6 / 6 * 100%);
+}
+
+.grid-container {
+  /* The built-in grid framework for docusaurus uses horizontal padding on each column */
+  --double-horizontal-spacing: calc(var(--ifm-spacing-horizontal) * 2);
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--double-horizontal-spacing);
+}
+
+.grid-lane-item--1-xs {
+  grid-column: span 1;
+}
+
+.grid-lane-item--2-xs {
+  grid-column: span 2;
+}
+
+.grid-lane-item--3-xs {
+  grid-column: span 3;
+}
+
+.grid-lane-item--4-xs {
+  grid-column: span 4;
+}
+
+.grid-lane-item--6-xs {
+  grid-column: span 6;
+}
+
+/* Tablet columns (sm breakpoint ≥ 768px) */
+@media screen and (min-width: 768px) {
+  .col--1-sm {
+    --ifm-col-width: calc(1 / 12 * 100%);
+  }
+
+  .col--4-sm {
+    --ifm-col-width: calc(4 / 12 * 100%);
+  }
+
+  .col--8-sm {
+    --ifm-col-width: calc(8 / 12 * 100%);
+  }
+
+  .grid-container {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .grid-lane-item--1-sm {
+    grid-column: span 1;
+  }
+
+  .grid-lane-item--4-sm {
+    grid-column: span 4;
+  }
+
+  .grid-lane-item--8-sm {
+    grid-column: span 8;
+  }
+}
+
+/* Desktop columns (md breakpoint ≥ 1024px) */
+@media screen and (min-width: 1024px) {
+  .col--3-md {
+    --ifm-col-width: calc(3 / 12 * 100%);
+  }
+
+  .col--6-md {
+    --ifm-col-width: calc(6 / 12 * 100%);
+  }
+
+  .grid-lane-item--3-md {
+    grid-column: span 3;
+  }
+
+  .grid-lane-item--6-md {
+    grid-column: span 6;
+  }
+}
+
+/* Ensure images take up the same space when they load */
+.aspect {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
 }

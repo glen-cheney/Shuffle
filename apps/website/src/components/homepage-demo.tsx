@@ -1,18 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react';
-import cx from 'clsx';
 import Shuffle from 'shufflejs';
+import GridLanes from 'shufflejs/grid-lanes';
 import styles from './homepage-demo.module.css';
-import { DEMO_ITEMS } from './homepage-demo-constants';
+import { DemoFilters } from '../homepage/demo/demo-filters';
+import { ClassicShuffleGrid } from '../homepage/demo/classic-shuffle-grid';
+import classicGridStyles from '../homepage/demo/classic-shuffle-grid.module.css';
+import { GridLanesGrid } from '../homepage/demo/grid-lanes-grid';
 
 const DEBUG = false;
 
-type ShuffleInstance = InstanceType<typeof Shuffle>;
-
 export const HomepageDemo: React.FC = () => {
-  const shuffleRef = useRef<ShuffleInstance | null>(null);
+  const shuffleRef = useRef<Shuffle | null>(null);
+  const shuffleGridLanesRef = useRef<GridLanes | null>(null);
   const [searchText, setSearchText] = useState('');
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [sortValue, setSortValue] = useState('dom');
+  const [mode, setMode] = useState<'shuffle' | 'grid-lanes'>('grid-lanes');
 
   // Helper function to apply filter and search together
   const applyFilter = (search: string, filter: string | null) => {
@@ -25,14 +28,14 @@ export const HomepageDemo: React.FC = () => {
       if (filter) {
         const { groups } = element.dataset;
         if (groups) {
-          const groupArray = JSON.parse(groups) as string[];
+          const groupArray = groups.split(' ');
           if (!groupArray.includes(filter)) {
             return false;
           }
         }
       }
 
-      const titleElement = element.querySelector(`.${styles.pictureItemTitle}`);
+      const titleElement = element.querySelector('[data-title-element]');
       if (!titleElement) {
         return true;
       }
@@ -73,17 +76,39 @@ export const HomepageDemo: React.FC = () => {
 
   const initShuffle = () => {
     shuffleRef.current ??= new Shuffle('#grid', {
-      itemSelector: `.${styles.pictureItem}`,
-      sizer: `.${styles.sizer}`,
+      itemSelector: `.${classicGridStyles.pictureItem}`,
+      sizer: `.${classicGridStyles.sizer}`,
+      delimiter: ' ',
+    });
+    // TODO: images are the wrong height after this re-render. Could be either
+    // the img wrapper isn't correctly setting its height without the image, or
+    // something weird with react rendering.
+  };
+
+  const destroyGridLanes = () => {
+    if (shuffleGridLanesRef.current) {
+      shuffleGridLanesRef.current.destroy();
+      shuffleGridLanesRef.current = null;
+    }
+  };
+
+  const initGridLanes = () => {
+    shuffleGridLanesRef.current ??= new GridLanes('#grid', {
+      itemSelector: 'figure',
     });
   };
 
-  // Initialize Shuffle on mount
   useEffect(() => {
-    initShuffle();
-
-    return destroyShuffle;
-  }, []);
+    if (mode === 'shuffle') {
+      initShuffle();
+    } else {
+      initGridLanes();
+    }
+    return () => {
+      destroyShuffle();
+      destroyGridLanes();
+    };
+  }, [mode]);
 
   return (
     <section className={styles.homepageDemo}>
@@ -96,139 +121,45 @@ export const HomepageDemo: React.FC = () => {
         </div>
       </div>
 
-      <div className="container">
-        <div className="row">
-          <div className={cx('col', styles['col--4-sm'])}>
-            <div className={styles.filtersGroup}>
-              <label htmlFor="filters-search-input" className={styles.filterLabel}>
-                Search
-              </label>
-              <input
-                className={styles.textfield}
-                type="search"
-                id="filters-search-input"
-                placeholder="Search items..."
-                value={searchText}
-                onChange={(event) => {
-                  const newSearchText = event.target.value;
-                  setSearchText(newSearchText);
-                  applyFilter(newSearchText, activeFilter);
-                  applySort(sortValue);
-                }}
-              />
-            </div>
-          </div>
-        </div>
+      <DemoFilters
+        searchText={searchText}
+        activeFilter={activeFilter}
+        mode={mode}
+        sortValue={sortValue}
+        onSearchTextChange={(newSearchText) => {
+          setSearchText(newSearchText);
+          applyFilter(newSearchText, activeFilter);
+          applySort(sortValue);
+        }}
+        onModeChange={(newMode) => {
+          setMode(newMode);
+        }}
+        onFilterChange={(newFilter) => {
+          setActiveFilter(newFilter);
+          applyFilter(searchText, newFilter);
+          applySort(sortValue);
+        }}
+        onSortChange={(newSortValue) => {
+          setSortValue(newSortValue);
+          applySort(newSortValue);
+        }}
+      />
 
-        <div className="row">
-          <div className={cx('col', 'col--12', styles.filtersWrap)}>
-            <div className={styles.filtersGroup}>
-              <p className={styles.filterLabel}>Filter</p>
-              <div className={styles.btnGroup}>
-                {['space', 'nature', 'animal', 'city'].map((group) => (
-                  <button
-                    key={group}
-                    type="button"
-                    className={cx(styles.btn, styles.btnPrimary, activeFilter === group && styles.active)}
-                    onClick={() => {
-                      const newFilter = activeFilter === group ? null : group;
-                      setActiveFilter(newFilter);
-                      applyFilter(searchText, newFilter);
-                      applySort(sortValue);
-                    }}
-                  >
-                    {group.charAt(0).toUpperCase() + group.slice(1)}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <fieldset className={styles.filtersGroup}>
-              <legend className={styles.filterLabel}>Sort</legend>
-              <div className={styles.btnGroup}>
-                {[
-                  { value: 'dom', label: 'Default' },
-                  { value: 'title', label: 'Title' },
-                  { value: 'date-created', label: 'Date Created' },
-                ].map((option) => (
-                  <label key={option.value} className={cx(styles.btn, sortValue === option.value && styles.active)}>
-                    <input
-                      type="radio"
-                      name="sort-value"
-                      value={option.value}
-                      checked={sortValue === option.value}
-                      onChange={(event) => {
-                        const newSortValue = event.target.value;
-                        setSortValue(newSortValue);
-                        applySort(newSortValue);
-                      }}
-                    />
-                    {option.label}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-          </div>
-        </div>
-      </div>
-
-      <div className="container">
-        <div id="grid" className={cx('row', styles.myShuffle)}>
-          {DEMO_ITEMS.map((item) => (
-            <figure
-              key={item.id}
-              className={cx(
-                'col',
-                styles[`col--${item.display.colXs}-xs`],
-                styles[`col--${item.display.colSm}-sm`],
-                styles[`col--${item.display.colMd}-md`],
-                styles.pictureItem,
-                item.display.isOverlay && styles.pictureItemOverlay,
-                item.display.heightSpan2 && styles.pictureItemH2,
-              )}
-              data-groups={JSON.stringify(item.groups)}
-              data-date-created={item.dateCreated}
-              data-title={item.title}
-            >
-              <div className={styles.pictureItemInner}>
-                {item.display.lockAspectRatio ? (
-                  <div className={styles.aspect}>
-                    <img src={item.image} srcSet={item.imageSrcSet} alt={item.alt} />
-                  </div>
-                ) : (
-                  <img src={item.image} srcSet={item.imageSrcSet} alt={item.alt} />
-                )}
-
-                <div className={styles.pictureItemDetails}>
-                  <figcaption className={styles.pictureItemTitle}>
-                    <a href={item.url} target="_blank" rel="noopener noreferrer">
-                      {item.title}
-                    </a>
-                  </figcaption>
-                  <p className={styles.pictureItemTags}>{item.tags.join(', ')}</p>
-                </div>
-
-                {item.description && <p className={styles.pictureItemDescription}>{item.description}</p>}
-              </div>
-            </figure>
-          ))}
-
-          <div className={cx('col', styles['col--1-xs'], styles['col--1-sm'], styles.sizer)} />
-        </div>
-      </div>
+      {mode === 'shuffle' ? <ClassicShuffleGrid key="shuffle" /> : <GridLanesGrid key="grid-lanes" />}
 
       {DEBUG && (
         <div className="container">
           <div className="row">
-            <div className="col col--12">
+            <div className="col col--12" style={{ display: 'flex', gap: '4px' }}>
               <button
                 type="button"
                 className={styles.btn}
                 onClick={() => {
                   destroyShuffle();
+                  destroyGridLanes();
                 }}
               >
-                Destroy Shuffle
+                Destroy Shuffle(s)
               </button>
               <button
                 type="button"
@@ -238,6 +169,15 @@ export const HomepageDemo: React.FC = () => {
                 }}
               >
                 Init Shuffle
+              </button>
+              <button
+                type="button"
+                className={styles.btn}
+                onClick={() => {
+                  initGridLanes();
+                }}
+              >
+                Init Grid Lanes
               </button>
             </div>
           </div>
