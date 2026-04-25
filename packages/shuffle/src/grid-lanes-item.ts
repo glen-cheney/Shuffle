@@ -37,12 +37,14 @@ export class GridLanesItem {
     this.element.classList.add(Classes.HIDDEN);
     this.element.setAttribute('aria-hidden', 'true');
     this.element.style.setProperty('view-transition-name', 'none');
+    this.element.style.removeProperty('--shuffle-index');
   }
 
   dispose(): void {
     this.element.classList.remove(Classes.SHUFFLE_ITEM, Classes.VISIBLE, Classes.HIDDEN);
     this.element.style.removeProperty('view-transition-name');
     this.element.style.removeProperty('view-transition-class');
+    this.element.style.removeProperty('--shuffle-index');
     this.element.removeAttribute('aria-hidden');
   }
 }
