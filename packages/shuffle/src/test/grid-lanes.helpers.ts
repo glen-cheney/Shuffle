@@ -106,9 +106,7 @@ export function mockStartViewTransition({
       ready: Promise.resolve(),
       updateCallbackDone: Promise.resolve(),
       skipTransition,
-      // oxlint-disable-next-line typescript/ban-ts-comment, typescript/prefer-ts-expect-error
-      // @ts-ignore partial mock
       types: { forEach: noop },
-    };
+    } as unknown as ViewTransition;
   });
 }

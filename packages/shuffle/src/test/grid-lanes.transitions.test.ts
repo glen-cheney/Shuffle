@@ -2,8 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import GridLanes from '../shuffle-lanes';
-import { createFixture, isItemVisible, mockStartViewTransition } from './grid-lanes.helpers';
-import type { AnyFn } from './grid-lanes.helpers';
+import { createFixture, isItemVisible, mockStartViewTransition, type AnyFn } from './grid-lanes.helpers';
 
 describe('update concurrency last write wins', () => {
   afterEach(() => {
