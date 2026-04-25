@@ -1,0 +1,112 @@
+// oxlint-disable promise/prefer-await-to-then
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import GridLanes from '../shuffle-lanes';
+import { createFixture, isItemVisible, mockStartViewTransition, type AnyFn } from './grid-lanes.helpers';
+
+describe('update concurrency last write wins', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
+  });
+
+  it('rapid filter calls result in exactly one shuffle:layout event after the filters', async () => {
+    const { container } = createFixture();
+    mockStartViewTransition();
+    const instance = new GridLanes(container, { itemSelector: '.item' });
+
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    const layoutSpy = vi.fn<AnyFn>();
+    instance.on('shuffle:layout', layoutSpy);
+
+    instance.filter('design');
+    instance.filter('ux');
+
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(layoutSpy.mock.calls).toHaveLength(1);
+  });
+
+  it('last filter state is what gets committed when called rapidly', () => {
+    const { container, items } = createFixture();
+    const [item0] = items;
+    const item2 = items.at(2)!;
+    mockStartViewTransition();
+    const instance = new GridLanes(container, { itemSelector: '.item' });
+
+    instance.filter('design');
+    instance.filter('ux');
+
+    expect(isItemVisible(instance, item2)).toBe(true);
+    expect(isItemVisible(instance, item0)).toBe(false);
+  });
+
+  it('skipTransition is called on the interrupted transition', () => {
+    const { container } = createFixture();
+    const skipFn = vi.fn<() => void>();
+    const neverResolve = new Promise<void>((_resolve) => {
+      void 0;
+    });
+    mockStartViewTransition({ finished: neverResolve, skipTransition: skipFn });
+
+    const instance = new GridLanes(container, { itemSelector: '.item' });
+
+    instance.filter('design');
+    instance.filter('ux');
+
+    expect(skipFn.mock.calls).toHaveLength(1);
+  });
+});
+
+describe('no-VT fallback path', () => {
+  let savedVTDescriptor: PropertyDescriptor | undefined;
+
+  beforeEach(() => {
+    savedVTDescriptor = Object.getOwnPropertyDescriptor(document, 'startViewTransition');
+    Object.defineProperty(document, 'startViewTransition', { value: undefined, configurable: true });
+  });
+
+  afterEach(() => {
+    document.body.innerHTML = '';
+    if (savedVTDescriptor) {
+      Object.defineProperty(document, 'startViewTransition', savedVTDescriptor);
+    } else {
+      Reflect.deleteProperty(document, 'startViewTransition');
+    }
+    vi.restoreAllMocks();
+  });
+
+  it('applies filter/sort state synchronously when startViewTransition is unavailable', () => {
+    const { container, items } = createFixture();
+    const [item0, item1, item2] = items;
+
+    const instance = new GridLanes(container, { itemSelector: '.item' });
+    instance.filter('design');
+
+    expect(isItemVisible(instance, item0)).toBe(true);
+    expect(isItemVisible(instance, item1)).toBe(true);
+    expect(isItemVisible(instance, item2)).toBe(false);
+  });
+
+  it('emits shuffle:layout asynchronously via microtask when VT is unavailable', async () => {
+    const { container } = createFixture();
+    const instance = new GridLanes(container, { itemSelector: '.item' });
+
+    await Promise.resolve();
+
+    const layoutSpy = vi.fn<AnyFn>();
+    instance.on('shuffle:layout', layoutSpy);
+
+    instance.filter('design');
+
+    expect(layoutSpy).not.toHaveBeenCalled();
+
+    await Promise.resolve();
+    expect(layoutSpy.mock.calls).toHaveLength(1);
+  });
+});

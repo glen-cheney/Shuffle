@@ -16,7 +16,7 @@ vi.mock('../transition-manager', () => ({
   }),
 }));
 
-// TODO: find a different way to cover the branches from resize observer callbacks.
+// Coverage note: this mock triggers resize observer callback branches in tests.
 type ResizeObserverCallback = (entries: ResizeObserverEntry[]) => void;
 
 class MockResizeObserver {

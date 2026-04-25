@@ -6,6 +6,10 @@ export class GridLanesItem {
   element: HTMLElement;
   isVisible: boolean;
 
+  get isHidden(): boolean {
+    return !this.isVisible;
+  }
+
   constructor(element: HTMLElement, id: string, defaultOrder: number) {
     this.id = id;
     this.defaultOrder = defaultOrder;
@@ -24,6 +28,7 @@ export class GridLanesItem {
     this.element.classList.remove(Classes.HIDDEN);
     this.element.classList.add(Classes.VISIBLE);
     this.element.removeAttribute('aria-hidden');
+    this.element.style.setProperty('view-transition-name', this.id);
   }
 
   hide(): void {
@@ -31,5 +36,13 @@ export class GridLanesItem {
     this.element.classList.remove(Classes.VISIBLE);
     this.element.classList.add(Classes.HIDDEN);
     this.element.setAttribute('aria-hidden', 'true');
+    this.element.style.setProperty('view-transition-name', 'none');
+  }
+
+  dispose(): void {
+    this.element.classList.remove(Classes.SHUFFLE_ITEM, Classes.VISIBLE, Classes.HIDDEN);
+    this.element.style.removeProperty('view-transition-name');
+    this.element.style.removeProperty('view-transition-class');
+    this.element.removeAttribute('aria-hidden');
   }
 }
