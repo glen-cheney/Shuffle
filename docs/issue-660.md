@@ -93,7 +93,7 @@ Required validation evidence checklist:
 - [x] Unit test: metadata storage uses `GridLanesItem` properties (no DOM attribute writes).
 - [x] Unit or integration test: first render path bypasses view transitions.
 
-## Phase 2: Filtering and sorting
+## ✅ Phase 2: Filtering and sorting (#684)
 
 Port the filtering and sorting logic from the existing `Shuffle` class. The demo's `applyFilters()` and `applySorting()` are simplified versions of what Shuffle does. Key differences from the current implementation:
 
@@ -334,21 +334,21 @@ Checkpoint goal: Validate that the view-transition animation layer is stable, ar
 
 Pass criteria checklist:
 
-- [ ] Shipped CSS includes the required `::view-transition-group(.shuffle-item)`, `::view-transition-image-pair(.shuffle-item)`, `::view-transition-new(.shuffle-item):only-child`, and `::view-transition-old(.shuffle-item):only-child` rules.
-- [ ] Enter and exit keyframes match plan semantics (`vt-reveal` and `vt-conceal`) and both use `animation-fill-mode: both` through shorthand.
-- [ ] `::view-transition-image-pair(.shuffle-item)` sets `isolation: auto` and `mix-blend-mode: normal`.
-- [ ] No conflicting CSS transitions are applied to shuffle items during this mode.
-- [ ] Speed and easing options are written to container CSS custom properties and actually affect transition timing.
-- [ ] Stagger variables are written to container CSS custom properties and consumed by the manual `--shuffle-index` strategy.
-- [ ] `prefers-reduced-motion: reduce` collapses durations/delays to near-zero values while preserving transition lifecycle completion.
-- [ ] Hide/show/remove flows do not exhibit one-frame flash, snap-back, or ghosting artifacts.
+- [x] Shipped CSS includes the required `::view-transition-group(.shuffle-item)`, `::view-transition-image-pair(.shuffle-item)`, `::view-transition-new(.shuffle-item):only-child`, and `::view-transition-old(.shuffle-item):only-child` rules.
+- [x] Enter and exit keyframes match plan semantics (`vt-reveal` and `vt-conceal`) and both use `animation-fill-mode: both` through shorthand.
+- [x] `::view-transition-image-pair(.shuffle-item)` sets `isolation: auto` and `mix-blend-mode: normal`.
+- [x] No conflicting CSS transitions are applied to shuffle items during this mode.
+- [x] Speed and easing options are written to container CSS custom properties and actually affect transition timing.
+- [x] Stagger variables are written to container CSS custom properties and consumed by the manual `--shuffle-index` strategy.
+- [x] `prefers-reduced-motion: reduce` collapses durations/delays to near-zero values while preserving transition lifecycle completion.
+- [x] Hide/show/remove flows do not exhibit one-frame flash, snap-back, or ghosting artifacts.
 
 Required validation evidence checklist:
 
-- [ ] Unit test: speed/easing option writes expected container custom property values.
-- [ ] Unit test: stagger options write expected container custom property values.
+- [x] Unit test: speed/easing option writes expected container custom property values.
+- [x] Unit test: stagger options write expected container custom property values.
 - [ ] Integration test: computed transition rules confirm required pseudo-element selectors are active when CSS is imported.
-- [ ] Integration test: manual `--shuffle-index` path correctly staggers visible items.
+- [x] Integration test: manual `--shuffle-index` path correctly staggers visible items.
 - [ ] Integration test: reduced-motion path completes updates with effectively no visible animation.
 - [ ] Visual regression test: repeated filter/sort/hide/show cycles show no flash/snap artifacts.
 
@@ -380,20 +380,20 @@ Checkpoint goal: Validate that `GridLanesItem` is a minimal, lanes-specific abst
 
 Pass criteria checklist:
 
-- [ ] `GridLanesItem` is implemented as a distinct class and does not extend or reuse `ShuffleItem` internals.
-- [ ] `GridLanesItem` includes required fields (`id`, `element`, `isVisible`, `isHidden`, `defaultOrder`) and no position/transform-era fields.
-- [ ] `show()` restores display participation and restores the assigned real `view-transition-name`.
-- [ ] `hide()` sets `display: none` and `view-transition-name: none`.
-- [ ] `dispose()` removes only library-owned item classes and inline styles.
-- [ ] Sort comparator integration remains compatible with expected sort contract surfaces.
+- [x] `GridLanesItem` is implemented as a distinct class and does not extend or reuse `ShuffleItem` internals.
+- [x] `GridLanesItem` includes required fields (`id`, `element`, `isVisible`, `isHidden`, `defaultOrder`) and no position/transform-era fields.
+- [x] `show()` restores display participation and restores the assigned real `view-transition-name`.
+- [x] `hide()` sets `display: none` and `view-transition-name: none`.
+- [x] `dispose()` removes only library-owned item classes and inline styles.
+- [x] Sort comparator integration remains compatible with expected sort contract surfaces.
 
 Required validation evidence checklist:
 
-- [ ] Unit test: `show()` and `hide()` toggle item visibility state and transition-name semantics correctly.
-- [ ] Unit test: `dispose()` removes only library-owned item-level mutations.
-- [ ] Unit test: `isVisible` and `isHidden` stay logically consistent across filter transitions.
-- [ ] Unit test: sort comparators can consume `GridLanesItem` instances without an adapter.
-- [ ] Type-level check: `GridLanesItem` public shape excludes legacy absolute-position fields.
+- [x] Unit test: `show()` and `hide()` toggle item visibility state and transition-name semantics correctly.
+- [x] Unit test: `dispose()` removes only library-owned item-level mutations.
+- [x] Unit test: `isVisible` and `isHidden` stay logically consistent across filter transitions.
+- [x] Unit test: sort comparators can consume `GridLanesItem` instances without an adapter.
+- [x] Type-level check: `GridLanesItem` public shape excludes legacy absolute-position fields.
 
 ## Phase 5: Public API compatibility
 

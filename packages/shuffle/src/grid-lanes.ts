@@ -213,8 +213,11 @@ class GridLanes extends TinyEmitter {
     const fragment = document.createDocumentFragment();
     const visibleSet = new Set(sortedVisible);
 
+    let visibleCount = 0;
     for (const item of sortedVisible) {
       item.show();
+      item.element.style.setProperty('--shuffle-index', String(visibleCount));
+      visibleCount += 1;
       fragment.append(item.element);
     }
 
