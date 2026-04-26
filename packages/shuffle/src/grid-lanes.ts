@@ -52,6 +52,10 @@ const DEFAULT_GRID_LANES_OPTIONS: ResolvedGridLanesOptions = {
 let itemIdCounter = 0;
 let defaultOrderCounter = 0;
 
+function uniqueElements(elements: HTMLElement[]): HTMLElement[] {
+  return [...new Set(elements)];
+}
+
 class GridLanes extends TinyEmitter {
   element: HTMLElement;
   options: ResolvedGridLanesOptions;
@@ -60,6 +64,7 @@ class GridLanes extends TinyEmitter {
   group: GridLanesFilterArg = ALL_ITEMS;
   lastFilter: GridLanesFilterArg = ALL_ITEMS;
   lastSort: GridLanesSortOptions | null = null;
+  isEnabled = true;
   isInitialized = false;
   isTransitioning = false;
   #activeTransition: ViewTransition | null = null;
@@ -129,6 +134,24 @@ class GridLanes extends TinyEmitter {
   }
 
   /**
+   * Create and initialize a tracked item.
+   */
+  static #createItem(element: HTMLElement, { startHidden = false }: { startHidden?: boolean } = {}): GridLanesItem {
+    const id = `shuffle-item-${itemIdCounter}`;
+    itemIdCounter += 1;
+
+    const defaultOrder = defaultOrderCounter;
+    defaultOrderCounter += 1;
+
+    const item = new GridLanesItem(element, id, defaultOrder);
+    item.init();
+    if (startHidden) {
+      item.hide();
+    }
+    return item;
+  }
+
+  /**
    * Get all elements matching `itemSelector` and convert them to GridLanesItems.
    */
   #getItems(): Map<HTMLElement, GridLanesItem> {
@@ -142,15 +165,7 @@ class GridLanes extends TinyEmitter {
         continue;
       }
 
-      const id = `shuffle-item-${itemIdCounter}`;
-      itemIdCounter += 1;
-
-      const defaultOrder = defaultOrderCounter;
-      defaultOrderCounter += 1;
-
-      const item = new GridLanesItem(node, id, defaultOrder);
-      item.init();
-      items.set(node, item);
+      items.set(node, GridLanes.#createItem(node));
     }
 
     return items;
@@ -197,7 +212,8 @@ class GridLanes extends TinyEmitter {
    * Recompute filter/sort state and update DOM order.
    */
   #applyUpdate(): void {
-    const allItems = this.#getAllItems();
+    const pendingRemovals = new Set(this.#pendingRemovals);
+    const allItems = this.#getAllItems().filter((item) => !pendingRemovals.has(item));
 
     // Determine which items pass the current filter.
     const filteredItems =
@@ -221,7 +237,7 @@ class GridLanes extends TinyEmitter {
       fragment.append(item.element);
     }
 
-    for (const item of this.items.values()) {
+    for (const item of allItems) {
       if (!visibleSet.has(item)) {
         item.hide();
         fragment.append(item.element);
@@ -229,6 +245,10 @@ class GridLanes extends TinyEmitter {
     }
 
     this.element.append(fragment);
+
+    for (const item of pendingRemovals) {
+      item.element.remove();
+    }
   }
 
   /**
@@ -236,8 +256,8 @@ class GridLanes extends TinyEmitter {
    */
   #flushRemovals(): void {
     for (const item of this.#pendingRemovals) {
-      item.element.remove();
       this.items.delete(item.element);
+      item.dispose();
     }
     this.#pendingRemovals.length = 0;
   }
@@ -246,8 +266,13 @@ class GridLanes extends TinyEmitter {
    * Mark movement complete and emit the layout event.
    */
   #movementFinished(): void {
+    this.#activeTransition = null;
     this.isTransitioning = false;
-    this.emit(EventType.LAYOUT, this);
+    this.#flushRemovals();
+    this.emit(EventType.LAYOUT, {
+      type: EventType.LAYOUT,
+      shuffle: this,
+    });
   }
 
   /**
@@ -261,7 +286,6 @@ class GridLanes extends TinyEmitter {
       // Transition was skipped or aborted — cleanup still runs in finally.
     } finally {
       if (this.#activeTransition === vt) {
-        this.#activeTransition = null;
         this.#movementFinished();
       }
     }
@@ -273,7 +297,9 @@ class GridLanes extends TinyEmitter {
   #commit(): void {
     // Last-write-wins: cancel any in-flight transition before starting a new one.
     if (this.#activeTransition) {
-      this.#activeTransition.skipTransition();
+      const activeTransition = this.#activeTransition;
+      this.#activeTransition = null;
+      activeTransition.skipTransition();
       this.#flushRemovals();
     }
 
@@ -282,14 +308,12 @@ class GridLanes extends TinyEmitter {
     if (typeof document.startViewTransition === 'function' && this.isInitialized) {
       const vt = document.startViewTransition(() => {
         this.#applyUpdate();
-        this.#flushRemovals();
       });
       this.#activeTransition = vt;
       // Wait for the view transition to finish.
       void this.#monitorViewTransition(vt);
     } else {
       this.#applyUpdate();
-      this.#flushRemovals();
       queueMicrotask(() => {
         this.#movementFinished();
       });
@@ -305,6 +329,10 @@ class GridLanes extends TinyEmitter {
     category: GridLanesFilterArg = this.lastFilter,
     sortOptions: GridLanesSortOptions | null = this.lastSort,
   ): void {
+    if (!this.isEnabled) {
+      return;
+    }
+
     let nextCategory = category;
     if (!nextCategory || nextCategory.length === 0) {
       nextCategory = ALL_ITEMS;
@@ -325,6 +353,10 @@ class GridLanes extends TinyEmitter {
    * @param sortOptions The options object to pass to `sorter`.
    */
   sort(sortOptions: GridLanesSortOptions | null = null): void {
+    if (!this.isEnabled) {
+      return;
+    }
+
     this.lastSort = sortOptions;
     this.#commit();
   }
@@ -332,7 +364,11 @@ class GridLanes extends TinyEmitter {
   /**
    * Recalculate filter/sort state and re-render items.
    */
-  update(): void {
+  update({ force = false }: { force?: boolean } = {}): void {
+    if (!this.isEnabled && !force) {
+      return;
+    }
+
     this.#commit();
   }
 
@@ -341,9 +377,88 @@ class GridLanes extends TinyEmitter {
    * Browser layout is native, so this method only emits `shuffle:layout`.
    */
   layout(): void {
+    if (!this.isEnabled) {
+      return;
+    }
+
     queueMicrotask(() => {
       this.#movementFinished();
     });
+  }
+
+  /**
+   * Add new items to the container and reconcile them with the current state.
+   * @param newItems Collection of new items.
+   */
+  add(newItems: HTMLElement[]): void {
+    const collection = uniqueElements(newItems).filter((element) => !this.items.has(element));
+
+    if (collection.length === 0) {
+      return;
+    }
+
+    for (const element of collection) {
+      if (element.parentElement !== this.element) {
+        this.element.append(element);
+      }
+
+      const item = GridLanes.#createItem(element, { startHidden: true });
+      this.items.set(element, item);
+    }
+
+    this.#commit();
+  }
+
+  /**
+   * Disables filtering, sorting, and update/layout calls.
+   */
+  disable(): void {
+    this.isEnabled = false;
+    this.#activeTransition?.skipTransition();
+  }
+
+  /**
+   * Re-enables filtering, sorting, and updates.
+   * @param isUpdateLayout Whether to commit the current state immediately.
+   */
+  enable(isUpdateLayout = true): void {
+    this.isEnabled = true;
+    if (isUpdateLayout) {
+      this.update();
+    }
+  }
+
+  /**
+   * Remove items from the current collection.
+   * @param elements Elements to remove.
+   */
+  remove(elements: HTMLElement[]): void {
+    const collection = uniqueElements(elements);
+    if (collection.length === 0) {
+      return;
+    }
+
+    const itemsToRemove = collection
+      .map((element) => this.getItemByElement(element))
+      .filter((item): item is GridLanesItem => item !== undefined)
+      .filter((item) => !this.#pendingRemovals.includes(item));
+
+    if (itemsToRemove.length === 0) {
+      return;
+    }
+
+    const removedElements = itemsToRemove.map((item) => item.element);
+    this.#pendingRemovals.push(...itemsToRemove);
+
+    this.once(EventType.LAYOUT, () => {
+      this.emit(EventType.REMOVED, {
+        type: EventType.REMOVED,
+        shuffle: this,
+        collection: removedElements,
+      });
+    });
+
+    this.#commit();
   }
 
   /**
@@ -353,6 +468,49 @@ class GridLanes extends TinyEmitter {
    */
   getItemByElement(element: HTMLElement): GridLanesItem | undefined {
     return this.items.get(element);
+  }
+
+  /**
+   * Re-query items and preserve metadata for surviving elements.
+   */
+  resetItems(): void {
+    if (this.#activeTransition) {
+      const activeTransition = this.#activeTransition;
+      this.#activeTransition = null;
+      activeTransition.skipTransition();
+      this.#flushRemovals();
+      this.isTransitioning = false;
+    }
+
+    const nextItems = new Map<HTMLElement, GridLanesItem>();
+    // oxlint-disable-next-line unicorn/prefer-spread
+    const elements = Array.from(this.element.querySelectorAll(this.options.itemSelector));
+
+    for (const node of elements) {
+      if (!(node instanceof HTMLElement)) {
+        continue;
+      }
+
+      const existingItem = this.items.get(node);
+      if (existingItem) {
+        nextItems.set(node, existingItem);
+        continue;
+      }
+
+      nextItems.set(node, GridLanes.#createItem(node, { startHidden: true }));
+    }
+
+    for (const [element, item] of this.items) {
+      if (!nextItems.has(element)) {
+        item.dispose();
+      }
+    }
+
+    this.items = nextItems;
+    this.sortedItems = [...nextItems.values()];
+    this.#pendingRemovals = this.#pendingRemovals.filter((item) => nextItems.has(item.element));
+
+    this.#commit();
   }
 
   /**
@@ -371,6 +529,8 @@ class GridLanes extends TinyEmitter {
     this.items.clear();
     this.sortedItems.length = 0;
     this.#pendingRemovals.length = 0;
+    this.handlers = {};
+    this.isEnabled = false;
 
     if (this.element) {
       this.element.style.removeProperty('--shuffle-speed');

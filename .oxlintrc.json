@@ -70,6 +70,7 @@
       "files": ["*.test.{ts,tsx}"],
       "plugins": ["vitest"],
       "rules": {
+        "typescript/unbound-method": "off",
         "vitest/prefer-importing-vitest-globals": "off", // false positives on `test-utils` imports
         "vitest/no-importing-vitest-globals": "off", // we do not use `globals: true`
         "vitest/prefer-to-be-falsy": "off",
