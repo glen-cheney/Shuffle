@@ -1,5 +1,6 @@
 import React from 'react';
 import cx from 'clsx';
+import 'shufflejs/grid-lanes.css';
 
 import { DEMO_ITEMS } from '../../components/homepage-demo-constants';
 import { PictureItemContent } from './picture-item-content';
