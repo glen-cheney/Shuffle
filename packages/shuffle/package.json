@@ -24,6 +24,7 @@
       "types": "./dist/shuffle-lanes.d.mts",
       "default": "./dist/shuffle-lanes.mjs"
     },
+    "./grid-lanes.css": "./dist/shuffle-lanes.css",
     "./package.json": "./package.json"
   },
   "types": "./dist/shuffle.d.mts",

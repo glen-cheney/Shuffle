@@ -314,11 +314,6 @@ The shipped CSS must honor `prefers-reduced-motion: reduce`. Add a media query t
   ::view-transition-old(.shuffle-item):only-child {
     animation-duration: 0.001ms;
   }
-  @supports (animation-delay: calc((sibling-index() - 1) * 1ms)) {
-    ::view-transition-group(.shuffle-item) {
-      animation-delay: 0ms;
-    }
-  }
 }
 ```
 
@@ -433,28 +428,28 @@ Checkpoint goal: Validate public API compatibility and lifecycle semantics so ex
 
 Pass criteria checklist:
 
-- [ ] Public methods are present with compatible signatures: `filter`, `sort`, `layout`, `update`, `add`, `remove`, `enable`, `disable`, `destroy`, `resetItems`, `getItemByElement`.
-- [ ] Decision: Does window resize trigger a View Transition? Evaluate if native browser reflow (instant) is preferable to animated reflow for performance and feel.
-- [ ] `layout()` behaves as a no-op for geometry while still participating in expected lifecycle/event behavior.
-- [ ] `LAYOUT` always fires asynchronously.
-- [ ] With view transitions enabled, `LAYOUT` fires after `ViewTransition.finished` settles (resolve or reject).
-- [ ] Without view transitions, updates apply synchronously but `LAYOUT` still emits in a microtask.
-- [ ] `REMOVED` fires only after physical DOM removal completes.
-- [ ] `disable()` stops new behavior and aborts in-flight transitions via `skipTransition()`.
-- [ ] `enable()` resumes normal filter/sort/update behavior.
-- [ ] `destroy()` strips only library-owned styles/classes/listeners and does not remove user-owned container inline styles wholesale.
-- [ ] `add()` flow prevents flash of unfiltered content by hiding new items before the first update.
-- [ ] `resetItems()` reconciles item state: survivors keep existing metadata and only newly discovered elements get minted values.
+- [x] Public methods are present with compatible signatures: `filter`, `sort`, `layout`, `update`, `add`, `remove`, `enable`, `disable`, `destroy`, `resetItems`, `getItemByElement`.
+- [x] Decision: Does window resize trigger a View Transition? **No** — `GridLanes` has no `ResizeObserver` or resize listener. The browser reflows the grid-lanes layout natively and instantly on resize; no view transition is triggered. This is the correct behavior: animated reflow on resize would feel laggy and is unnecessary since the browser owns layout geometry.
+- [x] `layout()` behaves as a no-op for geometry while still participating in expected lifecycle/event behavior.
+- [x] `LAYOUT` always fires asynchronously.
+- [x] With view transitions enabled, `LAYOUT` fires after `ViewTransition.finished` settles (resolve or reject).
+- [x] Without view transitions, updates apply synchronously but `LAYOUT` still emits in a microtask.
+- [x] `REMOVED` fires only after physical DOM removal completes.
+- [x] `disable()` stops new behavior and aborts in-flight transitions via `skipTransition()`.
+- [x] `enable()` resumes normal filter/sort/update behavior.
+- [x] `destroy()` strips only library-owned styles/classes/listeners and does not remove user-owned container inline styles wholesale.
+- [x] `add()` flow prevents flash of unfiltered content by hiding new items before the first update.
+- [x] `resetItems()` reconciles item state: survivors keep existing metadata and only newly discovered elements get minted values.
 - [ ] Hidden-item tab order behavior change (`display: none`) is documented as part of API behavior expectations.
 
 Required validation evidence checklist:
 
-- [ ] API surface test: method presence and callable signatures.
-- [ ] Integration test: `LAYOUT` async timing with VT enabled and disabled.
-- [ ] Integration test: `REMOVED` fires after DOM removal and after layout completion.
-- [ ] Integration test: `disable()` aborts active transition and `enable()` restores behavior.
-- [ ] Unit/integration test: `destroy()` strips only library-owned styles/classes and preserves user-owned `style` content.
-- [ ] Integration test: `resetItems()` preserves existing metadata for survivors.
+- [x] API surface test: method presence and callable signatures.
+- [x] Integration test: `LAYOUT` async timing with VT enabled and disabled.
+- [x] Integration test: `REMOVED` fires after DOM removal and after layout completion.
+- [x] Integration test: `disable()` aborts active transition and `enable()` restores behavior.
+- [x] Unit/integration test: `destroy()` strips only library-owned styles/classes and preserves user-owned `style` content.
+- [x] Integration test: `resetItems()` preserves existing metadata for survivors.
 
 ## Phase 6: CSS shipped with the package
 
@@ -478,21 +473,21 @@ Checkpoint goal: Validate that the package ships a correct, minimal stylesheet c
 
 Pass criteria checklist:
 
-- [ ] `packages/shuffle/src/shuffle-lanes.css` exists and is included in the build output.
-- [ ] CSS includes `.shuffle-item--visible` and `.shuffle-item--hidden` class definitions.
-- [ ] CSS includes required `::view-transition-*` rules and the stagger `@supports` block.
-- [ ] CSS includes the `@media (prefers-reduced-motion: reduce)` override block.
-- [ ] CSS includes a recommended grid-lanes container example comment for authors.
-- [ ] CSS does not set `display: grid-lanes`, `display: grid`, `grid-template-columns`, or `gap` for user containers.
-- [ ] CSS remains scoped to library-owned item classes and view-transition selectors to avoid broad global collisions.
-- [ ] Package exports include `shufflejs/grid-lanes.css` and `shufflejs/grid-lanes` subpaths.
-- [ ] Consumer import of `shufflejs/grid-lanes.css` works without custom post-build copy hacks.
+- [x] `packages/shuffle/src/shuffle-lanes.css` exists and is included in the build output.
+- [x] CSS includes `.shuffle-item--visible` and `.shuffle-item--hidden` class definitions.
+- [x] CSS includes required `::view-transition-*` rules and the stagger `@supports` block.
+- [x] CSS includes the `@media (prefers-reduced-motion: reduce)` override block.
+- [x] CSS includes a recommended grid-lanes container example comment for authors.
+- [x] CSS does not set `display: grid-lanes`, `display: grid`, `grid-template-columns`, or `gap` for user containers.
+- [x] CSS remains scoped to library-owned item classes and view-transition selectors to avoid broad global collisions.
+- [x] Package exports include `shufflejs/grid-lanes.css` and `shufflejs/grid-lanes` subpaths.
+- [x] Consumer import of `shufflejs/grid-lanes.css` works without custom post-build copy hacks.
 
 Required validation evidence checklist:
 
-- [ ] Build artifact check: emitted `dist/shuffle-lanes.css` exists after package build.
-- [ ] Static content check: emitted CSS contains required sections and omits layout-ownership rules.
-- [ ] Package export check: `package.json` exports resolve for both JS and CSS subpaths.
+- [x] Build artifact check: emitted `dist/shuffle-lanes.css` exists after package build.
+- [x] Static content check: emitted CSS contains required sections and omits layout-ownership rules.
+- [x] Package export check: `package.json` exports resolve for both JS and CSS subpaths.
 - [ ] Consumer smoke test: importing `shufflejs/grid-lanes.css` in a sample app applies hide/show/view-transition styles.
 - [ ] Bundler behavior check: CSS is retained in production build when imported.
 
