@@ -523,22 +523,22 @@ Checkpoint goal: Validate progressive enhancement across browser capability tier
 
 Pass criteria checklist:
 
-- [ ] User CSS baseline uses `display: grid` with explicit column/gap definitions.
-- [ ] User CSS enhancement layer switches to `display: grid-lanes` inside `@supports (display: grid-lanes)`.
-- [ ] Tier 1 behavior is correct: grid-lanes layout plus view-transition animations where both features are available.
-- [ ] Tier 2 behavior is correct: standard grid layout plus view-transition animations where grid-lanes is unavailable.
-- [ ] Tier 3 behavior is correct: standard grid layout with instant updates when view transitions are unavailable.
-- [ ] JS logic does not add extra layout branching beyond view-transition capability checks.
-- [ ] Filter/sort/add/remove semantics remain consistent across all tiers (only layout/animation capabilities vary).
-- [ ] No tier breaks API/event expectations established in earlier phases.
+- [x] User CSS baseline uses `display: grid` with explicit column/gap definitions.
+- [x] User CSS enhancement layer switches to `display: grid-lanes` inside `@supports (display: grid-lanes)`.
+- [x] Tier 1 behavior is correct: grid-lanes layout plus view-transition animations where both features are available.
+- [x] Tier 2 behavior is correct: standard grid layout plus view-transition animations where grid-lanes is unavailable.
+- [x] Tier 3 behavior is correct: standard grid layout with instant updates when view transitions are unavailable.
+- [x] JS logic does not add extra layout branching beyond view-transition capability checks.
+- [x] Filter/sort/add/remove semantics remain consistent across all tiers (only layout/animation capabilities vary).
+- [x] No tier breaks API/event expectations established in earlier phases.
 
 Required validation evidence checklist:
 
-- [ ] Browser integration test: Tier 1 environment confirms lanes layout and animated updates.
-- [ ] Browser integration test: Tier 2 environment confirms grid fallback with animated updates.
-- [ ] Browser integration test: Tier 3 environment confirms grid fallback with no animation and correct final DOM state.
-- [ ] Cross-tier parity test: same sequence of API calls yields matching visibility/order outcomes.
-- [ ] Documentation example test: published CSS snippet works as written without additional hidden requirements.
+- [x] Browser integration test: Tier 1 environment confirms lanes layout and animated updates.
+- [x] Browser integration test: Tier 2 environment confirms grid fallback with animated updates.
+- [x] Browser integration test: Tier 3 environment confirms grid fallback with no animation and correct final DOM state.
+- [x] Cross-tier parity test: same sequence of API calls yields matching visibility/order outcomes.
+- [x] Documentation example test: published CSS snippet works as written without additional hidden requirements.
 
 ## Phase 8: Testing
 
@@ -598,11 +598,11 @@ Required validation evidence checklist:
 
 - Explain the CSS-first approach: user writes `grid-template-columns`, `gap`, `flow-tolerance` in their CSS
 - Show the `@supports` progressive enhancement pattern
-- Document which Shuffle options are replaced by CSS properties (link to `shuffle-to-grid-lanes-mapping.js`)
+- Document which Shuffle options are replaced by CSS properties
 - Explain that `layout()` is a no-op — the browser re-layouts automatically on DOM changes
 - Document keyboard/focus behavior: tab order follows DOM order; `GridLanes` does not manage `tabindex`
 
-### Migration guide from Shuffle v7
+### Migration guide from Shuffle JS-based layout (classic/original Shuffle)
 
 - Replace `columnWidth` / `sizer` / `gutterWidth` options with CSS `grid-template-columns` + `gap`
 - Remove any custom `speed` / `easing` CSS overrides on `.shuffle-item` (view transitions handle it)

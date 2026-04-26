@@ -9,6 +9,17 @@ import {
   mockStartViewTransition,
 } from './grid-lanes.helpers';
 
+function injectHiddenRule(): HTMLStyleElement {
+  const style = document.createElement('style');
+  style.textContent = `
+    [data-shuffle-lanes] .shuffle-item--hidden {
+      display: none !important;
+    }
+  `;
+  document.head.append(style);
+  return style;
+}
+
 describe('sorting', () => {
   beforeEach(() => {
     mockStartViewTransition();
@@ -87,6 +98,20 @@ describe('hidden item semantics', () => {
     expect(item2.classList.contains('shuffle-item--visible')).toBe(false);
     expect(item2.getAttribute('aria-hidden')).toBe('true');
     expect(item2.style.getPropertyValue('view-transition-name')).toBe('none');
+  });
+
+  it('hidden items are out of flow when hidden class rule is present', () => {
+    const style = injectHiddenRule();
+    const { container, items } = createFixture();
+    const item2 = items.at(2)!;
+    const instance = new GridLanes(container, { itemSelector: '.item' });
+
+    instance.filter('design');
+
+    expect(item2.classList.contains('shuffle-item--hidden')).toBe(true);
+    expect(globalThis.getComputedStyle(item2).display).toBe('none');
+
+    style.remove();
   });
 
   it('shown items have shuffle-item--visible class, no aria-hidden, and real view-transition-name', () => {
