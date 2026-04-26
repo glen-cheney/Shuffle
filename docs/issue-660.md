@@ -205,7 +205,7 @@ Required validation evidence checklist:
 - [x] Integration test: rapid successive update calls prove last-write-wins and one `shuffle:layout` per committed state.
 - [x] Integration test: no-VT fallback path commits expected DOM order/visibility and still emits asynchronous `shuffle:layout`.
 
-## Phase 3: View transition animations
+## ✅ Phase 3: View transition animations
 
 ### Required CSS
 
@@ -347,7 +347,7 @@ Required validation evidence checklist:
 - [ ] Integration test: reduced-motion path completes updates with effectively no visible animation.
 - [ ] Visual regression test: repeated filter/sort/hide/show cycles show no flash/snap artifacts.
 
-## Phase 4: GridLanesItem class
+## ✅ Phase 4: GridLanesItem class
 
 `GridLanes` uses a distinct internal item class `GridLanesItem` — it does NOT reuse or extend `ShuffleItem` from core Shuffle. The classes have compatible public surfaces for sort comparators (`compare(a, b)`, `by(element)`, `key`) but different internals.
 
@@ -390,7 +390,7 @@ Required validation evidence checklist:
 - [x] Unit test: sort comparators can consume `GridLanesItem` instances without an adapter.
 - [x] Type-level check: `GridLanesItem` public shape excludes legacy absolute-position fields.
 
-## Phase 5: Public API compatibility
+## ✅ Phase 5: Public API compatibility
 
 `GridLanes` should expose the same public methods as Shuffle where they make sense:
 
@@ -451,7 +451,7 @@ Required validation evidence checklist:
 - [x] Unit/integration test: `destroy()` strips only library-owned styles/classes and preserves user-owned `style` content.
 - [x] Integration test: `resetItems()` preserves existing metadata for survivors.
 
-## Phase 6: CSS shipped with the package
+## ✅ Phase 6: CSS shipped with the package
 
 Ship a minimal CSS file at `packages/shuffle/src/shuffle-lanes.css` containing:
 

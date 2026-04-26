@@ -25,7 +25,7 @@
  *   }
  */
 
-.shuffle-item--hidden {
+[data-shuffle-lanes] .shuffle-item--hidden {
   display: none !important;
 }
 

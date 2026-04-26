@@ -13,6 +13,7 @@
     // Suspicious
     "typescript/no-unsafe-type-assertion": "off",
     "import/no-named-as-default-member": "off",
+    "import/no-unassigned-import": ["error", { "allow": ["**/*.css"] }],
 
     // Style
     "eslint/capitalized-comments": "off",

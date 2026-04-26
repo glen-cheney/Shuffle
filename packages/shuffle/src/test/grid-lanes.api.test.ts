@@ -248,6 +248,20 @@ describe('destroy()', () => {
     expect(container.style.getPropertyValue('--shuffle-stagger-max')).toBe('');
     // User property must survive
     expect(container.style.getPropertyValue('--user-prop')).toBe('42px');
+    // data attribute must be removed
+    expect(container.dataset.shuffleLanes).toBeUndefined();
+  });
+
+  it('sets data-shuffle-lanes on the container during init', () => {
+    mockStartViewTransition();
+    const container = createTemplateFixture(`
+      <div style="display: grid;">
+        <div class="item" data-groups="a">Item</div>
+      </div>
+    `);
+    const instance = new GridLanes(container, { itemSelector: '.item' });
+    expect(container.dataset.shuffleLanes).toBe('');
+    instance.destroy();
   });
 
   it('removes library-owned item classes and styles', async () => {

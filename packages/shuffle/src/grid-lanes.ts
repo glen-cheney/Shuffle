@@ -95,6 +95,7 @@ class GridLanes extends TinyEmitter {
       return;
     }
 
+    this.element.dataset.shuffleLanes = '';
     this.items = this.#getItems();
     this.sortedItems = this.#getAllItems();
 
@@ -533,6 +534,7 @@ class GridLanes extends TinyEmitter {
     this.isEnabled = false;
 
     if (this.element) {
+      delete this.element.dataset.shuffleLanes;
       this.element.style.removeProperty('--shuffle-speed');
       this.element.style.removeProperty('--shuffle-easing');
       this.element.style.removeProperty('--shuffle-stagger-amount');
