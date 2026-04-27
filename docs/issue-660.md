@@ -618,16 +618,16 @@ Checkpoint goal: Validate that documentation and migration guidance are complete
 
 Pass criteria checklist:
 
-- [ ] Docs clearly separate CSS-owned layout responsibilities from JS-owned behavior.
-- [ ] Docs include a working progressive enhancement snippet with `@supports (display: grid-lanes)`.
-- [ ] Docs describe which legacy options are replaced by CSS and reference the mapping companion file.
-- [ ] Docs explain `layout()` no-op semantics in grid-lanes mode.
-- [ ] Docs explain that `filter()` and `sort()` are scheduled and commit in a microtask rather than mutating DOM synchronously.
-- [ ] Docs call out accessibility and tab-order behavior changes from `display: none` hiding.
-- [ ] Migration guide provides explicit before/after import changes (`shufflejs` to `shufflejs/grid-lanes`).
-- [ ] Migration guide provides explicit replacement guidance for removed options (`columnWidth`, `gutterWidth`, `sizer`, `buffer`).
-- [ ] Docs state that `shufflejs/grid-lanes.css` import is required.
-- [ ] Examples are copy-pasteable and reflect the final API/options contract.
+- [x] Docs clearly separate CSS-owned layout responsibilities from JS-owned behavior. (`getting-started.md` and `configuration.md` both explicitly state which concerns belong in CSS vs JS.)
+- [x] Docs include a working progressive enhancement snippet with `@supports (display: grid-lanes)`. (In `getting-started.md#css`.)
+- [x] Docs describe which legacy options are replaced by CSS and reference the mapping companion file. (Migration guide table; `configuration.md` intro.)
+- [x] Docs explain `layout()` no-op semantics in grid-lanes mode. (`configuration.md#layout` method entry.)
+- [x] Docs explain that `filter()` and `sort()` are scheduled and commit in a microtask rather than mutating DOM synchronously. (`getting-started.md#how-updates-work`.)
+- [x] Docs call out accessibility and tab-order behavior changes from `display: none` hiding. (`getting-started.md#accessibility`; `migration.md` step 6.)
+- [x] Migration guide provides explicit before/after import changes (`shufflejs` to `shufflejs/grid-lanes`). (`migration.md` step 1.)
+- [x] Migration guide provides explicit replacement guidance for removed options (`columnWidth`, `gutterWidth`, `sizer`, `buffer`). (`migration.md` step 2 table.)
+- [x] Docs state that `shufflejs/grid-lanes.css` import is required. (`getting-started.md#import`; `migration.md` step 1.)
+- [x] Examples are copy-pasteable and reflect the final API/options contract.
 
 ## ✅ Phase 10: Concrete interfaces and config
 
