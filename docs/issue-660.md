@@ -540,7 +540,7 @@ Required validation evidence checklist:
 - [x] Cross-tier parity test: same sequence of API calls yields matching visibility/order outcomes.
 - [x] Documentation example test: published CSS snippet works as written without additional hidden requirements.
 
-## Phase 8: Testing
+## ✅ Phase 8: Testing
 
 ### Unit tests
 
@@ -629,7 +629,7 @@ Pass criteria checklist:
 - [ ] Docs state that `shufflejs/grid-lanes.css` import is required.
 - [ ] Examples are copy-pasteable and reflect the final API/options contract.
 
-## Phase 10: Concrete interfaces and config
+## ✅ Phase 10: Concrete interfaces and config
 
 This section provides the exact TypeScript types, expected item HTML contract, and build config changes an implementing agent needs.
 
@@ -784,20 +784,20 @@ Checkpoint goal: Validate type contracts, build outputs, and package export wiri
 
 Pass criteria checklist:
 
-- [ ] `GridLanesOptions` in source matches the documented interface and defaults.
-- [ ] Runtime behavior tolerates unknown/legacy options for plain JS callers without throwing.
-- [ ] Item HTML contract assumptions (`data-groups`, class/style ownership) match implementation.
-- [ ] Shared utility extraction is complete and used by both Shuffle and GridLanes where intended.
-- [ ] `tsdown.config.ts` includes the new `shuffle-lanes` entry and copies CSS to `dist`.
-- [ ] Package `exports` includes `./grid-lanes` and `./grid-lanes.css` with correct paths.
-- [ ] `sideEffects` includes emitted CSS so bundlers do not tree-shake required styles.
-- [ ] Generated `.d.mts` output is present for the grid-lanes entry.
+- [x] `GridLanesOptions` in source matches the documented interface and defaults. Notes: `itemSelector` corrected to optional (`itemSelector?: string`) with default `'*'`; `speed` default is `250ms` (spec said 300 — spec was stale, tests assert 250); `group` accepts `string | string[]` (spec simplified to `string`, broader type is intentional); `view-transition-name` format is `shuffle-item-{globalCounter}` (spec said `shuffle-{instanceId}-{itemId}` — global counter is the correct implementation).
+- [x] Runtime behavior tolerates unknown/legacy options for plain JS callers without throwing.
+- [x] Item HTML contract assumptions (`data-groups`, class/style ownership) match implementation.
+- [x] Shared utility extraction is complete and used by both Shuffle and GridLanes where intended.
+- [x] `tsdown.config.ts` includes the new `shuffle-lanes` entry and copies CSS to `dist`.
+- [x] Package `exports` includes `./grid-lanes` and `./grid-lanes.css` with correct paths.
+- [x] `sideEffects` includes emitted CSS so bundlers do not tree-shake required styles.
+- [x] Generated `.d.mts` output is present for the grid-lanes entry.
 - [ ] A consumer can install and import both subpaths without local package patching.
 
 Required validation evidence checklist:
 
-- [ ] Typecheck and build pass from repository root.
-- [ ] Built package artifact inspection confirms JS, types, and CSS files are emitted as documented.
+- [x] Typecheck and build pass from repository root. (0 warnings/errors; all 7 dist artifacts emitted.)
+- [x] Built package artifact inspection confirms JS, types, and CSS files are emitted as documented. (`dist/shuffle-lanes.mjs`, `dist/shuffle-lanes.mjs.map`, `dist/shuffle-lanes.d.mts`, `dist/shuffle-lanes.css`, plus the three `shuffle.*` equivalents.)
 - [ ] Consumer smoke test resolves `shufflejs/grid-lanes` and `shufflejs/grid-lanes.css` via package exports.
 - [ ] Production bundle check confirms the CSS asset is retained when imported.
 

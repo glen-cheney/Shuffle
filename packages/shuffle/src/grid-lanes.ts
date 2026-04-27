@@ -13,13 +13,47 @@ import type {
 } from './core/types';
 
 export interface GridLanesOptions {
-  itemSelector: string;
+  /**
+   * e.g. '.picture-item'.
+   */
+  itemSelector?: string;
+
+  /**
+   * Initial filter group.
+   */
   group?: string | string[];
+
+  /**
+   * Affects using an array with filter. e.g. `filter(['one', 'two'])`. With "any",
+   * the element passes the test if any of its groups are in the array. With "all",
+   * the element only passes if all groups are in the array.
+   */
   filterMode?: FilterModeOptions;
+
+  /**
+   * Shuffle can be initialized with a sort object. It is the same object
+   * given to the sort method.
+   */
   initialSort?: CoreSortOptions<GridLanesItem> | null;
+
+  /**
+   * Transition/animation speed (milliseconds).
+   */
   speed?: number;
+
+  /**
+   * CSS easing function to use.
+   */
   easing?: string;
+
+  /**
+   * Transition delay offset for each item in milliseconds.
+   */
   staggerAmount?: number;
+
+  /**
+   * Maximum stagger delay in milliseconds.
+   */
   staggerAmountMax?: number;
 }
 
