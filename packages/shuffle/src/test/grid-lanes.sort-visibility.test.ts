@@ -81,6 +81,39 @@ describe('sorting', () => {
     expect(domOrder[1]).toBe(item1);
     expect(domOrder[2]).toBe(item2);
   });
+
+  it('sort() with reverse:true inverts the sort order', async () => {
+    const { container, items } = createSortFixture();
+    const [item0, item1, item2] = items;
+    const instance = new GridLanes(container, { itemSelector: '.item' });
+
+    // Without reverse: ascending by sort-value → item1(1), item2(2), item0(3)
+    // With reverse: descending → item0(3), item2(2), item1(1)
+    instance.sort({ reverse: true, by: (el) => Number(el.dataset.sortValue) });
+    await waitForLayout(instance);
+
+    const domOrder = Array.from(container.querySelectorAll<HTMLElement>('.item'));
+    expect(domOrder[0]).toBe(item0);
+    expect(domOrder[1]).toBe(item2);
+    expect(domOrder[2]).toBe(item1);
+  });
+
+  it('sort() with a compare function sorts DOM in the expected order', async () => {
+    const { container, items } = createSortFixture();
+    const [item0, item1, item2] = items;
+    const instance = new GridLanes(container, { itemSelector: '.item' });
+
+    // compare: descending by sort-value → item0(3), item2(2), item1(1)
+    instance.sort({
+      compare: (itemA, itemB) => Number(itemB.element.dataset.sortValue) - Number(itemA.element.dataset.sortValue),
+    });
+    await waitForLayout(instance);
+
+    const domOrder = Array.from(container.querySelectorAll<HTMLElement>('.item'));
+    expect(domOrder[0]).toBe(item0);
+    expect(domOrder[1]).toBe(item2);
+    expect(domOrder[2]).toBe(item1);
+  });
 });
 
 describe('hidden item semantics', () => {
@@ -176,5 +209,65 @@ describe('hidden item semantics', () => {
     const lastVisibleIndex = allDomChildren.indexOf(lastVisible!);
     const firstHiddenIndex = allDomChildren.indexOf(firstHidden!);
     expect(lastVisibleIndex).toBeLessThan(firstHiddenIndex);
+  });
+});
+
+describe('combined filter and sort', () => {
+  beforeEach(() => {
+    mockStartViewTransition();
+  });
+
+  afterEach(() => {
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
+  });
+
+  it('applying filter then sort produces correct visible DOM order', async () => {
+    const { container, items } = createSortFixture();
+    const [item0, item1, item2] = items;
+    // item0: sort-value=3; item1: sort-value=1; item2: sort-value=2
+    // Add groups so we can filter.
+    item0.dataset.groups = 'a';
+    item1.dataset.groups = 'a';
+    item2.dataset.groups = 'b';
+
+    const instance = new GridLanes(container, { itemSelector: '.item' });
+
+    // Filter to group 'a' — only item0 and item1 are visible.
+    instance.filter('a');
+    await waitForLayout(instance);
+
+    // Sort ascending by sort-value among visible items: item1(1), item0(3).
+    instance.sort({ by: (el) => Number(el.dataset.sortValue) });
+    await waitForLayout(instance);
+
+    const visibleDomOrder = Array.from(container.querySelectorAll<HTMLElement>('.item')).filter((el) =>
+      isItemVisible(instance, el),
+    );
+    expect(visibleDomOrder).toStrictEqual([item1, item0]);
+    expect(isItemVisible(instance, item2)).toBe(false);
+  });
+
+  it('changing the filter after a sort preserves the active sort order', async () => {
+    const { container, items } = createSortFixture();
+    const [item0, item1, item2] = items;
+    item0.dataset.groups = 'a';
+    item1.dataset.groups = 'a b';
+    item2.dataset.groups = 'b';
+
+    const instance = new GridLanes(container, { itemSelector: '.item' });
+
+    // Sort ascending by sort-value first.
+    instance.sort({ by: (el) => Number(el.dataset.sortValue) });
+    await waitForLayout(instance);
+
+    // Then filter to group 'a' — item0(3) and item1(1) remain, sorted ascending: item1, item0.
+    instance.filter('a');
+    await waitForLayout(instance);
+
+    const visibleDomOrder = Array.from(container.querySelectorAll<HTMLElement>('.item')).filter((el) =>
+      isItemVisible(instance, el),
+    );
+    expect(visibleDomOrder).toStrictEqual([item1, item0]);
   });
 });

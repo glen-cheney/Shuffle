@@ -297,15 +297,25 @@ describe('add()', () => {
   it('newly added items are tracked and initialized', async () => {
     const { instance } = await renderFixture();
 
-    const newEl = document.createElement('div');
-    newEl.className = 'item';
-    newEl.dataset.groups = 'design';
-    instance.add([newEl]);
+    const newEl1 = document.createElement('div');
+    newEl1.className = 'item';
+    newEl1.dataset.groups = 'design';
+    const newEl2 = document.createElement('div');
+    newEl2.className = 'item';
+    newEl2.dataset.groups = 'ux';
+    instance.add([newEl1, newEl2]);
 
-    expect(instance.getItemByElement(newEl)).toBeDefined();
-    expect(instance.items.size).toBe(4);
-    expect(newEl.classList.contains('shuffle-item')).toBe(true);
-    expect(newEl.style.getPropertyValue('view-transition-name')).not.toBe('');
+    const item1 = getGridLanesItem(instance, newEl1);
+    const item2 = getGridLanesItem(instance, newEl2);
+    expect(item1).toBeDefined();
+    expect(item2).toBeDefined();
+    expect(instance.items.size).toBe(5);
+    expect(newEl1.classList.contains('shuffle-item')).toBe(true);
+    expect(newEl1.style.getPropertyValue('view-transition-name')).not.toBe('');
+
+    expect(item1.id).toMatch(/^shuffle-item-\d+$/);
+    expect(item2.id).toMatch(/^shuffle-item-\d+$/);
+    expect(item1.id).not.toBe(item2.id);
   });
 
   it('new items start hidden before the view transition callback fires (no flash)', async () => {
