@@ -50,6 +50,23 @@ See [`turbo.json`](turbo.json) for available tasks across workspaces.
 
 **Note:** Never run commands from a nested directory.
 
+## After Completing Work
+
+After finishing a task, always run type-check and linting to ensure code quality:
+
+```bash
+# Type-check all workspaces
+yarn type-check
+
+# Run linting across the project
+yarn lint
+
+# Run tests to verify your changes don't break anything
+yarn test
+```
+
+These validation steps help catch errors early and maintain consistent code standards across the monorepo.
+
 ## When in Doubt
 
 Refer to [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full contributor guide, including detailed release procedures and best practices.

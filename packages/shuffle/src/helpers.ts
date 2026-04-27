@@ -58,6 +58,18 @@ export function arrayUnique<Item>(items: Item[]): Item[] {
   return [...new Set(items)];
 }
 
+const DEFAULT_NUMBER = 0;
+
+/**
+ * Always returns a numeric value, given a value. Logic from jQuery's `isNumeric`.
+ * @param value Possibly numeric value.
+ * @return `value` or zero if `value` isn't numeric.
+ */
+
+export function getNumber(value: unknown): number {
+  return Number.parseFloat(String(value)) || DEFAULT_NUMBER;
+}
+
 const EXPECTED_WIDTH = 10;
 let computedElementSize: boolean | null = null;
 
@@ -78,18 +90,6 @@ export function testComputedSize(): boolean {
   div.remove();
 
   return computedElementSize;
-}
-
-const DEFAULT_NUMBER = 0;
-
-/**
- * Always returns a numeric value, given a value. Logic from jQuery's `isNumeric`.
- * @param value Possibly numeric value.
- * @return `value` or zero if `value` isn't numeric.
- */
-
-export function getNumber(value: unknown): number {
-  return Number.parseFloat(String(value)) || DEFAULT_NUMBER;
 }
 
 /**

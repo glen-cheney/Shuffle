@@ -20,13 +20,18 @@
       "types": "./dist/shuffle.d.mts",
       "default": "./dist/shuffle.mjs"
     },
+    "./grid-lanes": {
+      "types": "./dist/shuffle-lanes.d.mts",
+      "default": "./dist/shuffle-lanes.mjs"
+    },
+    "./grid-lanes.css": "./dist/shuffle-lanes.css",
     "./package.json": "./package.json"
   },
   "types": "./dist/shuffle.d.mts",
   "files": [
     "dist"
   ],
-  "sideEffects": false,
+  "sideEffects": ["./dist/shuffle-lanes.css"],
   "scripts": {
     "build": "tsdown",
     "test": "vitest run",

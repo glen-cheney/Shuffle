@@ -1,0 +1,86 @@
+/*
+ * shuffle-lanes.css
+ *
+ * Required stylesheet for GridLanes (shufflejs/grid-lanes).
+ * Import this alongside your grid-lanes JS entry point:
+ *
+ *   import 'shufflejs/grid-lanes.css';
+ *
+ * This file controls item visibility and view-transition animations.
+ * Layout (columns, gap, grid-template-columns) belongs in your own CSS.
+ *
+ * Recommended container setup:
+ *
+ *   .grid {
+ *     display: grid;
+ *     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+ *     gap: 20px;
+ *     align-items: start;
+ *   }
+ *
+ *   @supports (display: grid-lanes) {
+ *     .grid {
+ *       display: grid-lanes;
+ *     }
+ *   }
+ */
+
+[data-shuffle-lanes] .shuffle-item--hidden {
+  display: none !important;
+}
+
+::view-transition-group(.shuffle-item) {
+  animation-duration: var(--shuffle-speed, 250ms);
+  animation-timing-function: var(--shuffle-easing, cubic-bezier(0.4, 0, 0.2, 1));
+  animation-delay: min(
+    calc(var(--shuffle-index, 0) * var(--shuffle-stagger-amount, 15ms)),
+    var(--shuffle-stagger-max, 150ms)
+  );
+}
+
+::view-transition-image-pair(.shuffle-item) {
+  isolation: auto;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(.shuffle-item):only-child {
+  animation: shuffle-lanes-reveal var(--shuffle-speed, 250ms) var(--shuffle-easing, cubic-bezier(0.4, 0, 0.2, 1)) both;
+}
+
+::view-transition-old(.shuffle-item):only-child {
+  animation: shuffle-lanes-conceal var(--shuffle-speed, 250ms) var(--shuffle-easing, cubic-bezier(0.4, 0, 0.2, 1)) both;
+}
+
+@keyframes shuffle-lanes-reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.001);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shuffle-lanes-conceal {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.001);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(.shuffle-item) {
+    animation-duration: 0.001ms;
+    animation-delay: 0ms;
+  }
+
+  ::view-transition-new(.shuffle-item):only-child,
+  ::view-transition-old(.shuffle-item):only-child {
+    animation-duration: 0.001ms;
+  }
+}
