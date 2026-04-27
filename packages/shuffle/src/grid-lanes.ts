@@ -52,6 +52,10 @@ const DEFAULT_GRID_LANES_OPTIONS: ResolvedGridLanesOptions = {
 let itemIdCounter = 0;
 let defaultOrderCounter = 0;
 
+function noop(): void {
+  // empty
+}
+
 function uniqueElements(elements: HTMLElement[]): HTMLElement[] {
   return [...new Set(elements)];
 }
@@ -69,6 +73,7 @@ class GridLanes extends TinyEmitter {
   isTransitioning = false;
   #activeTransition: ViewTransition | null = null;
   #pendingRemovals: GridLanesItem[] = [];
+  #commitScheduled = false;
 
   /**
    * Categorize and sort a grid of items using native grid-lanes behavior.
@@ -281,6 +286,21 @@ class GridLanes extends TinyEmitter {
    * @param vt Native view transition object.
    */
   async #monitorViewTransition(vt: ViewTransition): Promise<void> {
+    /**
+     * The `ready` promise can reject for various reasons, including:
+     * - The update callback fails
+     * - The transition is skipped or aborted before it starts
+     * - Invalid transition setup (e.g. conflicting view-transition-name usage)
+     *
+     * For us, the most common reason will be that the transition is skipped,
+     * since we call `skipTransition()` on any active transition when starting
+     * a new one. This is expected, and why we schedule microtasks to apply
+     * updates instead of applying them immediately.
+     */
+    // oxlint-disable-next-line promise/prefer-await-to-then
+    vt.ready.catch(noop);
+
+    // Wait for the view transition to finish and always finalize the state.
     try {
       await vt.finished;
     } catch {
@@ -293,11 +313,29 @@ class GridLanes extends TinyEmitter {
   }
 
   /**
+   * Schedule a deferred commit via microtask, coalescing multiple synchronous
+   * filter/sort calls within the same tick into a single transition.
+   */
+  #scheduleCommit(): void {
+    if (!this.#commitScheduled) {
+      this.#commitScheduled = true;
+      queueMicrotask(() => {
+        if (this.#commitScheduled) {
+          this.#commitScheduled = false;
+          this.#commit();
+        }
+      });
+    }
+  }
+
+  /**
    * Commit the pending update using view transitions when available.
    */
   #commit(): void {
-    // Last-write-wins: cancel any in-flight transition before starting a new one.
+    this.#commitScheduled = false;
+
     if (this.#activeTransition) {
+      // Last-write-wins: cancel any in-flight transition before starting a new one.
       const activeTransition = this.#activeTransition;
       this.#activeTransition = null;
       activeTransition.skipTransition();
@@ -346,7 +384,7 @@ class GridLanes extends TinyEmitter {
 
     this.lastSort = sortOptions;
 
-    this.#commit();
+    this.#scheduleCommit();
   }
 
   /**
@@ -359,7 +397,8 @@ class GridLanes extends TinyEmitter {
     }
 
     this.lastSort = sortOptions;
-    this.#commit();
+
+    this.#scheduleCommit();
   }
 
   /**

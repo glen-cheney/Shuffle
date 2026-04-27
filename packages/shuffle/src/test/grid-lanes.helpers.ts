@@ -37,6 +37,22 @@ export function isItemVisible(instance: GridLanes, element: HTMLElement): boolea
   return getGridLanesItem(instance, element).isVisible;
 }
 
+export function waitForLayout(instance: GridLanes): Promise<void> {
+  return new Promise((resolve) => {
+    instance.once('shuffle:layout', () => {
+      resolve();
+    });
+  });
+}
+
+export function waitForRemoved(instance: GridLanes): Promise<void> {
+  return new Promise((resolve) => {
+    instance.once('shuffle:removed', () => {
+      resolve();
+    });
+  });
+}
+
 export function createFixture(): { container: HTMLElement; items: HTMLElement[] } {
   const container = createTemplateFixture(`
     <div style="display: grid;">
@@ -90,15 +106,21 @@ function noop(): void {
   void 0;
 }
 
+export function createUnresolvedPromise<Result = void>(): Promise<Result> {
+  return new Promise<Result>(noop);
+}
+
 export function mockStartViewTransition({
   finished = Promise.resolve(),
   skipTransition = noop,
+  invokeUpdateCallback = true,
 }: {
   finished?: Promise<void>;
   skipTransition?: () => void;
+  invokeUpdateCallback?: boolean;
 } = {}): Mock<(callbackOptions?: ViewTransitionUpdateCallback | StartViewTransitionOptions) => ViewTransition> {
   return vi.spyOn(document, 'startViewTransition').mockImplementation((callbackOrOptions) => {
-    if (typeof callbackOrOptions === 'function') {
+    if (typeof callbackOrOptions === 'function' && invokeUpdateCallback) {
       callbackOrOptions();
     }
     return {

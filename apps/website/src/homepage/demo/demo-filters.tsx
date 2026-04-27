@@ -48,8 +48,8 @@ export const DemoFilters: React.FC<DemoFiltersProps> = ({
           <legend className={styles.filterLabel}>Mode</legend>
           <div className={styles.btnGroup}>
             {[
-              { value: 'shuffle', label: 'Class JS Layout' },
-              { value: 'grid-lanes', label: 'Native Grid Lanes' },
+              { value: 'shuffle', label: 'JS Layout' },
+              { value: 'grid-lanes', label: 'CSS Grid Lanes' },
             ].map((option) => (
               <label key={option.value} className={cx(styles.btn, mode === option.value && styles.active)}>
                 <input

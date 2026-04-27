@@ -491,7 +491,7 @@ Required validation evidence checklist:
 - [ ] Consumer smoke test: importing `shufflejs/grid-lanes.css` in a sample app applies hide/show/view-transition styles.
 - [ ] Bundler behavior check: CSS is retained in production build when imported.
 
-## Phase 7: Progressive enhancement strategy
+## ✅ Phase 7: Progressive enhancement strategy
 
 ```css
 /* User's CSS */
@@ -600,6 +600,7 @@ Required validation evidence checklist:
 - Show the `@supports` progressive enhancement pattern
 - Document which Shuffle options are replaced by CSS properties
 - Explain that `layout()` is a no-op — the browser re-layouts automatically on DOM changes
+- Document timing semantics: `filter()` and `sort()` schedule work and commit in a microtask, so DOM/order/visibility changes are not observable synchronously until the scheduled update runs
 - Document keyboard/focus behavior: tab order follows DOM order; `GridLanes` does not manage `tabindex`
 
 ### Migration guide from Shuffle JS-based layout (classic/original Shuffle)
@@ -609,6 +610,7 @@ Required validation evidence checklist:
 - Add `@supports (display: grid-lanes)` block to CSS
 - Change import from `shufflejs` to `shufflejs/grid-lanes`
 - `buffer` option → `flow-tolerance` CSS property on the container
+- Note behavioral timing change: code which reads DOM state immediately after `filter()` or `sort()` must instead wait for the scheduled update, typically via `shuffle:layout`
 
 ### Phase 9 validation checkpoint
 
@@ -620,6 +622,7 @@ Pass criteria checklist:
 - [ ] Docs include a working progressive enhancement snippet with `@supports (display: grid-lanes)`.
 - [ ] Docs describe which legacy options are replaced by CSS and reference the mapping companion file.
 - [ ] Docs explain `layout()` no-op semantics in grid-lanes mode.
+- [ ] Docs explain that `filter()` and `sort()` are scheduled and commit in a microtask rather than mutating DOM synchronously.
 - [ ] Docs call out accessibility and tab-order behavior changes from `display: none` hiding.
 - [ ] Migration guide provides explicit before/after import changes (`shufflejs` to `shufflejs/grid-lanes`).
 - [ ] Migration guide provides explicit replacement guidance for removed options (`columnWidth`, `gutterWidth`, `sizer`, `buffer`).

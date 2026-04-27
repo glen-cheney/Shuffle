@@ -9,6 +9,45 @@ import { GridLanesGrid } from '../homepage/demo/grid-lanes-grid';
 
 const DEBUG = false;
 
+function getSortOptions(sortValue: string) {
+  if (sortValue === 'title') {
+    return {
+      by: (element: HTMLElement) => (element.dataset.title ?? '').toLowerCase(),
+    };
+  }
+
+  if (sortValue === 'date-created') {
+    return {
+      reverse: true,
+      by: (element: HTMLElement) => element.dataset.dateCreated ?? '',
+    };
+  }
+
+  return {};
+}
+
+function filterWithSearch(element: HTMLElement, searchText: string, activeFilter: string | null): boolean {
+  const searchLower = searchText.toLowerCase();
+
+  if (activeFilter) {
+    const { groups } = element.dataset;
+    if (groups) {
+      const groupArray = groups.split(' ');
+      if (!groupArray.includes(activeFilter)) {
+        return false;
+      }
+    }
+  }
+
+  const titleElement = element.querySelector('[data-title-element]');
+  if (!titleElement) {
+    return true;
+  }
+
+  const titleText = titleElement.textContent?.toLowerCase().trim() ?? '';
+  return titleText.includes(searchLower);
+}
+
 export const HomepageDemo: React.FC = () => {
   const shuffleRef = useRef<Shuffle | null>(null);
   const shuffleGridLanesRef = useRef<GridLanes | null>(null);
@@ -17,54 +56,32 @@ export const HomepageDemo: React.FC = () => {
   const [sortValue, setSortValue] = useState('dom');
   const [mode, setMode] = useState<'shuffle' | 'grid-lanes'>('grid-lanes');
 
-  // Helper function to apply filter and search together
-  const applyFilter = (search: string, filter: string | null) => {
-    if (!shuffleRef.current) {
-      return;
+  // Helper function to apply filter, search, and sort together
+  const applyFilter = (search: string, filter: string | null, currentSortValue: string) => {
+    if (shuffleRef.current) {
+      shuffleRef.current.filter(
+        (element: HTMLElement) => filterWithSearch(element, search, filter),
+        getSortOptions(currentSortValue),
+      );
     }
 
-    const searchLower = search.toLowerCase();
-    shuffleRef.current.filter((element: HTMLElement) => {
-      if (filter) {
-        const { groups } = element.dataset;
-        if (groups) {
-          const groupArray = groups.split(' ');
-          if (!groupArray.includes(filter)) {
-            return false;
-          }
-        }
-      }
-
-      const titleElement = element.querySelector('[data-title-element]');
-      if (!titleElement) {
-        return true;
-      }
-
-      const titleText = titleElement.textContent?.toLowerCase().trim() ?? '';
-      return titleText.includes(searchLower);
-    });
+    if (shuffleGridLanesRef.current) {
+      shuffleGridLanesRef.current.filter(
+        (element: HTMLElement) => filterWithSearch(element, search, filter),
+        getSortOptions(currentSortValue),
+      );
+    }
   };
 
   // Helper function to apply sorting
   const applySort = (sort: string) => {
-    if (!shuffleRef.current) {
-      return;
+    if (shuffleRef.current) {
+      shuffleRef.current.sort(getSortOptions(sort));
     }
 
-    let sortOptions = {};
-
-    if (sort === 'title') {
-      sortOptions = {
-        by: (element: HTMLElement) => (element.dataset.title ?? '').toLowerCase(),
-      };
-    } else if (sort === 'date-created') {
-      sortOptions = {
-        reverse: true,
-        by: (element: HTMLElement) => element.dataset.dateCreated ?? '',
-      };
+    if (shuffleGridLanesRef.current) {
+      shuffleGridLanesRef.current.sort(getSortOptions(sort));
     }
-
-    shuffleRef.current.sort(sortOptions);
   };
 
   const destroyShuffle = () => {
@@ -128,16 +145,17 @@ export const HomepageDemo: React.FC = () => {
         sortValue={sortValue}
         onSearchTextChange={(newSearchText) => {
           setSearchText(newSearchText);
-          applyFilter(newSearchText, activeFilter);
-          applySort(sortValue);
+          applyFilter(newSearchText, activeFilter, sortValue);
         }}
         onModeChange={(newMode) => {
           setMode(newMode);
+          setSearchText('');
+          setActiveFilter(null);
+          setSortValue('dom');
         }}
         onFilterChange={(newFilter) => {
           setActiveFilter(newFilter);
-          applyFilter(searchText, newFilter);
-          applySort(sortValue);
+          applyFilter(searchText, newFilter, sortValue);
         }}
         onSortChange={(newSortValue) => {
           setSortValue(newSortValue);

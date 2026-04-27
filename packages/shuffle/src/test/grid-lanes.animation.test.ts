@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import GridLanes from '../shuffle-lanes';
-import { createFixture, getGridLanesItem, mockStartViewTransition } from './grid-lanes.helpers';
+import { createFixture, getGridLanesItem, mockStartViewTransition, waitForLayout } from './grid-lanes.helpers';
 
 describe('speed and easing options', () => {
   afterEach(() => {
@@ -53,7 +53,7 @@ describe('--shuffle-index stagger assignment', () => {
     expect.assertions(3);
   });
 
-  it('reassigns --shuffle-index after filtering to only count visible items', () => {
+  it('reassigns --shuffle-index after filtering to only count visible items', async () => {
     const { container, items } = createFixture();
     const [item0, item1, item2] = items;
     mockStartViewTransition();
@@ -61,6 +61,7 @@ describe('--shuffle-index stagger assignment', () => {
 
     // After filtering to 'design', items 0 and 1 are visible; item 2 is hidden.
     instance.filter('design');
+    await waitForLayout(instance);
 
     expect(item0.style.getPropertyValue('--shuffle-index')).toBe('0');
     expect(item1.style.getPropertyValue('--shuffle-index')).toBe('1');
@@ -68,13 +69,14 @@ describe('--shuffle-index stagger assignment', () => {
     expect(item2.style.getPropertyValue('--shuffle-index')).toBe('');
   });
 
-  it('--shuffle-index starts at 0 for the first visible item regardless of sort order', () => {
+  it('--shuffle-index starts at 0 for the first visible item regardless of sort order', async () => {
     const { container } = createFixture();
     mockStartViewTransition();
     const instance = new GridLanes(container, { itemSelector: '.item' });
 
     // Sort by textContent.
     instance.sort({ by: (element) => element.textContent });
+    await waitForLayout(instance);
 
     const sortedVisibleItems = instance.sortedItems;
     expect(sortedVisibleItems).toHaveLength(3);

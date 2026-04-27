@@ -31,7 +31,7 @@
   "files": [
     "dist"
   ],
-  "sideEffects": false,
+  "sideEffects": ["./dist/shuffle-lanes.css"],
   "scripts": {
     "build": "tsdown",
     "test": "vitest run",

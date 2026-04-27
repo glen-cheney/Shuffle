@@ -8,6 +8,7 @@ import {
   isItemVisible,
   mockStartViewTransition,
   queryElement,
+  waitForLayout,
 } from './grid-lanes.helpers';
 
 describe('grid lanes init', () => {
@@ -79,7 +80,7 @@ describe('grid lanes init', () => {
     }
   });
 
-  it('bypasses view transitions on first render and uses them after initialization', () => {
+  it('bypasses view transitions on first render and uses them after initialization', async () => {
     const { container } = createFixture();
     const startViewTransition = mockStartViewTransition();
 
@@ -92,7 +93,8 @@ describe('grid lanes init', () => {
     expect(instance.isInitialized).toBe(true);
 
     instance.filter('ux');
-    expect(startViewTransition.mock.calls).toHaveLength(1);
+    await waitForLayout(instance);
+    expect(startViewTransition).toHaveBeenCalledOnce();
   });
 });
 
@@ -106,7 +108,7 @@ describe('data-groups parsing', () => {
     vi.restoreAllMocks();
   });
 
-  it('parses whitespace-separated tokens', () => {
+  it('parses whitespace-separated tokens', async () => {
     const container = createTemplateFixture(`
       <div style="display: grid;">
         <div class="item" data-groups="nature  city  featured"></div>
@@ -116,16 +118,19 @@ describe('data-groups parsing', () => {
 
     const instance = new GridLanes(container, { itemSelector: '.item' });
     instance.filter('nature');
+    await waitForLayout(instance);
     expect(isItemVisible(instance, item)).toBe(true);
 
     instance.filter('featured');
+    await waitForLayout(instance);
     expect(isItemVisible(instance, item)).toBe(true);
 
     instance.filter('other');
+    await waitForLayout(instance);
     expect(isItemVisible(instance, item)).toBe(false);
   });
 
-  it('trims data-groups before splitting', () => {
+  it('trims data-groups before splitting', async () => {
     const container = createTemplateFixture(`
       <div style="display: grid;">
         <div class="item" data-groups="   nature   featured   "></div>
@@ -135,9 +140,11 @@ describe('data-groups parsing', () => {
 
     const instance = new GridLanes(container, { itemSelector: '.item' });
     instance.filter('nature');
+    await waitForLayout(instance);
     expect(isItemVisible(instance, item)).toBe(true);
 
     instance.filter('featured');
+    await waitForLayout(instance);
     expect(isItemVisible(instance, item)).toBe(true);
   });
 
@@ -149,7 +156,7 @@ describe('data-groups parsing', () => {
   it.each<EmptyGroupsCase>([
     { name: 'missing data-groups', groupsValue: undefined },
     { name: 'empty data-groups', groupsValue: '   ' },
-  ])('treats $name as no groups', ({ groupsValue }) => {
+  ])('treats $name as no groups', async ({ groupsValue }) => {
     const groupsAttr = groupsValue === undefined ? '' : ` data-groups="${groupsValue}"`;
     const container = createTemplateFixture(`
       <div style="display: grid;">
@@ -160,6 +167,7 @@ describe('data-groups parsing', () => {
 
     const instance = new GridLanes(container, { itemSelector: '.item' });
     instance.filter('any-group');
+    await waitForLayout(instance);
     expect(isItemVisible(instance, item)).toBe(false);
   });
 });
@@ -184,32 +192,38 @@ describe('filter mode', () => {
   it.each<FilterModeCase>([
     { mode: 'any', itemAVisible: true, itemBVisible: true, itemCVisible: true },
     { mode: 'all', itemAVisible: true, itemBVisible: false, itemCVisible: false },
-  ])('filterMode $mode applies token matching', ({ mode, itemAVisible, itemBVisible, itemCVisible }) => {
+  ])('filterMode $mode applies token matching', async ({ mode, itemAVisible, itemBVisible, itemCVisible }) => {
     const { container, itemA, itemB, itemC } = createMultiGroupFixture();
     const instance = new GridLanes(container, { itemSelector: '.item', filterMode: mode });
 
     instance.filter(['nature', 'featured']);
+    await waitForLayout(instance);
     expect(isItemVisible(instance, itemA)).toBe(itemAVisible);
     expect(isItemVisible(instance, itemB)).toBe(itemBVisible);
     expect(isItemVisible(instance, itemC)).toBe(itemCVisible);
   });
 
-  it('filter with "all" string shows every item', () => {
+  it('filter with "all" string shows every item', async () => {
     const { container, itemA, itemB, itemC } = createMultiGroupFixture();
     const instance = new GridLanes(container, { itemSelector: '.item' });
+
     instance.filter('nature');
+    await waitForLayout(instance);
+
     instance.filter('all');
+    await waitForLayout(instance);
 
     expect(isItemVisible(instance, itemA)).toBe(true);
     expect(isItemVisible(instance, itemB)).toBe(true);
     expect(isItemVisible(instance, itemC)).toBe(true);
   });
 
-  it('filter with a predicate function', () => {
+  it('filter with a predicate function', async () => {
     const { container, itemA, itemB, itemC } = createMultiGroupFixture();
     const instance = new GridLanes(container, { itemSelector: '.item' });
 
     instance.filter((element) => element.dataset.groups?.includes('featured') ?? false);
+    await waitForLayout(instance);
 
     expect(isItemVisible(instance, itemA)).toBe(true);
     expect(isItemVisible(instance, itemB)).toBe(false);

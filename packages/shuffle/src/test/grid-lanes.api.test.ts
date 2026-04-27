@@ -5,9 +5,12 @@ import GridLanes from '../shuffle-lanes';
 import {
   createFixture,
   createTemplateFixture,
+  createUnresolvedPromise,
   getGridLanesItem,
   isItemVisible,
   mockStartViewTransition,
+  waitForLayout,
+  waitForRemoved,
   type AnyFn,
 } from './grid-lanes.helpers';
 
@@ -15,9 +18,7 @@ async function renderFixture() {
   const { container, items } = createFixture();
   const instance = new GridLanes(container, { itemSelector: '.item' });
 
-  // Drain init microtask
-  await Promise.resolve();
-  await Promise.resolve();
+  await waitForLayout(instance);
 
   return { instance, container, items };
 }
@@ -76,34 +77,32 @@ describe('LAYOUT async timing', () => {
 
     resolveFinished();
     await finished;
-    // One more microtask for the finally handler
-    await Promise.resolve();
-
-    expect(layoutSpy.mock.calls).toHaveLength(1);
+    expect(layoutSpy).not.toHaveBeenCalled();
+    await waitForLayout(instance);
+    expect(layoutSpy).toHaveBeenCalledOnce();
   });
 
   it('LAYOUT fires in a microtask without VT', async () => {
-    let savedDescriptor: PropertyDescriptor | undefined;
-    savedDescriptor = Object.getOwnPropertyDescriptor(document, 'startViewTransition');
+    const savedDescriptor = Object.getOwnPropertyDescriptor(document, 'startViewTransition');
     Object.defineProperty(document, 'startViewTransition', { value: undefined, configurable: true });
 
-    const { instance } = await renderFixture();
+    try {
+      const { instance } = await renderFixture();
 
-    const layoutSpy = vi.fn<AnyFn>();
-    instance.on('shuffle:layout', layoutSpy);
+      const layoutSpy = vi.fn<AnyFn>();
+      instance.on('shuffle:layout', layoutSpy);
 
-    instance.filter('design');
+      instance.filter('design');
+      expect(layoutSpy).not.toHaveBeenCalled();
 
-    // Still synchronous — not yet
-    expect(layoutSpy).not.toHaveBeenCalled();
-
-    await Promise.resolve();
-    expect(layoutSpy.mock.calls).toHaveLength(1);
-
-    if (savedDescriptor) {
-      Object.defineProperty(document, 'startViewTransition', savedDescriptor);
-    } else {
-      Reflect.deleteProperty(document, 'startViewTransition');
+      await waitForLayout(instance);
+      expect(layoutSpy).toHaveBeenCalledOnce();
+    } finally {
+      if (savedDescriptor) {
+        Object.defineProperty(document, 'startViewTransition', savedDescriptor);
+      } else {
+        Reflect.deleteProperty(document, 'startViewTransition');
+      }
     }
   });
 });
@@ -130,10 +129,7 @@ describe('remove() and REMOVED event', () => {
     });
 
     instance.remove([itemToRemove]);
-
-    await Promise.resolve();
-    await Promise.resolve();
-    await Promise.resolve();
+    await waitForRemoved(instance);
 
     expect(order).toEqual(['layout', 'removed']);
   });
@@ -143,10 +139,7 @@ describe('remove() and REMOVED event', () => {
     const [itemToRemove] = items;
 
     instance.remove([itemToRemove]);
-
-    await Promise.resolve();
-    await Promise.resolve();
-    await Promise.resolve();
+    await waitForRemoved(instance);
 
     expect(instance.getItemByElement(itemToRemove)).toBeUndefined();
     expect(instance.items.size).toBe(2);
@@ -154,8 +147,7 @@ describe('remove() and REMOVED event', () => {
 
   it('calling remove() with an empty array is a no-op', () => {
     const { container } = createFixture();
-    mockStartViewTransition();
-    const startVT = vi.spyOn(document, 'startViewTransition');
+    const startVT = mockStartViewTransition();
     const instance = new GridLanes(container, { itemSelector: '.item' });
     const callCount = startVT.mock.calls.length;
 
@@ -173,17 +165,18 @@ describe('enable() and disable()', () => {
 
   it('disable() sets isEnabled to false and aborts active transition', async () => {
     const skipFn = vi.fn<() => void>();
-    const neverResolve = new Promise<void>(() => {
-      void 0;
-    });
-    mockStartViewTransition({ finished: neverResolve, skipTransition: skipFn });
+    const neverResolve = createUnresolvedPromise();
+    const startViewTransition = mockStartViewTransition({ finished: neverResolve, skipTransition: skipFn });
     const { instance } = await renderFixture();
 
     instance.filter('design');
+    await vi.waitFor(() => {
+      expect(startViewTransition).toHaveBeenCalledOnce();
+    });
     instance.disable();
 
     expect(instance.isEnabled).toBe(false);
-    expect(skipFn.mock.calls).toHaveLength(1);
+    expect(skipFn).toHaveBeenCalledOnce();
   });
 
   it.each(['filter', 'sort', 'update', 'layout'] as const)(
@@ -316,21 +309,10 @@ describe('add()', () => {
   });
 
   it('new items start hidden before the view transition callback fires (no flash)', async () => {
-    // Capture the VT callback without calling it so we can inspect pre-callback state.
-    const capturedCallbacks: Array<() => void> = [];
-    vi.spyOn(document, 'startViewTransition').mockImplementation((cb) => {
-      if (typeof cb === 'function') {
-        capturedCallbacks.push(cb);
-      }
-      return {
-        finished: new Promise<void>(() => {
-          void 0;
-        }),
-        ready: Promise.resolve(),
-        updateCallbackDone: Promise.resolve(),
-        skipTransition: () => void 0,
-        types: { forEach: () => void 0 },
-      } as unknown as ViewTransition;
+    // Keep the update callback from running so we can inspect pre-callback state.
+    const startViewTransition = mockStartViewTransition({
+      // Prevent the view transition from executing its inner callback.
+      invokeUpdateCallback: false,
     });
 
     const { instance } = await renderFixture();
@@ -340,13 +322,16 @@ describe('add()', () => {
     newEl.dataset.groups = 'design';
     instance.add([newEl]);
 
-    expect(capturedCallbacks).toHaveLength(1);
+    expect(startViewTransition).toHaveBeenCalledOnce();
+    expect(startViewTransition.mock.calls[0]?.[0]).toEqual(expect.any(Function));
 
     // Item is registered in the Map immediately after add()
     expect(instance.getItemByElement(newEl)).toBeDefined();
     // Item starts hidden so it won't flash as visible before the VT callback runs
     expect(newEl.classList.contains('shuffle-item--hidden')).toBe(true);
     expect(newEl.classList.contains('shuffle-item--visible')).toBe(false);
+
+    startViewTransition.mockReset();
   });
 
   it('add() is idempotent for already-tracked elements', async () => {
@@ -427,16 +412,17 @@ describe('resetItems()', () => {
 
   it('resetItems() while a transition is in-flight aborts the transition', async () => {
     const skipFn = vi.fn<() => void>();
-    const neverResolve = new Promise<void>(() => {
-      void 0;
-    });
-    mockStartViewTransition({ finished: neverResolve, skipTransition: skipFn });
+    const neverResolve = createUnresolvedPromise();
+    const startViewTransition = mockStartViewTransition({ finished: neverResolve, skipTransition: skipFn });
     const { instance } = await renderFixture();
 
     instance.filter('design');
+    await vi.waitFor(() => {
+      expect(startViewTransition).toHaveBeenCalledOnce();
+    });
     instance.resetItems();
 
-    expect(skipFn.mock.calls).toHaveLength(1);
+    expect(skipFn).toHaveBeenCalledOnce();
   });
 });
 
@@ -459,7 +445,7 @@ describe('layout() no-op', () => {
     expect(layoutSpy).not.toHaveBeenCalled();
     expect(startVT.mock.calls.length).toBe(callsBefore);
 
-    await Promise.resolve();
-    expect(layoutSpy.mock.calls).toHaveLength(1);
+    await waitForLayout(instance);
+    expect(layoutSpy).toHaveBeenCalledOnce();
   });
 });

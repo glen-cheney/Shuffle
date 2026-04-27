@@ -2,7 +2,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import GridLanes from '../shuffle-lanes';
-import { createFixture, isItemVisible, mockStartViewTransition, type AnyFn } from './grid-lanes.helpers';
+import {
+  createFixture,
+  createUnresolvedPromise,
+  isItemVisible,
+  mockStartViewTransition,
+  waitForLayout,
+  type AnyFn,
+} from './grid-lanes.helpers';
 
 describe('update concurrency last write wins', () => {
   afterEach(() => {
@@ -15,24 +22,19 @@ describe('update concurrency last write wins', () => {
     mockStartViewTransition();
     const instance = new GridLanes(container, { itemSelector: '.item' });
 
-    await Promise.resolve();
-    await Promise.resolve();
-    await Promise.resolve();
+    await waitForLayout(instance);
 
     const layoutSpy = vi.fn<AnyFn>();
     instance.on('shuffle:layout', layoutSpy);
 
     instance.filter('design');
     instance.filter('ux');
+    await waitForLayout(instance);
 
-    await Promise.resolve();
-    await Promise.resolve();
-    await Promise.resolve();
-
-    expect(layoutSpy.mock.calls).toHaveLength(1);
+    expect(layoutSpy).toHaveBeenCalledOnce();
   });
 
-  it('last filter state is what gets committed when called rapidly', () => {
+  it('last filter state is what gets committed when called rapidly', async () => {
     const { container, items } = createFixture();
     const [item0] = items;
     const item2 = items.at(2)!;
@@ -41,25 +43,30 @@ describe('update concurrency last write wins', () => {
 
     instance.filter('design');
     instance.filter('ux');
+    await waitForLayout(instance);
 
     expect(isItemVisible(instance, item2)).toBe(true);
     expect(isItemVisible(instance, item0)).toBe(false);
   });
 
-  it('skipTransition is called on the interrupted transition', () => {
+  it('skipTransition is called when a second filter interrupts an in-flight transition', async () => {
     const { container } = createFixture();
     const skipFn = vi.fn<() => void>();
-    const neverResolve = new Promise<void>((_resolve) => {
-      void 0;
-    });
-    mockStartViewTransition({ finished: neverResolve, skipTransition: skipFn });
+    const neverResolve = createUnresolvedPromise();
+    const startViewTransition = mockStartViewTransition({ finished: neverResolve, skipTransition: skipFn });
 
     const instance = new GridLanes(container, { itemSelector: '.item' });
 
     instance.filter('design');
-    instance.filter('ux');
+    await vi.waitFor(() => {
+      expect(startViewTransition).toHaveBeenCalledOnce();
+    });
 
-    expect(skipFn.mock.calls).toHaveLength(1);
+    // sees transition A in-flight → skips it
+    instance.filter('ux');
+    await vi.waitFor(() => {
+      expect(skipFn).toHaveBeenCalledOnce();
+    });
   });
 });
 
@@ -81,12 +88,13 @@ describe('no-VT fallback path', () => {
     vi.restoreAllMocks();
   });
 
-  it('applies filter/sort state synchronously when startViewTransition is unavailable', () => {
+  it('applies filter/sort state in a microtask when startViewTransition is unavailable', async () => {
     const { container, items } = createFixture();
     const [item0, item1, item2] = items;
 
     const instance = new GridLanes(container, { itemSelector: '.item' });
     instance.filter('design');
+    await waitForLayout(instance);
 
     expect(isItemVisible(instance, item0)).toBe(true);
     expect(isItemVisible(instance, item1)).toBe(true);
@@ -97,7 +105,7 @@ describe('no-VT fallback path', () => {
     const { container } = createFixture();
     const instance = new GridLanes(container, { itemSelector: '.item' });
 
-    await Promise.resolve();
+    await waitForLayout(instance);
 
     const layoutSpy = vi.fn<AnyFn>();
     instance.on('shuffle:layout', layoutSpy);
@@ -106,7 +114,7 @@ describe('no-VT fallback path', () => {
 
     expect(layoutSpy).not.toHaveBeenCalled();
 
-    await Promise.resolve();
-    expect(layoutSpy.mock.calls).toHaveLength(1);
+    await waitForLayout(instance);
+    expect(layoutSpy).toHaveBeenCalledOnce();
   });
 });

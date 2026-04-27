@@ -77,6 +77,7 @@
         "vitest/prefer-to-be-falsy": "off",
         "vitest/prefer-to-be-truthy": "off",
         "vitest/require-test-timeout": "off",
+        "vitest/prefer-called-times": "off",
         "unicorn/prefer-spread": "off" // false positive for NodeList
       }
     }
