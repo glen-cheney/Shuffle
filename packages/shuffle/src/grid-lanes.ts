@@ -241,7 +241,8 @@ class GridLanes extends TinyEmitter {
    * @return The sorted items.
    */
   #sortItems(items: GridLanesItem[]): GridLanesItem[] {
-    if (!this.lastSort) {
+    const hasSort = this.lastSort !== null && this.lastSort !== undefined && Object.keys(this.lastSort).length > 0;
+    if (!hasSort) {
       // Default: restore original encounter order via defaultOrder.
       return items.toSorted((itemA, itemB) => itemA.defaultOrder - itemB.defaultOrder);
     }
@@ -407,7 +408,7 @@ class GridLanes extends TinyEmitter {
     }
 
     let nextCategory = category;
-    if (!nextCategory || nextCategory.length === 0) {
+    if (!nextCategory || (typeof nextCategory !== 'function' && nextCategory.length === 0)) {
       nextCategory = ALL_ITEMS;
     }
 

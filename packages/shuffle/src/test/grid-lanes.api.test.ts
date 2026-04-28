@@ -217,6 +217,20 @@ describe('enable() and disable()', () => {
     expect(startVT.mock.calls.length).toBe(callsBefore);
     expect(instance.isEnabled).toBe(true);
   });
+
+  it('update({ force: true }) triggers a commit even when disabled', async () => {
+    const startVT = mockStartViewTransition();
+    const { instance } = await renderFixture();
+    expect(startVT).toHaveBeenCalledTimes(0);
+
+    instance.disable();
+    expect(startVT).toHaveBeenCalledTimes(0);
+    instance.update({ force: true });
+    expect(startVT).toHaveBeenCalledOnce();
+    await waitForLayout(instance);
+
+    expect(instance.isEnabled).toBe(false);
+  });
 });
 
 describe('destroy()', () => {

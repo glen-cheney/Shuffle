@@ -142,7 +142,7 @@ No-op in Grid Lanes mode. The browser handles geometry automatically. This metho
 
 ### `add(newItems)`
 
-Appends new items to the grid and applies the current filter and sort. `newItems` is an array of elements. New elements must be children of the container before calling `add()`.
+Appends new items to the grid and applies the current filter and sort. `newItems` is an array of elements. Elements that are not already children of the container are automatically appended to it before being added to the grid.
 
 ### `remove(elements)`
 
