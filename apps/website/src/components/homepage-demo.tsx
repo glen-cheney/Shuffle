@@ -97,9 +97,6 @@ export const HomepageDemo: React.FC = () => {
       sizer: `.${classicGridStyles.sizer}`,
       delimiter: ' ',
     });
-    // TODO: images are the wrong height after this re-render. Could be either
-    // the img wrapper isn't correctly setting its height without the image, or
-    // something weird with react rendering.
   };
 
   const destroyGridLanes = () => {

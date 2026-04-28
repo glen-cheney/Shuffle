@@ -39,6 +39,9 @@ Use Turbo's `--filter` flag to run tasks for a specific workspace:
 # Run tests only for the shufflejs package
 yarn turbo run test --filter=shufflejs
 
+# Run a single test suite file in the shufflejs package
+yarn turbo run test --filter=shufflejs -- src/test/grid-lanes.animation.test.ts
+
 # Build only the website docs
 yarn turbo run build --filter=shuffle-docs
 
