@@ -33,12 +33,12 @@ describe('shuffle layout', () => {
       child.style.height = '150px';
     }
 
-    const columnWidth = vi.fn((containerWidth: number) => {
+    const columnWidth = vi.fn<(containerWidth: number) => number>((containerWidth: number) => {
       expect(containerWidth).toBe(1000);
       return 300;
     });
 
-    const gutterWidth = vi.fn(() => 50);
+    const gutterWidth = vi.fn<() => number>(() => 50);
 
     instance.value = new Shuffle(fixture, {
       columnWidth,
@@ -65,12 +65,12 @@ describe('shuffle layout', () => {
     children[5].style.width = '600px';
     children[6].style.width = '900px';
 
-    const columnWidth = vi.fn((containerWidth: number) => {
+    const columnWidth = vi.fn<(containerWidth: number) => number>((containerWidth: number) => {
       expect(containerWidth).toBe(1200);
       return 300;
     });
 
-    const gutterWidth = vi.fn(() => 0);
+    const gutterWidth = vi.fn<() => number>(() => 0);
 
     instance.value = new Shuffle(fixture, {
       columnWidth,

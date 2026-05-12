@@ -1,15 +1,6 @@
 import type Shuffle from './shuffle';
 import type { ShuffleItem } from './shuffle-item';
-
-interface JqueryLike {
-  [index: number]: HTMLElement;
-  length: number;
-  jquery: string;
-}
-
-export type ElementOption = Element | HTMLElement | string | JqueryLike;
-
-export type FilterModeOptions = 'any' | 'all';
+import type { ElementOption, FilterModeOptions, SortOptions } from './core/types';
 
 export interface ShuffleOptions {
   /**
@@ -62,7 +53,7 @@ export interface ShuffleOptions {
    * Shuffle can be initialized with a sort object. It is the same object
    * given to the sort method.
    */
-  initialSort?: SortOptions | null;
+  initialSort?: SortOptions<ShuffleItem> | null;
 
   /**
    * Whether to center grid items in the row with the leftover space.
@@ -110,24 +101,6 @@ export interface ShuffleOptions {
   useTransforms?: boolean;
 }
 
-export interface SortOptions {
-  // Use array.reverse() to reverse the results of your sort.
-  reverse?: boolean;
-
-  // Sorting function which gives you the element each shuffle item is using by default.
-  // oxlint-disable-next-line typescript/no-explicit-any
-  by?: ((element: HTMLElement) => any) | null;
-
-  // Custom sort function.
-  compare?: ((itemA: ShuffleItem, itemB: ShuffleItem) => number) | null;
-
-  // If true, this will skip the sorting and return a randomized order in the array.
-  randomize?: boolean;
-
-  // Determines which property of the `ShuffleItem` instance is passed to the `by` function.
-  key?: keyof ShuffleItem;
-}
-
 export type InlineCssStyles = Record<string, string | number>;
 
 export interface ShuffleItemCss {
@@ -145,9 +118,6 @@ export interface ShuffleItemCss {
     after: InlineCssStyles;
   };
 }
-
-export type FilterFunction = (this: HTMLElement, element: HTMLElement, shuffle: Shuffle) => boolean;
-export type FilterArg = string | string[] | FilterFunction;
 
 export interface RemovedEventType {
   collection: HTMLElement[];
@@ -179,11 +149,6 @@ export type ShuffleEventCallback = (data: ShuffleEventData) => void;
  * Union of event types (without the shuffle property).
  */
 export type ShuffleEventType = RemovedEventType | LayoutEventType;
-
-export interface FilterSet {
-  visible: ShuffleItem[];
-  hidden: ShuffleItem[];
-}
 
 export interface QueueItem {
   item: ShuffleItem;

@@ -1,5 +1,4 @@
-import type { ShuffleItem } from './shuffle-item';
-import type { SortOptions } from './types';
+import type { SortOptions, SortableElement } from './types';
 
 /**
  * Fisher-Yates shuffle.
@@ -46,7 +45,7 @@ const defaults = {
  * @param options Sorting options.
  * @return The sorted array.
  */
-export function sorter(arr: ShuffleItem[], options?: SortOptions | null): ShuffleItem[] {
+export function sorter<Item extends SortableElement>(arr: Item[], options?: SortOptions<Item> | null): Item[] {
   // Handle invalid input gracefully
   if (!Array.isArray(arr)) {
     return [];
@@ -68,15 +67,16 @@ export function sorter(arr: ShuffleItem[], options?: SortOptions | null): Shuffl
   // If we don't have opts.by, default to DOM order
   if (typeof opts.by === 'function') {
     const sortBy = opts.by;
+    const key = opts.key as keyof Item;
     arr.sort((itemA, itemB) => {
       // Exit early if we already know we want to revert
       if (revert) {
         return 0;
       }
 
-      const itemAValue = itemA[opts.key];
-      const itemBValue = itemB[opts.key];
-      // @ts-expect-error the key is dynamic, but we know it will be a valid key of ShuffleItem
+      const itemAValue = itemA[key];
+      const itemBValue = itemB[key];
+      // @ts-expect-error the key is dynamic, but we know it will be a valid key of item
       // oxlint-disable-next-line typescript/no-unsafe-assignment
       const valA = sortBy(itemAValue);
       // @ts-expect-error dynamic key

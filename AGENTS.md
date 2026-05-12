@@ -39,6 +39,9 @@ Use Turbo's `--filter` flag to run tasks for a specific workspace:
 # Run tests only for the shufflejs package
 yarn turbo run test --filter=shufflejs
 
+# Run a single test suite file in the shufflejs package
+yarn turbo run test --filter=shufflejs -- src/test/grid-lanes.animation.test.ts
+
 # Build only the website docs
 yarn turbo run build --filter=shuffle-docs
 
@@ -49,6 +52,23 @@ yarn turbo run lint --filter=shufflejs
 See [`turbo.json`](turbo.json) for available tasks across workspaces.
 
 **Note:** Never run commands from a nested directory.
+
+## After Completing Work
+
+After finishing a task, always run type-check and linting to ensure code quality:
+
+```bash
+# Type-check all workspaces
+yarn type-check
+
+# Run linting across the project
+yarn lint
+
+# Run tests to verify your changes don't break anything
+yarn test
+```
+
+These validation steps help catch errors early and maintain consistent code standards across the monorepo.
 
 ## When in Doubt
 

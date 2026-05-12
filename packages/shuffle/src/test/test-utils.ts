@@ -1,4 +1,4 @@
-// oxlint-disable eslint-plugin-react-hooks/rules-of-hooks
+// oxlint-disable eslint-plugin-react-hooks/rules-of-hooks, class-methods-use-this, no-empty-function
 import { test as baseTest, type TestAPI, vi } from 'vitest';
 import { fixtures } from './fixtures';
 import type Shuffle from '../shuffle';
@@ -16,7 +16,7 @@ vi.mock('../transition-manager', () => ({
   }),
 }));
 
-// TODO: find a different way to cover the branches from resize observer callbacks.
+// Coverage note: this mock triggers resize observer callback branches in tests.
 type ResizeObserverCallback = (entries: ResizeObserverEntry[]) => void;
 
 class MockResizeObserver {

@@ -5,6 +5,8 @@ dist
 
 # testing
 coverage
+packages/shuffle/.vitest-attachments/
+packages/shuffle/src/test/__screenshots__/
 
 # next.js
 .next/
