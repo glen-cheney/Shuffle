@@ -3,6 +3,7 @@ import { type Mock, vi } from 'vitest';
 
 import type GridLanes from '../shuffle-lanes';
 import type { GridLanesItem } from '../grid-lanes-item';
+import '../../dist/shuffle-lanes.css';
 
 export function createTemplateFixture(html: string): HTMLElement {
   const template = document.createElement('template');
@@ -122,7 +123,14 @@ export function mockStartViewTransition({
   return vi.spyOn(document, 'startViewTransition').mockImplementation((callbackOrOptions) => {
     if (typeof callbackOrOptions === 'function' && invokeUpdateCallback) {
       callbackOrOptions();
+    } else if (
+      typeof callbackOrOptions === 'object' &&
+      typeof callbackOrOptions.update === 'function' &&
+      invokeUpdateCallback
+    ) {
+      callbackOrOptions.update();
     }
+
     return {
       finished,
       ready: Promise.resolve(),

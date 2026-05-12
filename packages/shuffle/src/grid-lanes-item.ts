@@ -20,7 +20,6 @@ export class GridLanesItem {
   init(): void {
     this.element.classList.add(Classes.SHUFFLE_ITEM, Classes.VISIBLE);
     this.element.style.setProperty('view-transition-name', this.id);
-    this.element.style.setProperty('view-transition-class', Classes.SHUFFLE_ITEM);
   }
 
   show(): void {
@@ -43,7 +42,6 @@ export class GridLanesItem {
   dispose(): void {
     this.element.classList.remove(Classes.SHUFFLE_ITEM, Classes.VISIBLE, Classes.HIDDEN);
     this.element.style.removeProperty('view-transition-name');
-    this.element.style.removeProperty('view-transition-class');
     this.element.style.removeProperty('--shuffle-index');
     this.element.removeAttribute('aria-hidden');
   }

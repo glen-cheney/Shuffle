@@ -59,7 +59,7 @@ describe('grid lanes init', () => {
       expect(element.classList.contains('shuffle-item')).toBe(true);
       expect(element.classList.contains('shuffle-item--visible')).toBe(true);
       expect(element.style.getPropertyValue('view-transition-name')).toBe(itemId);
-      expect(element.style.getPropertyValue('view-transition-class')).toBe('shuffle-item');
+      expect(globalThis.getComputedStyle(element).getPropertyValue('view-transition-class')).toBe('shuffle-item');
     }
 
     expect(ids.size).toBe(3);

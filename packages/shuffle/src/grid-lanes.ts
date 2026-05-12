@@ -3,7 +3,7 @@ import { GridLanesItem } from './grid-lanes-item';
 import { matchesFilter } from './core/filter';
 import { sorter } from './core/sorter';
 import { resolveElementOption } from './core/resolve-element-option';
-import { ALL_ITEMS, EventType, FILTER_ATTRIBUTE_KEY, FilterMode } from './core/constants';
+import { ALL_ITEMS, Classes, EventType, FILTER_ATTRIBUTE_KEY, FilterMode } from './core/constants';
 import type {
   ElementOption,
   FilterArg as CoreFilterArg,
@@ -83,12 +83,9 @@ const DEFAULT_GRID_LANES_OPTIONS: ResolvedGridLanesOptions = {
   staggerAmountMax: 150,
 };
 
+let instanceCounter = 0;
 let itemIdCounter = 0;
 let defaultOrderCounter = 0;
-
-function noop(): void {
-  // empty
-}
 
 function uniqueElements(elements: HTMLElement[]): HTMLElement[] {
   return [...new Set(elements)];
@@ -102,12 +99,14 @@ class GridLanes extends TinyEmitter {
   group: GridLanesFilterArg = ALL_ITEMS;
   lastFilter: GridLanesFilterArg = ALL_ITEMS;
   lastSort: GridLanesSortOptions | null = null;
+  id = `shuffle-${(instanceCounter += 1)}`;
   isEnabled = true;
   isInitialized = false;
   isTransitioning = false;
   #activeTransition: ViewTransition | null = null;
   #pendingRemovals: GridLanesItem[] = [];
   #commitScheduled = false;
+  #containerHeight = 0;
 
   /**
    * Categorize and sort a grid of items using native grid-lanes behavior.
@@ -139,6 +138,7 @@ class GridLanes extends TinyEmitter {
     this.sortedItems = this.#getAllItems();
 
     this.#setTransitionProps();
+    this.element.classList.add(Classes.BASE);
 
     // Apply initial filter and sort synchronously, bypassing view transitions.
     const initialGroup = this.options.group;
@@ -171,6 +171,7 @@ class GridLanes extends TinyEmitter {
     this.element.style.setProperty('--shuffle-easing', this.options.easing);
     this.element.style.setProperty('--shuffle-stagger-amount', `${this.options.staggerAmount}ms`);
     this.element.style.setProperty('--shuffle-stagger-max', `${this.options.staggerAmountMax}ms`);
+    this.element.style.setProperty('view-transition-name', this.id);
   }
 
   /**
@@ -316,11 +317,7 @@ class GridLanes extends TinyEmitter {
     });
   }
 
-  /**
-   * Track a view transition lifecycle and finalize state when it ends.
-   * @param vt Native view transition object.
-   */
-  async #monitorViewTransition(vt: ViewTransition): Promise<void> {
+  async #animateContainerHeight(oldHeight: number, viewTransition: ViewTransition): Promise<void> {
     /**
      * The `ready` promise can reject for various reasons, including:
      * - The update callback fails
@@ -332,9 +329,25 @@ class GridLanes extends TinyEmitter {
      * a new one. This is expected, and why we schedule microtasks to apply
      * updates instead of applying them immediately.
      */
-    // oxlint-disable-next-line promise/prefer-await-to-then
-    vt.ready.catch(noop);
+    try {
+      await viewTransition.ready;
 
+      if (oldHeight !== this.#containerHeight) {
+        this.element.animate([{ height: `${oldHeight}px` }, { height: `${this.#containerHeight}px` }], {
+          duration: this.options.speed,
+          easing: this.options.easing,
+        });
+      }
+    } catch {
+      // Do nothing
+    }
+  }
+
+  /**
+   * Track a view transition lifecycle and finalize state when it ends.
+   * @param vt Native view transition object.
+   */
+  async #monitorViewTransition(vt: ViewTransition): Promise<void> {
     // Wait for the view transition to finish and always finalize the state.
     try {
       await vt.finished;
@@ -380,10 +393,20 @@ class GridLanes extends TinyEmitter {
     this.isTransitioning = true;
 
     if (typeof document.startViewTransition === 'function' && this.isInitialized) {
-      const vt = document.startViewTransition(() => {
-        this.#applyUpdate();
+      const oldHeight = this.element.offsetHeight;
+      const vt = document.startViewTransition({
+        update: () => {
+          this.#applyUpdate();
+          // Reading offsetHeight here forces the browser to calculate the new
+          // layout immediately so we get the updated height.
+          this.#containerHeight = this.element.offsetHeight;
+        },
+        types: ['shuffle-lanes'],
       });
       this.#activeTransition = vt;
+
+      void this.#animateContainerHeight(oldHeight, vt);
+
       // Wait for the view transition to finish.
       void this.#monitorViewTransition(vt);
     } else {
@@ -607,17 +630,17 @@ class GridLanes extends TinyEmitter {
     this.handlers = {};
     this.isEnabled = false;
 
-    if (this.element) {
-      delete this.element.dataset.shuffleLanes;
-      this.element.style.removeProperty('--shuffle-speed');
-      this.element.style.removeProperty('--shuffle-easing');
-      this.element.style.removeProperty('--shuffle-stagger-amount');
-      this.element.style.removeProperty('--shuffle-stagger-max');
+    delete this.element.dataset.shuffleLanes;
+    this.element.classList.remove(Classes.BASE);
+    this.element.style.removeProperty('--shuffle-speed');
+    this.element.style.removeProperty('--shuffle-easing');
+    this.element.style.removeProperty('--shuffle-stagger-amount');
+    this.element.style.removeProperty('--shuffle-stagger-max');
+    this.element.style.removeProperty('view-transition-name');
 
-      // @ts-expect-error instead of creating a complicated union type for when
-      // a shuffle instance is destroyed, just ignore it.
-      this.element = null;
-    }
+    // @ts-expect-error instead of creating a complicated union type for when
+    // a shuffle instance is destroyed, just ignore it.
+    this.element = null;
   }
 }
 

@@ -347,7 +347,10 @@ describe('add()', () => {
     instance.add([newEl]);
 
     expect(startViewTransition).toHaveBeenCalledOnce();
-    expect(startViewTransition.mock.calls[0]?.[0]).toEqual(expect.any(Function));
+    expect(startViewTransition).toHaveBeenCalledWith({
+      update: expect.any(Function),
+      types: ['shuffle-lanes'],
+    });
 
     // Item is registered in the Map immediately after add()
     expect(instance.getItemByElement(newEl)).toBeDefined();

@@ -25,6 +25,22 @@
  *   }
  */
 
+:root:active-view-transition-type(shuffle-lanes)::view-transition {
+  pointer-events: none;
+  view-transition-name: none;
+}
+
+/* Disable the default full-page cross-fade for this transition type */
+:root:active-view-transition-type(shuffle-lanes)::view-transition-old(root),
+:root:active-view-transition-type(shuffle-lanes)::view-transition-new(root) {
+  animation: none;
+}
+
+/* `view-transition-name` is set dynamically */
+.shuffle-item {
+  view-transition-class: shuffle-item;
+}
+
 [data-shuffle-lanes] .shuffle-item--hidden {
   display: none !important;
 }
