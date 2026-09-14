@@ -24,14 +24,19 @@
       "types": "./dist/shuffle-lanes.d.mts",
       "default": "./dist/shuffle-lanes.mjs"
     },
-    "./grid-lanes.css": "./dist/shuffle-lanes.css",
+    "./grid-lanes.css": {
+      "types": "./dist/shuffle-lanes.css.d.ts",
+      "default": "./dist/shuffle-lanes.css"
+    },
     "./package.json": "./package.json"
   },
   "types": "./dist/shuffle.d.mts",
   "files": [
     "dist"
   ],
-  "sideEffects": ["./dist/shuffle-lanes.css"],
+  "sideEffects": [
+    "./dist/shuffle-lanes.css"
+  ],
   "scripts": {
     "build": "tsdown",
     "test": "vitest run",

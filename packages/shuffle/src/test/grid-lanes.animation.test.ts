@@ -6,20 +6,13 @@ import { createFixture, getGridLanesItem, mockStartViewTransition, waitForLayout
 describe('speed and easing options', () => {
   afterEach(() => {
     document.body.innerHTML = '';
+    for (const element of document.querySelectorAll('style[data-shuffle-lanes-view-transition]')) {
+      element.remove();
+    }
     vi.restoreAllMocks();
   });
 
-  it('uses the default transition options when none are provided', () => {
-    const { container } = createFixture();
-    const _gl = new GridLanes(container, { itemSelector: '.item' });
-
-    expect(container.style.getPropertyValue('--shuffle-speed')).toBe('250ms');
-    expect(container.style.getPropertyValue('--shuffle-easing')).toBe('cubic-bezier(0.4, 0.0, 0.2, 1)');
-    expect(container.style.getPropertyValue('--shuffle-stagger-amount')).toBe('15ms');
-    expect(container.style.getPropertyValue('--shuffle-stagger-max')).toBe('150ms');
-  });
-
-  it('writes transition option values to container custom properties', () => {
+  it('does not write transition option values to container custom properties', () => {
     const { container } = createFixture();
     const _gl = new GridLanes(container, {
       itemSelector: '.item',
@@ -29,10 +22,55 @@ describe('speed and easing options', () => {
       staggerAmountMax: 200,
     });
 
-    expect(container.style.getPropertyValue('--shuffle-speed')).toBe('400ms');
-    expect(container.style.getPropertyValue('--shuffle-easing')).toBe('ease-in-out');
-    expect(container.style.getPropertyValue('--shuffle-stagger-amount')).toBe('30ms');
-    expect(container.style.getPropertyValue('--shuffle-stagger-max')).toBe('200ms');
+    expect(container.style.getPropertyValue('--shuffle-speed')).toBe('');
+    expect(container.style.getPropertyValue('--shuffle-easing')).toBe('');
+    expect(container.style.getPropertyValue('--shuffle-stagger-amount')).toBe('');
+    expect(container.style.getPropertyValue('--shuffle-stagger-max')).toBe('');
+  });
+
+  it('writes transition option values to the scoped View Transition rule before animating', async () => {
+    const { container } = createFixture();
+    mockStartViewTransition();
+    const instance = new GridLanes(container, {
+      itemSelector: '.item',
+      speed: 400,
+      easing: 'ease-in-out',
+      staggerAmount: 30,
+      staggerAmountMax: 200,
+    });
+
+    instance.filter('design');
+    await waitForLayout(instance);
+
+    const styleElement = document.querySelector<HTMLStyleElement>('style[data-shuffle-lanes-view-transition]');
+    const rule = styleElement?.sheet?.cssRules.item(0) as CSSStyleRule;
+
+    expect(rule).toBeInstanceOf(CSSStyleRule);
+    expect(rule.selectorText).toBe(':root:active-view-transition-type(shuffle-lanes)::view-transition');
+    expect(rule.style.getPropertyValue('pointer-events')).toBe('none');
+    expect(rule.style.getPropertyValue('--shuffle-speed')).toBe('400ms');
+    expect(rule.style.getPropertyValue('--shuffle-easing')).toBe('ease-in-out');
+    expect(rule.style.getPropertyValue('--shuffle-stagger-amount')).toBe('30ms');
+    expect(rule.style.getPropertyValue('--shuffle-stagger-max')).toBe('200ms');
+  });
+
+  it('reuses the scoped View Transition rule and lets the active instance update it', async () => {
+    const fixtureA = createFixture();
+    const fixtureB = createFixture();
+    mockStartViewTransition();
+    const instanceA = new GridLanes(fixtureA.container, { itemSelector: '.item', speed: 300 });
+    const instanceB = new GridLanes(fixtureB.container, { itemSelector: '.item', speed: 600 });
+
+    instanceA.filter('design');
+    await waitForLayout(instanceA);
+    instanceB.filter('ux');
+    await waitForLayout(instanceB);
+
+    const styleElements = document.querySelectorAll<HTMLStyleElement>('style[data-shuffle-lanes-view-transition]');
+    expect(styleElements).toHaveLength(1);
+
+    const rule = styleElements.item(0).sheet?.cssRules.item(0) as CSSStyleRule;
+    expect(rule.style.getPropertyValue('--shuffle-speed')).toBe('600ms');
   });
 });
 

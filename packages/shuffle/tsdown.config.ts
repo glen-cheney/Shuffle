@@ -16,7 +16,10 @@ const config: UserConfig[] = defineConfig([
     outDir: './dist',
     sourcemap: true,
     dts: true,
-    copy: [{ from: './src/shuffle-lanes.css', to: './dist' }],
+    copy: [
+      { from: './src/shuffle-lanes.css', to: './dist' },
+      { from: './src/shuffle-lanes.css.d.ts', to: './dist' },
+    ],
   },
 ]);
 

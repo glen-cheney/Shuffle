@@ -86,9 +86,45 @@ const DEFAULT_GRID_LANES_OPTIONS: ResolvedGridLanesOptions = {
 let instanceCounter = 0;
 let itemIdCounter = 0;
 let defaultOrderCounter = 0;
+let viewTransitionStyleElement: HTMLStyleElement | null = null;
+let viewTransitionStyleRule: CSSStyleRule | null = null;
 
 function uniqueElements(elements: HTMLElement[]): HTMLElement[] {
   return [...new Set(elements)];
+}
+
+function getViewTransitionStyleRule(): CSSStyleRule | null {
+  if (viewTransitionStyleElement?.isConnected && viewTransitionStyleRule?.parentStyleSheet) {
+    return viewTransitionStyleRule;
+  }
+
+  const styleElement = document.createElement('style');
+  styleElement.dataset.shuffleLanesViewTransition = 'shuffle-lanes-view-transition';
+  document.head.append(styleElement);
+  viewTransitionStyleElement = styleElement;
+
+  // `sheet` is only missing when the style element is not connected to a document.
+  const sheet = styleElement.sheet!;
+  const ruleIndex = sheet.insertRule(
+    ':root:active-view-transition-type(shuffle-lanes)::view-transition {}',
+    sheet.cssRules.length,
+  );
+  const rule = sheet.cssRules.item(ruleIndex) as CSSStyleRule;
+  viewTransitionStyleRule = rule;
+  return rule;
+}
+
+function setViewTransitionProps(options: ResolvedGridLanesOptions): void {
+  const rule = getViewTransitionStyleRule();
+  if (!rule) {
+    return;
+  }
+
+  rule.style.setProperty('pointer-events', 'none');
+  rule.style.setProperty('--shuffle-speed', `${options.speed}ms`);
+  rule.style.setProperty('--shuffle-easing', options.easing);
+  rule.style.setProperty('--shuffle-stagger-amount', `${options.staggerAmount}ms`);
+  rule.style.setProperty('--shuffle-stagger-max', `${options.staggerAmountMax}ms`);
 }
 
 class GridLanes extends TinyEmitter {
@@ -137,7 +173,7 @@ class GridLanes extends TinyEmitter {
     this.items = this.#getItems();
     this.sortedItems = this.#getAllItems();
 
-    this.#setTransitionProps();
+    this.element.style.setProperty('view-transition-name', this.id);
     this.element.classList.add(Classes.BASE);
 
     // Apply initial filter and sort synchronously, bypassing view transitions.
@@ -161,17 +197,6 @@ class GridLanes extends TinyEmitter {
   #validateDisplay(): boolean {
     const { display } = globalThis.getComputedStyle(this.element);
     return display === 'grid' || display === 'grid-lanes';
-  }
-
-  /**
-   * Apply css custom properties used by GridLanes transitions.
-   */
-  #setTransitionProps(): void {
-    this.element.style.setProperty('--shuffle-speed', `${this.options.speed}ms`);
-    this.element.style.setProperty('--shuffle-easing', this.options.easing);
-    this.element.style.setProperty('--shuffle-stagger-amount', `${this.options.staggerAmount}ms`);
-    this.element.style.setProperty('--shuffle-stagger-max', `${this.options.staggerAmountMax}ms`);
-    this.element.style.setProperty('view-transition-name', this.id);
   }
 
   /**
@@ -394,6 +419,7 @@ class GridLanes extends TinyEmitter {
 
     if (typeof document.startViewTransition === 'function' && this.isInitialized) {
       const oldHeight = this.element.offsetHeight;
+      setViewTransitionProps(this.options);
       const vt = document.startViewTransition({
         update: () => {
           this.#applyUpdate();
@@ -632,10 +658,6 @@ class GridLanes extends TinyEmitter {
 
     delete this.element.dataset.shuffleLanes;
     this.element.classList.remove(Classes.BASE);
-    this.element.style.removeProperty('--shuffle-speed');
-    this.element.style.removeProperty('--shuffle-easing');
-    this.element.style.removeProperty('--shuffle-stagger-amount');
-    this.element.style.removeProperty('--shuffle-stagger-max');
     this.element.style.removeProperty('view-transition-name');
 
     // @ts-expect-error instead of creating a complicated union type for when

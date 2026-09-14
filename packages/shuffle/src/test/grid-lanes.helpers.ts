@@ -3,7 +3,7 @@ import { type Mock, vi } from 'vitest';
 
 import type GridLanes from '../shuffle-lanes';
 import type { GridLanesItem } from '../grid-lanes-item';
-import '../../dist/shuffle-lanes.css';
+import 'shufflejs/grid-lanes.css';
 
 export function createTemplateFixture(html: string): HTMLElement {
   const template = document.createElement('template');

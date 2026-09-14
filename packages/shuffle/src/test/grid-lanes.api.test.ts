@@ -239,7 +239,7 @@ describe('destroy()', () => {
     vi.restoreAllMocks();
   });
 
-  it('removes only library-owned container custom properties', () => {
+  it('does not remove user-owned container custom properties', () => {
     mockStartViewTransition();
     const container = createTemplateFixture(`
       <div style="display: grid; --user-prop: 42px;">
@@ -249,10 +249,6 @@ describe('destroy()', () => {
     const instance = new GridLanes(container, { itemSelector: '.item' });
     instance.destroy();
 
-    expect(container.style.getPropertyValue('--shuffle-speed')).toBe('');
-    expect(container.style.getPropertyValue('--shuffle-easing')).toBe('');
-    expect(container.style.getPropertyValue('--shuffle-stagger-amount')).toBe('');
-    expect(container.style.getPropertyValue('--shuffle-stagger-max')).toBe('');
     // User property must survive
     expect(container.style.getPropertyValue('--user-prop')).toBe('42px');
     // data attribute must be removed

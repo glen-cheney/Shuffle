@@ -53,7 +53,7 @@ Sort to apply on initialization. It is the same object accepted by `sort()`. See
 
 Default: `250`
 
-Transition duration in milliseconds. Written to `--shuffle-speed` on the container element and consumed by the shipped CSS.
+Transition duration in milliseconds. Written to Grid Lanes' scoped View Transition rule while a transition starts.
 
 ```js
 new GridLanes(container, { itemSelector: '.picture-item', speed: 400 });
@@ -63,7 +63,7 @@ new GridLanes(container, { itemSelector: '.picture-item', speed: 400 });
 
 Default: `'cubic-bezier(0.4, 0.0, 0.2, 1)'`
 
-CSS easing function for view transitions. Written to `--shuffle-easing` on the container.
+CSS easing function for view transitions. Written to Grid Lanes' scoped View Transition rule while a transition starts.
 
 ```js
 new GridLanes(container, { itemSelector: '.picture-item', easing: 'ease-in-out' });
@@ -73,13 +73,13 @@ new GridLanes(container, { itemSelector: '.picture-item', easing: 'ease-in-out' 
 
 Default: `15`
 
-Per-item animation delay offset in milliseconds. Each visible item gets an incremental delay based on its position in the sorted order. Written to `--shuffle-stagger-amount`.
+Per-item animation delay offset in milliseconds. Each visible item gets an incremental delay based on its position in the sorted order. Written to Grid Lanes' scoped View Transition rule while a transition starts.
 
 ### `staggerAmountMax` [number]
 
 Default: `150`
 
-Maximum total stagger delay in milliseconds. The per-item delay is capped at this value. Written to `--shuffle-stagger-max`.
+Maximum total stagger delay in milliseconds. The per-item delay is capped at this value. Written to Grid Lanes' scoped View Transition rule while a transition starts.
 
 ## Sorting object
 
