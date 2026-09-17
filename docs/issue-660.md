@@ -347,6 +347,18 @@ Required validation evidence checklist:
 - [ ] Integration test: reduced-motion path completes updates with effectively no visible animation.
 - [ ] Visual regression test: repeated filter/sort/hide/show cycles show no flash/snap artifacts.
 
+### View-transition interactivity findings
+
+Goal was to answer: while a GridLanes transition is running, can the user still click the rest of the page (e.g. filter buttons)? Method: Playwright-driven real browsers against a probe page (5s transition, trusted `mouse.click` on a fixed button 800ms in, asserting the click target and counter mid-transition). Note: `elementFromPoint` cannot assert click-through — mid-transition it routes to the root regardless of overlay styling — so the committed Vitest interaction test locks rule shape/scoping from a real transition instead of live hit-testing.
+
+Browsers tested: Playwright-pinned Chromium 1208 (≈ Chrome 145, headless and headed), the real installed Chrome 152, and Playwright WebKit 2248 (≈ Safari 26, which supports `startViewTransition` and `view-transition-class`).
+
+1. **[Bram.us](https://www.bram.us/2025/01/29/view-transitions-page-interactivity/) half 1 alone is insufficient.** `::view-transition { pointer-events: none }` is correctly applied mid-transition (verified via the scoped type selector), but real clicks still target the document root — identically for `none`, `auto !important`, and `none !important` on all overlay pseudos. This matches [csswg-drafts#7797](https://github.com/w3c/csswg-drafts/issues/7797): clicks hit the viewport-filling pseudos and are dispatched to the document element. The broad `(*)` selector variant was therefore rejected: empirically no better than the singleton rule.
+2. **`:root` exclusion restores clicks.** With `:root { view-transition-name: none !important }` in place before snapshot capture, the transition scopes to named snapshots only and mid-transition clicks reach the live button — in all three engines. Item/container animations still run (24 vs 25 live animations; only the root one is gone) and `shuffle:layout` fires normally. MDN confirms the semantics: a `view-transition-name` puts an element in a separate snapshot, `none` opts out — and duplicate names reject `ready` (which is why per-instance unique container IDs matter).
+3. **Upstream state.** [csswg-drafts#11596](https://github.com/w3c/csswg-drafts/issues/11596) (open) confirms transitioning elements are inert to hit-testing with no author-CSS override; root scoping is the supported escape hatch.
+
+Implication: the stash's temporary root suppression was revived in inline-style form — save/restore of `document.documentElement` inline `view-transition-name` (never a stylesheet, so it yields to author `!important`), refcounted across instances, removed after `ready` settles including the skip/reject path, with sync-throw and `destroy()`-mid-flight coverage. The singleton overlay rule is kept, and `old/new(root) { animation: none }` remains as a dormant-but-harmless fallback for unsuppressed transitions. Practical impact window is small regardless: real transitions run at 250ms with last-write-wins plus `skipTransition` absorbing rapid clicks. Covered by `grid-lanes.root-suppression.test.ts` (lifecycle) and a live click-through assertion in `grid-lanes.interaction.test.ts`.
+
 ## ✅ Phase 4: GridLanesItem class
 
 `GridLanes` uses a distinct internal item class `GridLanesItem` — it does NOT reuse or extend `ShuffleItem` from core Shuffle. The classes have compatible public surfaces for sort comparators (`compare(a, b)`, `by(element)`, `key`) but different internals.

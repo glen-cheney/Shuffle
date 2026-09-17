@@ -113,10 +113,12 @@ export function createUnresolvedPromise<Result = void>(): Promise<Result> {
 
 export function mockStartViewTransition({
   finished = Promise.resolve(),
+  ready = Promise.resolve(),
   skipTransition = noop,
   invokeUpdateCallback = true,
 }: {
   finished?: Promise<void>;
+  ready?: Promise<void>;
   skipTransition?: () => void;
   invokeUpdateCallback?: boolean;
 } = {}): Mock<(callbackOptions?: ViewTransitionUpdateCallback | StartViewTransitionOptions) => ViewTransition> {
@@ -133,10 +135,10 @@ export function mockStartViewTransition({
 
     return {
       finished,
-      ready: Promise.resolve(),
+      ready,
       updateCallbackDone: Promise.resolve(),
       skipTransition,
-      types: { forEach: noop },
-    } as unknown as ViewTransition;
+      types: new Set<string>(),
+    };
   });
 }

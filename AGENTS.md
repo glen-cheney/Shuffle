@@ -70,6 +70,10 @@ yarn test
 
 These validation steps help catch errors early and maintain consistent code standards across the monorepo.
 
+## Code style
+
+- Type casts are a code smell. Always avoid them if possible.
+
 ## When in Doubt
 
 Refer to [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full contributor guide, including detailed release procedures and best practices.

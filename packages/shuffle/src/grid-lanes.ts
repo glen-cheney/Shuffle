@@ -88,9 +88,59 @@ let itemIdCounter = 0;
 let defaultOrderCounter = 0;
 let viewTransitionStyleElement: HTMLStyleElement | null = null;
 let viewTransitionStyleRule: CSSStyleRule | null = null;
+let rootSuppressionCount = 0;
+let savedRootViewTransitionName: string | null = null;
 
 function uniqueElements(elements: HTMLElement[]): HTMLElement[] {
   return [...new Set(elements)];
+}
+
+/**
+ * Exclude `:root` from view-transition snapshots while a GridLanes transition
+ * captures. Without this, the root snapshot covers the viewport and clicks on
+ * the rest of the page are dispatched to the document element for the whole
+ * transition. With it, only named snapshots participate and outside content
+ * stays live and clickable.
+ *
+ * The exclusion is an inline style, so it yields to author `!important` rules
+ * and is easier to remove. Different shuffle instances share the styles.
+ */
+function acquireRootSuppression(): void {
+  if (rootSuppressionCount === 0) {
+    savedRootViewTransitionName = document.documentElement.style.getPropertyValue('view-transition-name');
+    document.documentElement.style.setProperty('view-transition-name', 'none');
+  }
+  rootSuppressionCount += 1;
+}
+
+function releaseRootSuppression(): void {
+  if (rootSuppressionCount === 0) {
+    return;
+  }
+
+  rootSuppressionCount -= 1;
+  if (rootSuppressionCount === 0) {
+    if (savedRootViewTransitionName) {
+      document.documentElement.style.setProperty('view-transition-name', savedRootViewTransitionName);
+    } else {
+      document.documentElement.style.removeProperty('view-transition-name');
+    }
+    savedRootViewTransitionName = null;
+  }
+}
+
+/**
+ * End the `:root` exclusion window once snapshots are captured. `ready`
+ * rejects when the transition is skipped, but the window ends either way.
+ */
+async function releaseRootSuppressionWhenSettled(ready: Promise<unknown>): Promise<void> {
+  try {
+    await ready;
+  } catch {
+    // A skipped transition rejects `ready`.
+  } finally {
+    releaseRootSuppression();
+  }
 }
 
 function getViewTransitionStyleRule(): CSSStyleRule | null {
@@ -420,16 +470,29 @@ class GridLanes extends TinyEmitter {
     if (typeof document.startViewTransition === 'function' && this.isInitialized) {
       const oldHeight = this.element.offsetHeight;
       setViewTransitionProps(this.options);
-      const vt = document.startViewTransition({
-        update: () => {
-          this.#applyUpdate();
-          // Reading offsetHeight here forces the browser to calculate the new
-          // layout immediately so we get the updated height.
-          this.#containerHeight = this.element.offsetHeight;
-        },
-        types: ['shuffle-lanes'],
-      });
+      acquireRootSuppression();
+
+      let vt: ViewTransition;
+      try {
+        vt = document.startViewTransition({
+          update: () => {
+            this.#applyUpdate();
+            // Reading offsetHeight here forces the browser to calculate the new
+            // layout immediately so we get the updated height.
+            this.#containerHeight = this.element.offsetHeight;
+          },
+          types: ['shuffle-lanes'],
+        });
+      } catch (error) {
+        releaseRootSuppression();
+        this.isTransitioning = false;
+        throw error;
+      }
       this.#activeTransition = vt;
+
+      // Old and new snapshots are both captured by `ready`, so the `:root`
+      // exclusion only needs to cover that ~1-frame window.
+      void releaseRootSuppressionWhenSettled(vt.ready);
 
       void this.#animateContainerHeight(oldHeight, vt);
 

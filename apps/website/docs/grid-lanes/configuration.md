@@ -81,6 +81,14 @@ Default: `150`
 
 Maximum total stagger delay in milliseconds. The per-item delay is capped at this value. Written to Grid Lanes' scoped View Transition rule while a transition starts.
 
+### Page interactivity during transitions
+
+While a GridLanes transition captures snapshots, `:root` is temporarily excluded from snapshotting via an inline style. Without this, the root snapshot covers the viewport and clicks on the rest of the page are dispatched to the document element for the whole transition. With it, only named item and container snapshots participate, so filter buttons and other page controls stay clickable mid-transition. The exclusion lasts roughly one frame (until the transition's `ready` settles, including skipped transitions), is shared across overlapping GridLanes instances, and restores any pre-existing inline value afterwards. You can override it with an `!important` rule.
+
+### Rapid successive updates
+
+Updates are last-write-wins: if `filter()`, `sort()`, or `update()` is called while a transition is still running, the in-flight transition is skipped and the new state commits immediately. Skipping fast-forwards the old transition's animations to their end state, so rapid clicks visibly jump to the previous end state before the next transition begins. Only the latest state animates (intermediate states are not shown because they're skipped when a new one starts). At the default 250ms `speed` this is barely perceptible, but is more noticeable if you increase the transition duration.
+
 ## Sorting object
 
 `sort()` and `initialSort` accept an object with the following properties:

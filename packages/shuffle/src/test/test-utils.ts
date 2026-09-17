@@ -108,3 +108,53 @@ export const test: TestAPI<ShuffleTestContext> = createTest('regular');
 export function childrenToArray(element: HTMLElement): HTMLElement[] {
   return Array.from(element.children, (child) => toHtmlElement(child));
 }
+
+/**
+ * A manually-settled promise for tests that need to control async timing.
+ */
+interface Deferred {
+  promise: Promise<void>;
+  resolve: () => void;
+  reject: (reason?: unknown) => void;
+}
+
+export function createDeferred(): Deferred {
+  let deferredResolve!: () => void;
+  let deferredReject!: (reason?: unknown) => void;
+  const promise = new Promise<void>((resolve, reject) => {
+    deferredResolve = resolve;
+    deferredReject = reject;
+  });
+  return { promise, resolve: deferredResolve, reject: deferredReject };
+}
+
+export function getScopedRule(): CSSStyleRule | null {
+  const styleElement = document.querySelector<HTMLStyleElement>('style[data-shuffle-lanes-view-transition]');
+  const rule = styleElement?.sheet?.cssRules.item(0);
+  return rule instanceof CSSStyleRule ? rule : null;
+}
+
+/**
+ * Collect all accessible author rules. Cross-origin sheets throw on access,
+ * so those are skipped — the shipped stylesheet is same-origin in this suite.
+ */
+export function collectAccessibleRules(): CSSStyleRule[] {
+  const rules: CSSStyleRule[] = [];
+  for (const sheet of document.styleSheets) {
+    let cssRules: CSSRuleList | null = null;
+    try {
+      ({ cssRules } = sheet);
+    } catch {
+      continue;
+    }
+    if (!cssRules) {
+      continue;
+    }
+    for (const rule of cssRules) {
+      if (rule instanceof CSSStyleRule) {
+        rules.push(rule);
+      }
+    }
+  }
+  return rules;
+}
