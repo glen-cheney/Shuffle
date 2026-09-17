@@ -48,13 +48,19 @@ function filterWithSearch(element: HTMLElement, searchText: string, activeFilter
   return titleText.includes(searchLower);
 }
 
+function supportsGridLanesDisplay(): boolean {
+  return typeof CSS !== 'undefined' && typeof CSS.supports === 'function' && CSS.supports('display', 'grid-lanes');
+}
+
 export const HomepageDemo: React.FC = () => {
   const shuffleRef = useRef<Shuffle | null>(null);
   const shuffleGridLanesRef = useRef<GridLanes | null>(null);
   const [searchText, setSearchText] = useState('');
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [sortValue, setSortValue] = useState('dom');
-  const [mode, setMode] = useState<'shuffle' | 'grid-lanes'>('grid-lanes');
+  // 'shuffle' first so server prerender and hydration agree; upgraded on mount below.
+  const [mode, setMode] = useState<'shuffle' | 'grid-lanes'>('shuffle');
+  const [supportsGridLanes, setSupportsGridLanes] = useState(false);
 
   // Helper function to apply filter, search, and sort together
   const applyFilter = (search: string, filter: string | null, currentSortValue: string) => {
@@ -113,6 +119,13 @@ export const HomepageDemo: React.FC = () => {
   };
 
   useEffect(() => {
+    if (supportsGridLanesDisplay()) {
+      setSupportsGridLanes(true);
+      setMode('grid-lanes');
+    }
+  }, []);
+
+  useEffect(() => {
     if (mode === 'shuffle') {
       initShuffle();
     } else {
@@ -131,6 +144,17 @@ export const HomepageDemo: React.FC = () => {
         <div className="row">
           <div className="col col--12">
             <h2>Demo</h2>
+            {mode === 'grid-lanes' && (
+              <p className={styles.supportNote}>
+                {supportsGridLanes ? (
+                  'Your browser supports display: grid-lanes.'
+                ) : (
+                  <span>
+                    Your browser does not support <code>grid-lanes</code>. You won't see the masonry layout.
+                  </span>
+                )}
+              </p>
+            )}
           </div>
         </div>
       </div>
