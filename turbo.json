@@ -17,6 +17,10 @@
     "type-check": {
       "cache": false
     },
+    "visual": {
+      "dependsOn": ["build"],
+      "cache": false
+    },
     "watch": {
       "cache": false
     }

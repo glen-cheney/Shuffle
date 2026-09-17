@@ -128,6 +128,8 @@ grid.once('shuffle:layout', () => {
 
 Classic Shuffle hides items with `visibility: hidden` (items remain in layout flow). Grid Lanes uses `display: none`, which removes items from layout flow and the accessibility tree.
 
+This also changes keyboard tab order: hidden items are no longer tabbable, and focus inside an item that gets filtered out moves to `<body>`. After filtering, move focus explicitly (typically on `shuffle:layout`) if the focused element may have disappeared. Tab order otherwise follows DOM order; GridLanes never writes `tabindex`.
+
 ## 7. No `resize` handling
 
 Classic Shuffle listens to window resize events and recalculates column widths. Grid Lanes has no resize listener because the browser reflows the grid instantly on resize.

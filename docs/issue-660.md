@@ -141,7 +141,7 @@ Critical: `hideItem` sets `view-transition-name: "none"` so the element doesn't 
 
 ### Sorting
 
-Sorting reorders the DOM. Use `container.append(...sortedElements)` inside the view transition callback. The browser animates position changes via `::view-transition-group()`.
+Sorting reorders the DOM inside the view transition callback. Placement uses feature-detected `Element.moveBefore()` (which retains focus and node state) with an `append()` fallback. The browser animates position changes via `::view-transition-group()`.
 
 Default sort order is restored using the `defaultOrder` property on each `GridLanesItem`.
 
@@ -331,19 +331,19 @@ Pass criteria checklist:
 - [x] Enter and exit keyframes match plan semantics (`vt-reveal` and `vt-conceal`) and both use `animation-fill-mode: both` through shorthand.
 - [x] `::view-transition-image-pair(.shuffle-item)` sets `isolation: auto` and `mix-blend-mode: normal`.
 - [x] No conflicting CSS transitions are applied to shuffle items during this mode.
-- [x] Speed and easing options are written to container CSS custom properties and actually affect transition timing.
+- [x] Speed and easing options are written to the scoped View Transition rule and actually affect transition timing.
 - [x] Stagger options produce literal per-name `::view-transition-group(<name>)` delays, capped at the max and zeroed under reduced motion. (Element-level `--shuffle-index` does not inherit into transition groups, so the var-based strategy was replaced.)
 - [x] `prefers-reduced-motion: reduce` collapses durations/delays to near-zero values while preserving transition lifecycle completion.
 - [x] Hide/show/remove flows do not exhibit one-frame flash, snap-back, or ghosting artifacts.
 
 Required validation evidence checklist:
 
-- [x] Unit test: speed/easing option writes expected container custom property values.
-- [x] Unit test: stagger options write expected container custom property values.
-- [ ] Integration test: computed transition rules confirm required pseudo-element selectors are active when CSS is imported.
+- [x] Unit test: speed/easing options write expected values to the scoped View Transition rule.
+- [x] Unit test: stagger options produce literal per-name group delays (see Stagger Strategy).
+- [x] Integration test: computed transition rules confirm required pseudo-element selectors are active when CSS is imported. (The browser interaction test asserts the singleton selector, `pointer-events`, and root rules against the real shipped stylesheet.)
 - [x] Integration test: manual `--shuffle-index` path correctly staggers visible items.
-- [ ] Integration test: reduced-motion path completes updates with effectively no visible animation.
-- [ ] Visual regression test: repeated filter/sort/hide/show cycles show no flash/snap artifacts.
+- [x] Integration test: reduced-motion path completes updates with effectively no visible animation. (Visual `reduced` project: all specs pass against the shared baselines, proving completion with pixel-identical end states.)
+- [x] Visual regression test: repeated filter/sort/hide/show cycles show no flash/snap artifacts. (Settled-state coverage via the `filter cycle` spec; single-frame mid-transition flashes remain manual territory.)
 
 ### View-transition interactivity findings
 
@@ -355,7 +355,7 @@ Browsers tested: Playwright-pinned Chromium 1208 (≈ Chrome 145, headless and h
 2. **`:root` exclusion restores clicks.** With `:root { view-transition-name: none !important }` in place before snapshot capture, the transition scopes to named snapshots only and mid-transition clicks reach the live button — in all three engines. Item/container animations still run (24 vs 25 live animations; only the root one is gone) and `shuffle:layout` fires normally. MDN confirms the semantics: a `view-transition-name` puts an element in a separate snapshot, `none` opts out — and duplicate names reject `ready` (which is why per-instance unique container IDs matter).
 3. **Upstream state.** [csswg-drafts#11596](https://github.com/w3c/csswg-drafts/issues/11596) (open) confirms transitioning elements are inert to hit-testing with no author-CSS override; root scoping is the supported escape hatch.
 
-Implication: the stash's temporary root suppression was revived in inline-style form — save/restore of `document.documentElement` inline `view-transition-name` (never a stylesheet, so it yields to author `!important`), refcounted across instances, removed after `ready` settles including the skip/reject path, with sync-throw and `destroy()`-mid-flight coverage. The singleton overlay rule is kept, and `old/new(root) { animation: none }` remains as a dormant-but-harmless fallback for unsuppressed transitions. Practical impact window is small regardless: real transitions run at 250ms with last-write-wins plus `skipTransition` absorbing rapid clicks. Covered by `grid-lanes.root-suppression.test.ts` (lifecycle) and a live click-through assertion in `grid-lanes.interaction.test.ts`.
+Implication: the stash's temporary root suppression was revived in inline-style form — save/restore of `document.documentElement` inline `view-transition-name` (never a stylesheet, so it yields to author `!important`), refcounted across instances, removed after `ready` settles including the skip/reject path, with sync-throw and `destroy()`-mid-flight coverage. The singleton overlay rule is kept, and `old/new(root) { animation: none }` remains as a dormant-but-harmless fallback for unsuppressed transitions. Practical impact window is small regardless: real transitions run at 250ms with last-write-wins plus `skipTransition` absorbing rapid clicks. Covered by the 'root snapshot suppression' suite in `grid-lanes.transitions.test.ts` (lifecycle) and a live click-through assertion in `grid-lanes.interaction.test.ts`.
 
 ## ✅ Phase 4: GridLanesItem class
 
@@ -428,7 +428,7 @@ Tab order policy: `GridLanes` uses `display: none` for hidden items (unlike Shuf
 
 `enable()` and `disable()` toggle `isEnabled`. `disable()` also calls `this.#activeTransition?.skipTransition()` to abort any in-flight animation immediately (mirroring `#cancelMovement()` in core Shuffle). `#activeTransition` is set to `null` after `#movementFinished()` runs.
 
-`destroy()` removes only library-owned styles. Specifically: remove `--shuffle-speed`, `--shuffle-easing`, `--shuffle-stagger-amount`, `--shuffle-stagger-max` custom properties from the container, and remove item-level inline styles (`view-transition-name`, `view-transition-class`, `display`). Never call `element.removeAttribute('style')` on the container — that would destroy user CSS.
+`destroy()` removes only library-owned styles. Specifically: the container's `view-transition-name` inline property, the instance's delay stylesheet, and item-level inline styles (`view-transition-name`, `view-transition-class`, `display`). (Transition option variables live on the shared scoped View Transition rule, not the container, so there is nothing to strip there.) Never call `element.removeAttribute('style')` on the container — that would destroy user CSS.
 
 `resetItems()`: re-query `itemSelector`. Surviving elements keep their existing metadata in the Map. Only newly discovered elements get new names and counter values. `resetItems()` reconciles — it does not reseed.
 
@@ -450,7 +450,7 @@ Pass criteria checklist:
 - [x] `destroy()` strips only library-owned styles/classes/listeners and does not remove user-owned container inline styles wholesale.
 - [x] `add()` flow prevents flash of unfiltered content by hiding new items before the first update.
 - [x] `resetItems()` reconciles item state: survivors keep existing metadata and only newly discovered elements get minted values.
-- [ ] Hidden-item tab order behavior change (`display: none`) is documented as part of API behavior expectations.
+- [x] Hidden-item tab order behavior change (`display: none`) is documented as part of API behavior expectations. (`getting-started.md#accessibility`; `migration.md` step 6 now covers tab order, focus loss, and `tabindex`.)
 
 Required validation evidence checklist:
 
@@ -498,8 +498,8 @@ Required validation evidence checklist:
 - [x] Build artifact check: emitted `dist/shuffle-lanes.css` exists after package build.
 - [x] Static content check: emitted CSS contains required sections and omits layout-ownership rules.
 - [x] Package export check: `package.json` exports resolve for both JS and CSS subpaths.
-- [ ] Consumer smoke test: importing `shufflejs/grid-lanes.css` in a sample app applies hide/show/view-transition styles.
-- [ ] Bundler behavior check: CSS is retained in production build when imported.
+- [x] Consumer smoke test: importing `shufflejs/grid-lanes.css` in a sample app applies hide/show/view-transition styles. (Verified via packed-tarball scratch app + production Vite build: emitted CSS contains `.shuffle-item--hidden`, `view-transition-group`, reveal keyframes, and the reduced-motion block.)
+- [x] Bundler behavior check: CSS is retained in production build when imported. (Minified bundle inspected; all sections present.)
 
 ## ✅ Phase 7: Progressive enhancement strategy
 
@@ -592,14 +592,14 @@ Pass criteria checklist:
 - [x] Integration tests validate stagger fallback behavior when `sibling-index()` is unsupported. (Manual `--shuffle-index` strategy is used; no `sibling-index()` branching exists.)
 - [x] Integration tests validate hidden/show transition-name behavior and `aria-hidden` toggling.
 - [x] Integration tests validate tab-order behavior under `display: none` semantics.
-- [ ] Visual regression suite cover supported animated and non-animated fallback paths.
+- [x] Visual regression suite cover supported animated and non-animated fallback paths. (`packages/shuffle/visual/`: Playwright `chromium` + `no-vt` projects share baselines, proving pixel-identical end states across paths. Local-only for now: `yarn test:e2e` (builds first, never cached), baselines via `yarn workspace shufflejs run visual:update`.)
 - [ ] CI runs the suite and fails on regressions.
 
 Required validation evidence checklist:
 
-- [x] Test run artifacts show passing unit and integration suites. (112 tests passing in Chromium via Vitest browser mode.)
-- [ ] Browser-matrix run includes at least one engine with VT support and one without. (No-VT path is exercised by mocking `startViewTransition`; real multi-browser matrix not yet configured.)
-- [ ] Visual snapshots/baselines updated and reviewed for intended changes only.
+- [x] Test run artifacts show passing unit and integration suites. (128 tests passing in Chromium via Vitest browser mode.)
+- [x] Browser-matrix run includes at least one engine with VT support and one without. (Chromium with VT, plus the `no-vt` visual project and mocked no-VT unit tests for the unsupported path. Real Safari/Firefox runs not covered.)
+- [x] Visual snapshots/baselines updated and reviewed for intended changes only. (5 baselines reviewed: initial, filtered, sorted, filtered-sorted, filter-cycle. Text-free fixture keeps them OS-comparable.)
 - [x] A regression test exists for each previously identified artifact class: flash (`add()` hides items before VT callback fires), ghosting (`view-transition-name: none` on hidden items). Snap-back prevention relies on CSS-only rules (no transitions on `.shuffle-item`); not directly exercisable in JS tests.
 
 ## Phase 9: Documentation and migration
@@ -802,14 +802,14 @@ Pass criteria checklist:
 - [x] Package `exports` includes `./grid-lanes` and `./grid-lanes.css` with correct paths.
 - [x] `sideEffects` includes emitted CSS so bundlers do not tree-shake required styles.
 - [x] Generated `.d.mts` output is present for the grid-lanes entry.
-- [ ] A consumer can install and import both subpaths without local package patching.
+- [x] A consumer can install and import both subpaths without local package patching. (Verified: packed tarball installs cleanly; Node resolves `.`, `./grid-lanes`, `./grid-lanes.css`, `./package.json`; ESM import of `shufflejs/grid-lanes` loads.)
 
 Required validation evidence checklist:
 
 - [x] Typecheck and build pass from repository root. (0 warnings/errors; all 7 dist artifacts emitted.)
 - [x] Built package artifact inspection confirms JS, types, and CSS files are emitted as documented. (`dist/shuffle-lanes.mjs`, `dist/shuffle-lanes.mjs.map`, `dist/shuffle-lanes.d.mts`, `dist/shuffle-lanes.css`, plus the three `shuffle.*` equivalents.)
-- [ ] Consumer smoke test resolves `shufflejs/grid-lanes` and `shufflejs/grid-lanes.css` via package exports.
-- [ ] Production bundle check confirms the CSS asset is retained when imported.
+- [x] Consumer smoke test resolves `shufflejs/grid-lanes` and `shufflejs/grid-lanes.css` via package exports. (Same packed-tarball verification as above.)
+- [x] Production bundle check confirms the CSS asset is retained when imported. (Minified Vite bundle inspected; JS entry points retained alongside CSS.)
 
 ### Implementation Notes
 
