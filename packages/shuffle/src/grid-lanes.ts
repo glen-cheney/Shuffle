@@ -96,6 +96,29 @@ function uniqueElements(elements: HTMLElement[]): HTMLElement[] {
 }
 
 /**
+ * Minimal surface of the `Element.moveBefore()` API for feature detection.
+ */
+interface MovableParent {
+  moveBefore(node: Node, child: Node | null): void;
+}
+
+/**
+ * Place an element at the end of its parent, preserving focus and node state
+ * when the platform supports `moveBefore()` and falling back to `append()`
+ * otherwise. Unlike `append()`, `moveBefore()` never removes and reinserts
+ * the node, so focused descendants, form values, and running animations
+ * survive reordering.
+ */
+function appendPreservingState(parent: Element, element: HTMLElement): void {
+  const movable: Element & Partial<MovableParent> = parent;
+  if (typeof movable.moveBefore === 'function') {
+    movable.moveBefore(element, null);
+  } else {
+    parent.append(element);
+  }
+}
+
+/**
  * Exclude `:root` from view-transition snapshots while a GridLanes transition
  * captures. Without this, the root snapshot covers the viewport and clicks on
  * the rest of the page are dispatched to the document element for the whole
@@ -193,6 +216,8 @@ class GridLanes extends TinyEmitter {
   #pendingRemovals: GridLanesItem[] = [];
   #commitScheduled = false;
   #containerHeight = 0;
+  #delayStyleElement: HTMLStyleElement | null = null;
+  #lastDelayKey: string | null = null;
 
   /**
    * Categorize and sort a grid of items using native grid-lanes behavior.
@@ -342,8 +367,9 @@ class GridLanes extends TinyEmitter {
     const sortedVisible = this.#sortItems(filteredItems);
     this.sortedItems = sortedVisible;
 
-    // Build a fragment: sorted visible items first (shown), then hidden items at the end.
-    const fragment = document.createDocumentFragment();
+    // Reorder in place: sorted visible items first (shown), then hidden items
+    // at the end. Each move places the element last, so sequential moves
+    // produce the final order directly.
     const visibleSet = new Set(sortedVisible);
 
     let visibleCount = 0;
@@ -351,17 +377,15 @@ class GridLanes extends TinyEmitter {
       item.show();
       item.element.style.setProperty('--shuffle-index', String(visibleCount));
       visibleCount += 1;
-      fragment.append(item.element);
+      appendPreservingState(this.element, item.element);
     }
 
     for (const item of allItems) {
       if (!visibleSet.has(item)) {
         item.hide();
-        fragment.append(item.element);
+        appendPreservingState(this.element, item.element);
       }
     }
-
-    this.element.append(fragment);
 
     for (const item of pendingRemovals) {
       item.element.remove();
@@ -452,6 +476,53 @@ class GridLanes extends TinyEmitter {
   }
 
   /**
+   * Write per-item `animation-delay` rules selected by name into this
+   * instance's own stylesheet.
+   *
+   * Stagger cannot be expressed through custom properties on the item elements
+   * because `::view-transition-group` element styles do not inherit from element
+   * styles.
+   *
+   * Per-name rules bypass inheritance. Rules sharing a delay
+   * value are collapsed into one selector list, identical consecutive commits
+   * skip the rewrite, and item names are globally unique, so instances never
+   * collide and stale rules cannot match future items.
+   */
+  #setViewTransitionDelays(items: GridLanesItem[]): void {
+    const { staggerAmount, staggerAmountMax } = this.options;
+    const reduceMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const key = `${reduceMotion}|${staggerAmount}|${staggerAmountMax}|${items.map((item) => item.id).join(',')}`;
+    if (key === this.#lastDelayKey && this.#delayStyleElement?.isConnected) {
+      return;
+    }
+
+    if (!this.#delayStyleElement?.isConnected) {
+      this.#delayStyleElement = document.createElement('style');
+      this.#delayStyleElement.dataset.shuffleLanesViewTransitionDelays = 'shuffle-lanes-view-transition-delays';
+      document.head.append(this.#delayStyleElement);
+    }
+
+    const delays = new Map<number, string[]>();
+    for (const [index, item] of items.entries()) {
+      const delay = reduceMotion ? 0 : Math.min(index * staggerAmount, staggerAmountMax);
+      const names = delays.get(delay);
+      if (names) {
+        names.push(item.id);
+      } else {
+        delays.set(delay, [item.id]);
+      }
+    }
+
+    const lines: string[] = [];
+    for (const [delay, names] of delays) {
+      const selectors = names.map((name) => `::view-transition-group(${name})`).join(', ');
+      lines.push(`${selectors} { animation-delay: ${delay}ms; }`);
+    }
+    this.#delayStyleElement.textContent = lines.join('\n');
+    this.#lastDelayKey = key;
+  }
+
+  /**
    * Commit the pending update using view transitions when available.
    */
   #commit(): void {
@@ -477,6 +548,10 @@ class GridLanes extends TinyEmitter {
         vt = document.startViewTransition({
           update: () => {
             this.#applyUpdate();
+            // Fresh order is only known after #applyUpdate; stylesheet writes
+            // here are part of the captured new state. Kept before the
+            // offsetHeight read below so all writes batch ahead of it.
+            this.#setViewTransitionDelays(this.sortedItems);
             // Reading offsetHeight here forces the browser to calculate the new
             // layout immediately so we get the updated height.
             this.#containerHeight = this.element.offsetHeight;
@@ -718,6 +793,12 @@ class GridLanes extends TinyEmitter {
     this.#pendingRemovals.length = 0;
     this.handlers = {};
     this.isEnabled = false;
+
+    // Owned delay stylesheet goes with the instance; item names are never
+    // reused, so no surviving transition can match its selectors afterwards.
+    this.#delayStyleElement?.remove();
+    this.#delayStyleElement = null;
+    this.#lastDelayKey = null;
 
     delete this.element.dataset.shuffleLanes;
     this.element.classList.remove(Classes.BASE);

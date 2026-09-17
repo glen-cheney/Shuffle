@@ -158,3 +158,32 @@ export function collectAccessibleRules(): CSSStyleRule[] {
   }
   return rules;
 }
+
+export function getDelayElements(): NodeListOf<HTMLStyleElement> {
+  return document.querySelectorAll<HTMLStyleElement>('style[data-shuffle-lanes-view-transition-delays]');
+}
+
+/**
+ * Read per-name delay rules from a GridLanes delay stylesheet, expanding
+ * collapsed selector lists into one entry per snapshot name.
+ */
+export function getDelayEntries(
+  element: HTMLStyleElement | null = document.querySelector<HTMLStyleElement>(
+    'style[data-shuffle-lanes-view-transition-delays]',
+  ),
+): { selector: string; delay: string }[] {
+  if (!element) {
+    return [];
+  }
+  const entries: { selector: string; delay: string }[] = [];
+  for (const rule of collectAccessibleRules()) {
+    if (rule.parentStyleSheet?.ownerNode !== element) {
+      continue;
+    }
+    const delay = rule.style.getPropertyValue('animation-delay');
+    for (const selector of rule.selectorText.split(',')) {
+      entries.push({ selector: selector.trim(), delay });
+    }
+  }
+  return entries;
+}

@@ -73,13 +73,13 @@ new GridLanes(container, { itemSelector: '.picture-item', easing: 'ease-in-out' 
 
 Default: `15`
 
-Per-item animation delay offset in milliseconds. Each visible item gets an incremental delay based on its position in the sorted order. Written to Grid Lanes' scoped View Transition rule while a transition starts.
+Per-item animation delay offset in milliseconds. Each visible item gets an incremental delay based on its position in the sorted order. Grid Lanes writes a literal `animation-delay` rule per visible item's transition group while a transition starts.
 
 ### `staggerAmountMax` [number]
 
 Default: `150`
 
-Maximum total stagger delay in milliseconds. The per-item delay is capped at this value. Written to Grid Lanes' scoped View Transition rule while a transition starts.
+Maximum total stagger delay in milliseconds. The per-item delay is capped at this value when Grid Lanes writes the per-item group rules.
 
 ### Page interactivity during transitions
 

@@ -4,9 +4,11 @@ import GridLanes from '../shuffle-lanes';
 import {
   createFixture,
   createSortFixture,
+  createTemplateFixture,
   getGridLanesItem,
   isItemVisible,
   mockStartViewTransition,
+  queryElement,
   waitForLayout,
 } from './grid-lanes.helpers';
 
@@ -102,6 +104,58 @@ describe('sorting', () => {
     expect(domOrder[0]).toBe(item0);
     expect(domOrder[1]).toBe(item2);
     expect(domOrder[2]).toBe(item1);
+  });
+});
+
+describe('reorder node preservation', () => {
+  beforeEach(() => {
+    mockStartViewTransition();
+  });
+
+  afterEach(() => {
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
+  });
+
+  it('retains focus within a moved item when sorting', async () => {
+    const container = createTemplateFixture(`
+      <div style="display: grid;">
+        <div class="item" data-groups="design"><button type="button">one</button></div>
+        <div class="item" data-groups="design"><button type="button">two</button></div>
+        <div class="item" data-groups="design"><button type="button">three</button></div>
+      </div>
+    `);
+    const instance = new GridLanes(container, { itemSelector: '.item' });
+    const button = queryElement(container, 'button');
+    button.focus();
+    expect(document.activeElement).toBe(button);
+
+    // Reverse order so every item moves.
+    instance.sort({ reverse: true, by: (element) => element.textContent });
+    await waitForLayout(instance);
+
+    expect(document.activeElement).toBe(button);
+  });
+
+  it('falls back to append order when moveBefore is unavailable', async () => {
+    const { container, items } = createSortFixture();
+    const [item0, item1, item2] = items;
+    const instance = new GridLanes(container, { itemSelector: '.item' });
+
+    // Shadow the prototype method with an own property so feature detection
+    // takes the fallback path for this container only.
+    Object.defineProperty(container, 'moveBefore', { value: undefined, configurable: true });
+    try {
+      instance.sort({ by: (el) => Number(el.dataset.sortValue) });
+      await waitForLayout(instance);
+    } finally {
+      Reflect.deleteProperty(container, 'moveBefore');
+    }
+
+    const domOrder = Array.from(container.querySelectorAll<HTMLElement>('.item'));
+    expect(domOrder[0]).toBe(item1);
+    expect(domOrder[1]).toBe(item2);
+    expect(domOrder[2]).toBe(item0);
   });
 });
 

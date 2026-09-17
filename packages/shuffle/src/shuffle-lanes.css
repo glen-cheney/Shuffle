@@ -45,13 +45,13 @@
   display: none !important;
 }
 
+/**
+ * Per-item stagger delay is written as `::view-transition-group(<name>)`
+ * because transition groups do not inherit element-level custom properties.
+ */
 ::view-transition-group(.shuffle-item) {
   animation-duration: var(--shuffle-speed, 250ms);
   animation-timing-function: var(--shuffle-easing, cubic-bezier(0.4, 0, 0.2, 1));
-  animation-delay: min(
-    calc(var(--shuffle-index, 0) * var(--shuffle-stagger-amount, 15ms)),
-    var(--shuffle-stagger-max, 150ms)
-  );
 }
 
 ::view-transition-image-pair(.shuffle-item) {

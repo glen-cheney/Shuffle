@@ -2,11 +2,15 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import GridLanes from '../shuffle-lanes';
 import { createFixture, getGridLanesItem, mockStartViewTransition, waitForLayout } from './grid-lanes.helpers';
+import { getDelayElements, getDelayEntries } from './test-utils';
 
 describe('speed and easing options', () => {
   afterEach(() => {
     document.body.innerHTML = '';
     for (const element of document.querySelectorAll('style[data-shuffle-lanes-view-transition]')) {
+      element.remove();
+    }
+    for (const element of document.querySelectorAll('style[data-shuffle-lanes-view-transition-delays]')) {
       element.remove();
     }
     vi.restoreAllMocks();
@@ -71,6 +75,154 @@ describe('speed and easing options', () => {
 
     const rule = styleElements.item(0).sheet?.cssRules.item(0) as CSSStyleRule;
     expect(rule.style.getPropertyValue('--shuffle-speed')).toBe('600ms');
+  });
+});
+
+describe('per-item stagger delays', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+    for (const element of document.querySelectorAll('style[data-shuffle-lanes-view-transition]')) {
+      element.remove();
+    }
+    for (const element of document.querySelectorAll('style[data-shuffle-lanes-view-transition-delays]')) {
+      element.remove();
+    }
+    vi.restoreAllMocks();
+  });
+
+  it('writes literal per-name group delays in visible order, capped at the max', async () => {
+    const { container } = createFixture();
+    mockStartViewTransition();
+    const instance = new GridLanes(container, {
+      itemSelector: '.item',
+      staggerAmount: 500,
+      staggerAmountMax: 700,
+    });
+
+    // All three items visible: delays 0ms, 500ms, min(1000ms, 700ms).
+    instance.filter('all');
+    await waitForLayout(instance);
+
+    const entries = getDelayEntries();
+    expect(entries).toHaveLength(3);
+    for (const entry of entries) {
+      expect(entry.selector).toMatch(/^::view-transition-group\(shuffle-item-\d+\)$/);
+    }
+    expect(entries.map((entry) => entry.delay)).toEqual(['0ms', '500ms', '700ms']);
+  });
+
+  it('rebuilds delay rules on each commit without accumulating', async () => {
+    const { container } = createFixture();
+    mockStartViewTransition();
+    const instance = new GridLanes(container, {
+      itemSelector: '.item',
+      staggerAmount: 100,
+      staggerAmountMax: 1000,
+    });
+
+    instance.filter('all');
+    await waitForLayout(instance);
+    expect(getDelayEntries()).toHaveLength(3);
+
+    // Only two items visible now; the third item's rule must be gone.
+    instance.filter('design');
+    await waitForLayout(instance);
+    const entries = getDelayEntries();
+    expect(entries).toHaveLength(2);
+    expect(entries.map((entry) => entry.delay)).toEqual(['0ms', '100ms']);
+  });
+
+  it('collapses items sharing a delay into one rule', async () => {
+    const { container } = createFixture();
+    mockStartViewTransition();
+    const instance = new GridLanes(container, { itemSelector: '.item', staggerAmount: 0 });
+
+    instance.filter('all');
+    await waitForLayout(instance);
+
+    const element = document.querySelector<HTMLStyleElement>('style[data-shuffle-lanes-view-transition-delays]');
+    expect(element?.sheet?.cssRules).toHaveLength(1);
+    expect(getDelayEntries(element)).toEqual([
+      expect.objectContaining({ delay: '0ms' }),
+      expect.objectContaining({ delay: '0ms' }),
+      expect.objectContaining({ delay: '0ms' }),
+    ]);
+  });
+
+  it('skips the rewrite when visible order and options are unchanged', async () => {
+    const { container } = createFixture();
+    mockStartViewTransition();
+    const instance = new GridLanes(container, {
+      itemSelector: '.item',
+      staggerAmount: 100,
+      staggerAmountMax: 1000,
+    });
+
+    instance.filter('design');
+    await waitForLayout(instance);
+    const element = document.querySelector<HTMLStyleElement>('style[data-shuffle-lanes-view-transition-delays]');
+    element!.textContent = 'garbage';
+
+    // Same visible set and options: the corrupt content must survive.
+    instance.filter('design');
+    await waitForLayout(instance);
+    expect(element!.textContent).toBe('garbage');
+
+    // Changed visible set: rewritten from scratch.
+    instance.filter('all');
+    await waitForLayout(instance);
+    expect(getDelayEntries(element).map((entry) => entry.delay)).toEqual(['0ms', '100ms', '200ms']);
+  });
+
+  it('gives each instance its own delay element and removes it on destroy', async () => {
+    const fixtureA = createFixture();
+    const fixtureB = createFixture();
+    mockStartViewTransition();
+    const instanceA = new GridLanes(fixtureA.container, {
+      itemSelector: '.item',
+      staggerAmount: 100,
+      staggerAmountMax: 1000,
+    });
+    const instanceB = new GridLanes(fixtureB.container, {
+      itemSelector: '.item',
+      staggerAmount: 300,
+      staggerAmountMax: 1000,
+    });
+
+    instanceA.filter('all');
+    await waitForLayout(instanceA);
+    instanceB.filter('all');
+    await waitForLayout(instanceB);
+
+    // Creation order matches commit order: A's element first.
+    const elements = getDelayElements();
+    expect(elements).toHaveLength(2);
+    expect(getDelayEntries(elements.item(0)).map((entry) => entry.delay)).toEqual(['0ms', '100ms', '200ms']);
+    expect(getDelayEntries(elements.item(1)).map((entry) => entry.delay)).toEqual(['0ms', '300ms', '600ms']);
+
+    instanceA.destroy();
+    const survivors = getDelayElements();
+    expect(survivors).toHaveLength(1);
+    expect(getDelayEntries(survivors.item(0)).map((entry) => entry.delay)).toEqual(['0ms', '300ms', '600ms']);
+  });
+
+  it('writes zero delays under prefers-reduced-motion', async () => {
+    vi.spyOn(globalThis, 'matchMedia').mockReturnValue({ matches: true } as MediaQueryList);
+    const { container } = createFixture();
+    mockStartViewTransition();
+    const instance = new GridLanes(container, {
+      itemSelector: '.item',
+      staggerAmount: 500,
+      staggerAmountMax: 2000,
+    });
+
+    instance.filter('all');
+    await waitForLayout(instance);
+
+    // One collapsed rule; every item gets 0ms.
+    const element = document.querySelector<HTMLStyleElement>('style[data-shuffle-lanes-view-transition-delays]');
+    expect(element?.sheet?.cssRules).toHaveLength(1);
+    expect(getDelayEntries(element).map((entry) => entry.delay)).toEqual(['0ms', '0ms', '0ms']);
   });
 });
 

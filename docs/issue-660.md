@@ -214,14 +214,13 @@ Required validation evidence checklist:
 ```css
 /* Scoped to shuffle items only — avoids colliding with other named
    view transitions on the same page (view-transition-class: shuffle-item
-   is set on each item by GridLanes at init time). */
+   is set on each item by GridLanes at init time).
+   Duration/easing come from tree-level variables; per-item stagger delay is
+   written by JS as literal ::view-transition-group(<name>) rules because
+   element-level custom properties do not inherit into transition groups. */
 ::view-transition-group(.shuffle-item) {
   animation-duration: var(--shuffle-speed, 0.3s);
   animation-timing-function: var(--shuffle-easing, cubic-bezier(0.4, 0, 0.2, 1));
-  animation-delay: min(
-    calc(var(--shuffle-index, 0) * var(--shuffle-stagger-amount, 15ms)),
-    var(--shuffle-stagger-max, 150ms)
-  );
 }
 
 ::view-transition-image-pair(.shuffle-item) {
@@ -277,7 +276,7 @@ These were discovered through debugging in Chrome and Firefox:
 Since `sibling-index()` is not yet universally supported, `GridLanes` will manually manage stagger:
 
 1. Inside `#doUpdate()`, iterate through visible items and set a `--shuffle-index` CSS custom property on each element.
-2. The CSS consumes `--shuffle-index` to calculate `animation-delay`.
+2. The per-item delay is computed in JS as `min(index * staggerAmount, staggerAmountMax)` and written as literal `::view-transition-group(<name>)` rules (rebuilt every commit). Custom properties on item elements do not inherit into transition groups, so the delay cannot be expressed as `var(--shuffle-index)` in CSS.
 3. This avoids physical DOM re-ordering for stagger alone and ensures compatibility.
 
 ```typescript
@@ -291,12 +290,12 @@ for (const item of this.#items.values()) {
 ```
 
 ```css
-/* CSS consumes the JS-provided index */
-::view-transition-group(.shuffle-item) {
-  animation-delay: min(
-    calc(var(--shuffle-index, 0) * var(--shuffle-stagger-amount, 15ms)),
-    var(--shuffle-stagger-max, 150ms)
-  );
+/* JS writes literal per-name rules (rebuilt every commit) */
+::view-transition-group(shuffle-item-0) {
+  animation-delay: 0ms;
+}
+::view-transition-group(shuffle-item-1) {
+  animation-delay: 15ms;
 }
 ```
 
@@ -308,7 +307,6 @@ The shipped CSS must honor `prefers-reduced-motion: reduce`. Add a media query t
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(.shuffle-item) {
     animation-duration: 0.001ms;
-    animation-delay: 0ms;
   }
   ::view-transition-new(.shuffle-item):only-child,
   ::view-transition-old(.shuffle-item):only-child {
@@ -334,7 +332,7 @@ Pass criteria checklist:
 - [x] `::view-transition-image-pair(.shuffle-item)` sets `isolation: auto` and `mix-blend-mode: normal`.
 - [x] No conflicting CSS transitions are applied to shuffle items during this mode.
 - [x] Speed and easing options are written to container CSS custom properties and actually affect transition timing.
-- [x] Stagger variables are written to container CSS custom properties and consumed by the manual `--shuffle-index` strategy.
+- [x] Stagger options produce literal per-name `::view-transition-group(<name>)` delays, capped at the max and zeroed under reduced motion. (Element-level `--shuffle-index` does not inherit into transition groups, so the var-based strategy was replaced.)
 - [x] `prefers-reduced-motion: reduce` collapses durations/delays to near-zero values while preserving transition lifecycle completion.
 - [x] Hide/show/remove flows do not exhibit one-frame flash, snap-back, or ghosting artifacts.
 
