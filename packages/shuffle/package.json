@@ -20,19 +20,31 @@
       "types": "./dist/shuffle.d.mts",
       "default": "./dist/shuffle.mjs"
     },
+    "./grid-lanes": {
+      "types": "./dist/shuffle-lanes.d.mts",
+      "default": "./dist/shuffle-lanes.mjs"
+    },
+    "./grid-lanes.css": {
+      "types": "./dist/shuffle-lanes.css.d.ts",
+      "default": "./dist/shuffle-lanes.css"
+    },
     "./package.json": "./package.json"
   },
   "types": "./dist/shuffle.d.mts",
   "files": [
     "dist"
   ],
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/shuffle-lanes.css"
+  ],
   "scripts": {
     "build": "tsdown",
     "test": "vitest run",
     "test:watch": "vitest --watch",
     "lint": "oxlint --type-aware",
     "type-check": "oxlint --type-aware --type-check",
+    "visual": "playwright test",
+    "visual:update": "playwright test --update-snapshots",
     "watch": "tsdown --watch"
   },
   "repository": {

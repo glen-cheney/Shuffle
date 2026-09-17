@@ -1,4 +1,4 @@
-// oxlint-disable eslint-plugin-react-hooks/rules-of-hooks
+// oxlint-disable eslint-plugin-react-hooks/rules-of-hooks, class-methods-use-this, no-empty-function
 import { test as baseTest, type TestAPI, vi } from 'vitest';
 import { fixtures } from './fixtures';
 import type Shuffle from '../shuffle';
@@ -16,7 +16,7 @@ vi.mock('../transition-manager', () => ({
   }),
 }));
 
-// TODO: find a different way to cover the branches from resize observer callbacks.
+// Coverage note: this mock triggers resize observer callback branches in tests.
 type ResizeObserverCallback = (entries: ResizeObserverEntry[]) => void;
 
 class MockResizeObserver {
@@ -107,4 +107,83 @@ export const test: TestAPI<ShuffleTestContext> = createTest('regular');
 
 export function childrenToArray(element: HTMLElement): HTMLElement[] {
   return Array.from(element.children, (child) => toHtmlElement(child));
+}
+
+/**
+ * A manually-settled promise for tests that need to control async timing.
+ */
+interface Deferred {
+  promise: Promise<void>;
+  resolve: () => void;
+  reject: (reason?: unknown) => void;
+}
+
+export function createDeferred(): Deferred {
+  let deferredResolve!: () => void;
+  let deferredReject!: (reason?: unknown) => void;
+  const promise = new Promise<void>((resolve, reject) => {
+    deferredResolve = resolve;
+    deferredReject = reject;
+  });
+  return { promise, resolve: deferredResolve, reject: deferredReject };
+}
+
+export function getScopedRule(): CSSStyleRule | null {
+  const styleElement = document.querySelector<HTMLStyleElement>('style[data-shuffle-lanes-view-transition]');
+  const rule = styleElement?.sheet?.cssRules.item(0);
+  return rule instanceof CSSStyleRule ? rule : null;
+}
+
+/**
+ * Collect all accessible author rules. Cross-origin sheets throw on access,
+ * so those are skipped — the shipped stylesheet is same-origin in this suite.
+ */
+export function collectAccessibleRules(): CSSStyleRule[] {
+  const rules: CSSStyleRule[] = [];
+  for (const sheet of document.styleSheets) {
+    let cssRules: CSSRuleList | null = null;
+    try {
+      ({ cssRules } = sheet);
+    } catch {
+      continue;
+    }
+    if (!cssRules) {
+      continue;
+    }
+    for (const rule of cssRules) {
+      if (rule instanceof CSSStyleRule) {
+        rules.push(rule);
+      }
+    }
+  }
+  return rules;
+}
+
+export function getDelayElements(): NodeListOf<HTMLStyleElement> {
+  return document.querySelectorAll<HTMLStyleElement>('style[data-shuffle-lanes-view-transition-delays]');
+}
+
+/**
+ * Read per-name delay rules from a GridLanes delay stylesheet, expanding
+ * collapsed selector lists into one entry per snapshot name.
+ */
+export function getDelayEntries(
+  element: HTMLStyleElement | null = document.querySelector<HTMLStyleElement>(
+    'style[data-shuffle-lanes-view-transition-delays]',
+  ),
+): { selector: string; delay: string }[] {
+  if (!element) {
+    return [];
+  }
+  const entries: { selector: string; delay: string }[] = [];
+  for (const rule of collectAccessibleRules()) {
+    if (rule.parentStyleSheet?.ownerNode !== element) {
+      continue;
+    }
+    const delay = rule.style.getPropertyValue('animation-delay');
+    for (const selector of rule.selectorText.split(',')) {
+      entries.push({ selector: selector.trim(), delay });
+    }
+  }
+  return entries;
 }

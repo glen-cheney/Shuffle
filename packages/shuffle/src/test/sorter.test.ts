@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { sorter } from '../sorter';
+import { sorter } from '../core/sorter';
 import { ShuffleItem } from '../shuffle-item';
 
 const MOCK_TEMPLATE = document.createElement('template');

@@ -1,0 +1,32 @@
+/* Shuffle needs either relative or absolute positioning on the container */
+.myShuffle {
+  position: relative;
+  overflow: hidden;
+}
+
+.sizer {
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.pictureItem {
+  height: 220px;
+  --picture-item-vertical-gap: 24px;
+  margin-top: var(--picture-item-vertical-gap);
+}
+
+.pictureItemH2 {
+  height: calc(220px * 2 + var(--picture-item-vertical-gap));
+}
+
+@media screen and (max-width: 767px) {
+  .pictureItem {
+    height: auto;
+    --picture-item-vertical-gap: 24px;
+  }
+
+  .pictureItemH2 {
+    height: auto;
+  }
+}
