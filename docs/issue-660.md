@@ -190,7 +190,7 @@ Pass criteria checklist:
 - [x] `filterMode: 'any'` and `filterMode: 'all'` produce correct visibility sets for multi-token filters.
 - [x] Hidden items leave layout flow via `display: none` (`shuffle-item--hidden`) and set `aria-hidden="true"`.
 - [x] Hidden items set `view-transition-name: none`; shown items restore their assigned transition name.
-- [x] Sorting reorders DOM via bulk append in the committed sorted order.
+- [x] Sorting reorders DOM in the committed sorted order via feature-detected `moveBefore()` (focus/state-preserving) with an `append()` fallback.
 - [x] Default sort restores original encounter order using `GridLanesItem.defaultOrder`.
 - [x] Update flow is last-write-wins: while one transition is active, newer `filter()/sort()/update()` calls overwrite pending state and only the latest state commits.
 - [x] Exactly one `shuffle:layout` event fires per committed state (not per API call).
@@ -589,10 +589,10 @@ Pass criteria checklist:
 - [x] Unit tests cover `add()`, `remove()`, and `destroy()` semantics specific to transition metadata and cleanup.
 - [ ] Integration tests validate grid-lanes support path and grid fallback path. (Requires Safari TP; not yet in CI matrix.)
 - [x] Integration tests validate transition correctness for filter/sort combinations.
-- [x] Integration tests validate stagger fallback behavior when `sibling-index()` is unsupported. (Manual `--shuffle-index` strategy is used; no `sibling-index()` branching exists.)
+- [x] Integration tests validate stagger fallback behavior when `sibling-index()` is unsupported. (Per-name literal group-delay rules are used; no `sibling-index()` branching exists. `--shuffle-index` is still assigned to elements but nothing consumes it.)
 - [x] Integration tests validate hidden/show transition-name behavior and `aria-hidden` toggling.
 - [x] Integration tests validate tab-order behavior under `display: none` semantics.
-- [x] Visual regression suite cover supported animated and non-animated fallback paths. (`packages/shuffle/visual/`: Playwright `chromium` + `no-vt` projects share baselines, proving pixel-identical end states across paths. Local-only for now: `yarn test:e2e` (builds first, never cached), baselines via `yarn workspace shufflejs run visual:update`.)
+- [x] Visual regression suite cover supported animated and non-animated fallback paths. (`packages/shuffle/visual/`: Playwright `chromium` + `no-vt` + `reduced` projects share baselines, proving pixel-identical end states across paths. Local-only for now: `yarn test:e2e` (builds first, never cached), baselines via `yarn turbo run visual:update --filter=shufflejs`.)
 - [ ] CI runs the suite and fails on regressions.
 
 Required validation evidence checklist:
@@ -675,29 +675,30 @@ export interface GridLanesOptions {
   initialSort?: SortOptions | null;
 
   /**
-   * Transition duration in milliseconds. Written to `--shuffle-speed` on the
-   * container element and consumed by the shipped CSS.
-   * @default 300
+   * Transition duration in milliseconds. Written to the scoped View Transition
+   * rule (`--shuffle-speed`) and consumed by the shipped CSS group/old/new rules.
+   * @default 250
    */
   speed?: number;
 
   /**
-   * CSS easing function. Written to `--shuffle-easing` on the container.
+   * CSS easing function. Written to the scoped View Transition rule
+   * (`--shuffle-easing`). Yields to an author `!important` rule.
    * @default 'cubic-bezier(0.4, 0, 0.2, 1)'
    */
   easing?: string;
 
   /**
-   * Per-item stagger delay in milliseconds. Written to
-   * `--shuffle-stagger-amount` and consumed by the shipped CSS.
-   * Falls back gracefully to zero delay if manual indexing is skipped.
+   * Per-item stagger delay in milliseconds. Computed in JS as
+   * `min(index * staggerAmount, staggerAmountMax)` and written as literal
+   * per-name `::view-transition-group(<name>)` rules (rebuilt every commit).
    * @default 15
    */
   staggerAmount?: number;
 
   /**
-   * Maximum stagger delay in milliseconds. Written to
-   * `--shuffle-stagger-max`.
+   * Maximum stagger delay in milliseconds. Cap applied when GridLanes writes
+   * the per-item group rules.
    * @default 150
    */
   staggerAmountMax?: number;

@@ -21,6 +21,10 @@
       "dependsOn": ["build"],
       "cache": false
     },
+    "visual:update": {
+      "dependsOn": ["build"],
+      "cache": false
+    },
     "watch": {
       "cache": false
     }
