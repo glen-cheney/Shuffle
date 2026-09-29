@@ -119,6 +119,18 @@ describe('GridLanesItem dispose()', () => {
     expect(el.classList.contains('my-card')).toBe(true);
     expect(el.dataset.category).toBe('news');
   });
+
+  it('restores an author-provided inline view-transition-name', () => {
+    const el = createElement();
+    el.style.setProperty('view-transition-name', 'author-card', 'important');
+
+    const item = new GridLanesItem(el, 'shuffle-item-11', 0);
+    item.init();
+    item.dispose();
+
+    expect(el.style.getPropertyValue('view-transition-name')).toBe('author-card');
+    expect(el.style.getPropertyPriority('view-transition-name')).toBe('important');
+  });
 });
 
 describe('GridLanesItem sort comparator compatibility', () => {

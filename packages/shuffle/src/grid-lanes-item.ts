@@ -1,6 +1,7 @@
 import { Classes } from './core/constants';
 
 export class GridLanesItem {
+  #originalViewTransitionName: { value: string; priority: string; present: boolean };
   id: string;
   defaultOrder: number;
   element: HTMLElement;
@@ -15,6 +16,11 @@ export class GridLanesItem {
     this.defaultOrder = defaultOrder;
     this.element = element;
     this.isVisible = true;
+    this.#originalViewTransitionName = {
+      value: element.style.getPropertyValue('view-transition-name'),
+      priority: element.style.getPropertyPriority('view-transition-name'),
+      present: [...element.style].includes('view-transition-name'),
+    };
   }
 
   init(): void {
@@ -41,7 +47,15 @@ export class GridLanesItem {
 
   dispose(): void {
     this.element.classList.remove(Classes.SHUFFLE_ITEM, Classes.VISIBLE, Classes.HIDDEN);
-    this.element.style.removeProperty('view-transition-name');
+    if (this.#originalViewTransitionName.present) {
+      this.element.style.setProperty(
+        'view-transition-name',
+        this.#originalViewTransitionName.value,
+        this.#originalViewTransitionName.priority,
+      );
+    } else {
+      this.element.style.removeProperty('view-transition-name');
+    }
     this.element.style.removeProperty('--shuffle-index');
     this.element.removeAttribute('aria-hidden');
   }

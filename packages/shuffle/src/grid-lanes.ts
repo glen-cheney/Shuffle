@@ -215,6 +215,7 @@ class GridLanes extends TinyEmitter {
   #activeTransition: ViewTransition | null = null;
   #pendingRemovals: GridLanesItem[] = [];
   #commitScheduled = false;
+  #originalViewTransitionName: { value: string; priority: string; present: boolean };
   #containerHeight = 0;
   #delayStyleElement: HTMLStyleElement | null = null;
   #lastDelayKey: string | null = null;
@@ -237,6 +238,11 @@ class GridLanes extends TinyEmitter {
     }
 
     this.element = el;
+    this.#originalViewTransitionName = {
+      value: el.style.getPropertyValue('view-transition-name'),
+      priority: el.style.getPropertyPriority('view-transition-name'),
+      present: [...el.style].includes('view-transition-name'),
+    };
     if (!this.#validateDisplay()) {
       // oxlint-disable-next-line no-console
       console.error('GridLanes container must use `display: grid` or `display: grid-lanes`.');
@@ -791,6 +797,7 @@ class GridLanes extends TinyEmitter {
     this.items.clear();
     this.sortedItems.length = 0;
     this.#pendingRemovals.length = 0;
+    this.#commitScheduled = false;
     this.handlers = {};
     this.isEnabled = false;
 
@@ -802,7 +809,15 @@ class GridLanes extends TinyEmitter {
 
     delete this.element.dataset.shuffleLanes;
     this.element.classList.remove(Classes.BASE);
-    this.element.style.removeProperty('view-transition-name');
+    if (this.#originalViewTransitionName.present) {
+      this.element.style.setProperty(
+        'view-transition-name',
+        this.#originalViewTransitionName.value,
+        this.#originalViewTransitionName.priority,
+      );
+    } else {
+      this.element.style.removeProperty('view-transition-name');
+    }
 
     // @ts-expect-error instead of creating a complicated union type for when
     // a shuffle instance is destroyed, just ignore it.

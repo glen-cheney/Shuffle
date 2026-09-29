@@ -172,6 +172,29 @@ describe('root snapshot suppression', () => {
     });
   });
 
+  it('restores the container’s author-provided inline value on destroy', () => {
+    const { container } = createFixture();
+    container.style.setProperty('view-transition-name', 'author-grid', 'important');
+    const instance = new GridLanes(container, { itemSelector: '.item' });
+
+    instance.destroy();
+
+    expect(container.style.getPropertyValue('view-transition-name')).toBe('author-grid');
+    expect(container.style.getPropertyPriority('view-transition-name')).toBe('important');
+  });
+
+  it('does not run a scheduled filter commit after destroy', async () => {
+    const { container } = createFixture();
+    const startViewTransition = mockStartViewTransition();
+    const instance = new GridLanes(container, { itemSelector: '.item' });
+
+    instance.filter('design');
+    instance.destroy();
+    await Promise.resolve();
+
+    expect(startViewTransition).not.toHaveBeenCalled();
+  });
+
   it('refcounts overlapping instances so the first release does not restore early', async () => {
     const deferredA = createDeferred();
     const deferredB = createDeferred();
