@@ -18,6 +18,7 @@ Without a reduced test case, your issue may be closed.
 - `cd packages/shuffle`
 - `yarn version major|minor|patch`.
 - `yarn npm publish`
+- `cd ../..`
 - `git add .`
 - `git commit -m "Release v0.0.0"`
 - `git push && git push --tags`

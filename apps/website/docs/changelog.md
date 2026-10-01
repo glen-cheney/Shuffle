@@ -6,6 +6,7 @@ sidebar_position: 15
 
 For a more detailed changelog, visit [the latest releases](https://github.com/glen-cheney/Shuffle/releases) on GitHub.
 
+- `v7.1.0` 2026-10-01 - Add the native Grid Lanes entry point with CSS-owned layouts, animated filtering and sorting via the View Transitions API, and add/remove lifecycle support.
 - `v7.0.0` 2026-02-12 - ESM-only, tsdown with target=ES2024, TypeScript source, oxlint, Vitest browser mode.
 - `v6.1.2` 2025-06-01 - Update dev dependencies and old username links.
 - `v6.1.1` 2024-07-07 - Update `"exports"` field in package.json to include `"types"`.
