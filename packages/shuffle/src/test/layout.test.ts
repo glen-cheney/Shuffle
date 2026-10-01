@@ -45,8 +45,8 @@ describe('shuffle layout', () => {
       gutterWidth,
     });
 
-    expect(columnWidth).toHaveBeenCalled();
-    expect(gutterWidth).toHaveBeenCalled();
+    expect(columnWidth).toHaveBeenCalledWith(1000);
+    expect(gutterWidth).toHaveBeenCalledWith(1000);
     expect(instance.value.colWidth).toBe(350);
     expect(instance.value.cols).toBe(3);
     expect(instance.value.positions).toEqual([600, 450, 450]);
@@ -77,8 +77,8 @@ describe('shuffle layout', () => {
       gutterWidth,
     });
 
-    expect(columnWidth).toHaveBeenCalled();
-    expect(gutterWidth).toHaveBeenCalled();
+    expect(columnWidth).toHaveBeenCalledWith(1200);
+    expect(gutterWidth).toHaveBeenCalledWith(1200);
     expect(instance.value.colWidth).toBe(300);
     expect(instance.value.cols).toBe(4);
     expect(instance.value.positions).toEqual([40, 40, 30, 30]);

@@ -57,7 +57,7 @@ describe('shuffle lifecycle', () => {
     triggerResize([createResizeObserverEntry(instance.value.containerWidth + 1)]);
 
     await vi.waitFor(() => {
-      expect(update).toHaveBeenCalled();
+      expect(update).toHaveBeenCalledWith();
     });
   });
 });

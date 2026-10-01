@@ -52,10 +52,10 @@
     <script type="module">
       import GridLanes from '/dist/shuffle-lanes.mjs';
 
-      window.__layouts = 0;
+      window.layoutCount = 0;
       const grid = new GridLanes('#grid', { itemSelector: '.block' });
       grid.on('shuffle:layout', () => {
-        window.__layouts += 1;
+        window.layoutCount += 1;
       });
       window.__grid = grid;
 

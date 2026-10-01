@@ -2,15 +2,15 @@ import { expect, test, type Page } from '@playwright/test';
 
 declare global {
   // Set by visual/grid.html; read back from specs.
-  var __layouts: number;
+  var layoutCount: number;
 }
 
 function layouts(page: Page): Promise<number> {
-  return page.evaluate(() => globalThis.__layouts);
+  return page.evaluate(() => globalThis.layoutCount);
 }
 
 async function waitForLayouts(page: Page, count: number): Promise<void> {
-  await page.waitForFunction((expected: number) => globalThis.__layouts >= expected, count);
+  await page.waitForFunction((expected: number) => globalThis.layoutCount >= expected, count);
 }
 
 test.beforeEach(async ({ page }, testInfo) => {
