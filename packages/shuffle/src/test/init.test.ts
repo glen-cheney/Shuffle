@@ -6,7 +6,7 @@ import Shuffle from '../shuffle';
 describe('shuffle init', () => {
   test('should have default options', ({ fixture, instance }) => {
     instance.value = new Shuffle(fixture);
-    expect(instance.value.items.length).toBe(10);
+    expect(instance.value.items).toHaveLength(10);
     expect(instance.value.visibleItems).toBe(10);
     expect(instance.value.sortedItems).toHaveLength(10);
     expect(instance.value.options.group).toBe('all');

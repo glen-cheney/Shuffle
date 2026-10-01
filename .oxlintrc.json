@@ -24,6 +24,7 @@
     "eslint/no-continue": "off",
     "eslint/no-magic-numbers": "off",
     "eslint/no-ternary": "off",
+    "eslint/one-var": "off",
     "eslint/sort-imports": "off",
     "eslint/sort-keys": "off",
     "import/consistent-type-specifier-style": "off",
@@ -34,6 +35,7 @@
     "promise/avoid-new": "off",
     "promise/prefer-await-to-callbacks": "off",
     "react/jsx-max-depth": "off",
+    "react/function-component-definition": "off",
     "typescript/prefer-readonly": "off",
     "unicorn/no-array-callback-reference": "off", // false positive with `filter` method on Shuffle.
     "unicorn/no-array-method-this-argument": "off", // false positive with `filter` method on Shuffle.
@@ -49,6 +51,7 @@
     "oxc/no-optional-chaining": "off",
     "oxc/no-rest-spread-properties": "off",
     "react/jsx-filename-extension": ["error", { "extensions": [".tsx"] }],
+    "react/jsx-no-literals": "off",
     "react/no-multi-comp": "off",
     "typescript/explicit-function-return-type": "off",
     "typescript/explicit-member-accessibility": "off",
@@ -62,6 +65,7 @@
     "eslint/max-lines": "off",
     "eslint/max-statements": "off",
     "import/max-dependencies": "off",
+    "typescript/prefer-nullish-coalescing": "off",
     "typescript/prefer-readonly-parameter-types": "off",
     "typescript/strict-boolean-expressions": "off",
     "unicorn/prefer-query-selector": "off"
@@ -71,13 +75,19 @@
       "files": ["*.test.{ts,tsx}"],
       "plugins": ["vitest"],
       "rules": {
+        "no-new": "off",
         "typescript/unbound-method": "off",
-        "vitest/prefer-importing-vitest-globals": "off", // false positives on `test-utils` imports
+        "vitest/no-standalone-expect": "off", // false positives
+        "vitest/no-hooks": "off",
         "vitest/no-importing-vitest-globals": "off", // we do not use `globals: true`
+        "vitest/prefer-importing-vitest-globals": "off", // false positives on `test-utils` imports
         "vitest/prefer-to-be-falsy": "off",
         "vitest/prefer-to-be-truthy": "off",
         "vitest/require-test-timeout": "off",
         "vitest/prefer-called-times": "off",
+        "vitest/prefer-strict-equal": "off",
+        "vitest/prefer-expect-assertions": "off",
+        "vitest/max-expects": "off",
         "unicorn/prefer-spread": "off" // false positive for NodeList
       }
     }

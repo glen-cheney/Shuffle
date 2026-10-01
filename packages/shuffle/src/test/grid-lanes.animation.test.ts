@@ -18,7 +18,7 @@ describe('speed and easing options', () => {
 
   it('does not write transition option values to container custom properties', () => {
     const { container } = createFixture();
-    const _gl = new GridLanes(container, {
+    new GridLanes(container, {
       itemSelector: '.item',
       speed: 400,
       easing: 'ease-in-out',
@@ -234,7 +234,7 @@ describe('--shuffle-index stagger assignment', () => {
 
   it('assigns sequential --shuffle-index to visible items after init', () => {
     const { container, items } = createFixture();
-    const _gl = new GridLanes(container, { itemSelector: '.item' });
+    new GridLanes(container, { itemSelector: '.item' });
 
     // All 3 items are visible by default.
     for (const [i, element] of items.entries()) {

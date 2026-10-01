@@ -153,7 +153,7 @@ describe('remove() and REMOVED event', () => {
 
     instance.remove([]);
 
-    expect(startVT.mock.calls.length).toBe(callCount);
+    expect(startVT).toHaveBeenCalledTimes(callCount);
   });
 });
 
@@ -189,7 +189,7 @@ describe('enable() and disable()', () => {
       instance.disable();
       instance[method]();
 
-      expect(startVT.mock.calls.length).toBe(callsBefore);
+      expect(startVT).toHaveBeenCalledTimes(callsBefore);
     },
   );
 
@@ -214,7 +214,7 @@ describe('enable() and disable()', () => {
     instance.disable();
     instance.enable(false);
 
-    expect(startVT.mock.calls.length).toBe(callsBefore);
+    expect(startVT).toHaveBeenCalledTimes(callsBefore);
     expect(instance.isEnabled).toBe(true);
   });
 
@@ -466,7 +466,7 @@ describe('layout() no-op', () => {
     instance.layout();
 
     expect(layoutSpy).not.toHaveBeenCalled();
-    expect(startVT.mock.calls.length).toBe(callsBefore);
+    expect(startVT).toHaveBeenCalledTimes(callsBefore);
 
     await waitForLayout(instance);
     expect(layoutSpy).toHaveBeenCalledOnce();

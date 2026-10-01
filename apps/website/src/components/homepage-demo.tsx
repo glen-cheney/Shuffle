@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import Shuffle from 'shufflejs';
 import GridLanes from 'shufflejs/grid-lanes';
 import styles from './homepage-demo.module.css';
@@ -52,15 +52,27 @@ function supportsGridLanesDisplay(): boolean {
   return typeof CSS !== 'undefined' && typeof CSS.supports === 'function' && CSS.supports('display', 'grid-lanes');
 }
 
+function subscribeToGridLanesSupport(): () => void {
+  return () => {};
+}
+
+function getServerGridLanesSupport(): boolean {
+  return false;
+}
+
 export const HomepageDemo: React.FC = () => {
   const shuffleRef = useRef<Shuffle | null>(null);
   const shuffleGridLanesRef = useRef<GridLanes | null>(null);
   const [searchText, setSearchText] = useState('');
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [sortValue, setSortValue] = useState('dom');
-  // 'shuffle' first so server prerender and hydration agree; upgraded on mount below.
-  const [mode, setMode] = useState<'shuffle' | 'grid-lanes'>('shuffle');
-  const [supportsGridLanes, setSupportsGridLanes] = useState(false);
+  const [modePreference, setModePreference] = useState<'shuffle' | 'grid-lanes' | null>(null);
+  const supportsGridLanes = useSyncExternalStore(
+    subscribeToGridLanesSupport,
+    supportsGridLanesDisplay,
+    getServerGridLanesSupport,
+  );
+  const mode = modePreference ?? (supportsGridLanes ? 'grid-lanes' : 'shuffle');
 
   // Helper function to apply filter, search, and sort together
   const applyFilter = (search: string, filter: string | null, currentSortValue: string) => {
@@ -90,50 +102,23 @@ export const HomepageDemo: React.FC = () => {
     }
   };
 
-  const destroyShuffle = () => {
-    if (shuffleRef.current) {
-      shuffleRef.current.destroy();
-      shuffleRef.current = null;
-    }
-  };
-
-  const initShuffle = () => {
-    shuffleRef.current ??= new Shuffle('#grid', {
-      itemSelector: `.${classicGridStyles.pictureItem}`,
-      sizer: `.${classicGridStyles.sizer}`,
-      delimiter: ' ',
-    });
-  };
-
-  const destroyGridLanes = () => {
-    if (shuffleGridLanesRef.current) {
-      shuffleGridLanesRef.current.destroy();
-      shuffleGridLanesRef.current = null;
-    }
-  };
-
-  const initGridLanes = () => {
-    shuffleGridLanesRef.current ??= new GridLanes('#grid', {
-      itemSelector: 'figure',
-    });
-  };
-
-  useEffect(() => {
-    if (supportsGridLanesDisplay()) {
-      setSupportsGridLanes(true);
-      setMode('grid-lanes');
-    }
-  }, []);
-
   useEffect(() => {
     if (mode === 'shuffle') {
-      initShuffle();
+      shuffleRef.current = new Shuffle('#grid', {
+        itemSelector: `.${classicGridStyles.pictureItem}`,
+        sizer: `.${classicGridStyles.sizer}`,
+        delimiter: ' ',
+      });
     } else {
-      initGridLanes();
+      shuffleGridLanesRef.current = new GridLanes('#grid', {
+        itemSelector: 'figure',
+      });
     }
     return () => {
-      destroyShuffle();
-      destroyGridLanes();
+      shuffleRef.current?.destroy();
+      shuffleRef.current = null;
+      shuffleGridLanesRef.current?.destroy();
+      shuffleGridLanesRef.current = null;
     };
   }, [mode]);
 
@@ -169,7 +154,7 @@ export const HomepageDemo: React.FC = () => {
           applyFilter(newSearchText, activeFilter, sortValue);
         }}
         onModeChange={(newMode) => {
-          setMode(newMode);
+          setModePreference(newMode);
           setSearchText('');
           setActiveFilter(null);
           setSortValue('dom');
@@ -194,8 +179,10 @@ export const HomepageDemo: React.FC = () => {
                 type="button"
                 className={styles.btn}
                 onClick={() => {
-                  destroyShuffle();
-                  destroyGridLanes();
+                  shuffleRef.current?.destroy();
+                  shuffleRef.current = null;
+                  shuffleGridLanesRef.current?.destroy();
+                  shuffleGridLanesRef.current = null;
                 }}
               >
                 Destroy Shuffle(s)
@@ -204,7 +191,13 @@ export const HomepageDemo: React.FC = () => {
                 type="button"
                 className={styles.btn}
                 onClick={() => {
-                  initShuffle();
+                  if (!shuffleRef.current) {
+                    shuffleRef.current = new Shuffle('#grid', {
+                      itemSelector: `.${classicGridStyles.pictureItem}`,
+                      sizer: `.${classicGridStyles.sizer}`,
+                      delimiter: ' ',
+                    });
+                  }
                 }}
               >
                 Init Shuffle
@@ -213,7 +206,11 @@ export const HomepageDemo: React.FC = () => {
                 type="button"
                 className={styles.btn}
                 onClick={() => {
-                  initGridLanes();
+                  if (!shuffleGridLanesRef.current) {
+                    shuffleGridLanesRef.current = new GridLanes('#grid', {
+                      itemSelector: 'figure',
+                    });
+                  }
                 }}
               >
                 Init Grid Lanes
