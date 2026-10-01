@@ -17,7 +17,7 @@ Shuffle operates on a group of items, giving you the ability to filter or sort t
 </div>
 ```
 
-The easiest way to use Shuffle is to add a `data-groups` attribute to each of the items in your grid as a [valid JSON](http://jsonlint.com/) array of strings.
+The easiest way to use Shuffle is to add a `data-groups` attribute to each of the items in your grid as a [valid JSON](https://jsonlint.com/) array of strings.
 
 ```html
 <!-- highlight-next-line -->

@@ -6,7 +6,7 @@ sidebar_position: 14
 
 ## Why Does Shuffle leave empty spaces?
 
-The algorithm used to place items does not keep track of empty space nor try to fill them. If you require this functionality, I suggest [packery](http://packery.metafizzy.co/).
+The algorithm used to place items does not keep track of empty space nor try to fill them. If you require this functionality, I suggest [packery](https://packery.metafizzy.co/).
 
 ## Why are images overlapping?
 

@@ -45,7 +45,7 @@ For a more detailed changelog, visit [the latest releases](https://github.com/gl
 - 2013-10-04 - Moved some Shuffle instance properties to constants. Converted from 4 to 2 space indentation. Added events enum and pulled out some strings to constants.
 - 2013-08-30 - Added animate-in demo.
 - `v2.0.0` 2013-07-05 - Shuffle 2.0 with masonry, adding and removing, and more.
-- 2012-11-03 - Replaced layout system with [masonry](http://masonry.desandro.com/). Items can now be different sizes! Added additional examples.
+- 2012-11-03 - Replaced layout system with [masonry](https://masonry.desandro.com/). Items can now be different sizes! Added additional examples.
 - 2012-10-24 - Better handling of grid item dimensions. Added a minimal markup page.
 - 2012-09-20 - Added `destroy` method
 - 2012-09-18 - Added sorting ability and made plugin responsive. Updated to Modernizr 2.6.2

@@ -107,8 +107,12 @@ export default {
               href: 'https://github.com/glen-cheney/Shuffle',
             },
             {
-              label: 'CodePen template',
-              href: 'http://codepen.io/pen?template=qrjOpX',
+              label: 'CodePen classic template',
+              href: 'https://codepen.io/pen?template=qrjOpX',
+            },
+            {
+              label: 'CodePen grid-lanes template',
+              href: 'https://codepen.io/pen?template=bNqoEYR',
             },
           ],
         },

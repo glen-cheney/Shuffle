@@ -10,7 +10,10 @@ npm install shufflejs
 
 ## Try it out on CodePen
 
-[Start a CodePen with a Shuffle template](http://codepen.io/pen?template=qrjOpX)
+Start a CodePen with a template:
+
+- [Classic JS-based layout](https://codepen.io/pen?template=qrjOpX)
+- [grid-lanes CSS layout](https://codepen.io/pen?template=bNqoEYR)
 
 View the [Shuffle collection](https://codepen.io/collection/AWGLbd) on CodePen.
 

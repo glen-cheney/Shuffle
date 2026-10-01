@@ -2,7 +2,7 @@ import type { SortOptions, SortableElement } from './types';
 
 /**
  * Fisher-Yates shuffle.
- * http://stackoverflow.com/a/962890/373422
+ * https://stackoverflow.com/a/962890/373422
  * https://bost.ocks.org/mike/shuffle/
  * @param array Array to shuffle.
  * @return Randomly sorted array.

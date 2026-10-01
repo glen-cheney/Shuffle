@@ -23,7 +23,7 @@ const shuffleInstance = new Shuffle(document.getElementById('grid'), {
 
 ## Inspiration
 
-This project was inspired by [Isotope](http://isotope.metafizzy.co/) and [Packery](http://packery.metafizzy.co/).
+This project was inspired by [Isotope](https://isotope.metafizzy.co/) and [Packery](https://packery.metafizzy.co/).
 
 [homepage]: https://shuffle.js.org
 [actions-img]: https://github.com/glen-cheney/Shuffle/actions/workflows/build.yml/badge.svg?branch=main

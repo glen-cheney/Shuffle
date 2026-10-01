@@ -13,7 +13,7 @@ v
 A clear and concise description of what the bug is.
 
 **Reproduction link**
-A minimal JSBin, JSFiddle, Codepen, or a GitHub repository that can reproduce the bug. You can use this "Shuffle with Images" template on CodePen to get started: http://codepen.io/pen?template=qrjOpX
+A minimal JSBin, JSFiddle, Codepen, or a GitHub repository that can reproduce the bug. You can use this "Shuffle with Images" template on CodePen to get started: <https://codepen.io/pen?template=qrjOpX>
 
 **To Reproduce**
 Steps to reproduce the behavior:

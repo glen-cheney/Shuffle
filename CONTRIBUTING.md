@@ -4,9 +4,12 @@
 
 All bug reports and issues **require** a [reduced test case](https://css-tricks.com/reduced-test-cases/).
 
-Want to start a CodePen with a shuffle template? Use this: [http://codepen.io/pen?template=qrjOpX](http://codepen.io/pen?template=qrjOpX)
+Want to start a CodePen with a shuffle template? Use one of these:
 
-Take a look at the GitHub [contributing guide](https://guides.github.com/activities/contributing-to-open-source/index.html). For demo links, please use things like [CodePen](http://codepen.io/), [JSFiddle](https://jsfiddle.net/), or [JS Bin](https://jsbin.com/) to create reduced test cases. For more best practices when contributing, check out [html5boilerplate's guide](https://github.com/h5bp/html5-boilerplate/blob/master/CONTRIBUTING.md).
+- [Classic JS-based layout](https://codepen.io/pen?template=qrjOpX)
+- [grid-lanes CSS layout](https://codepen.io/pen?template=bNqoEYR)
+
+Take a look at the GitHub [contributing guide](https://guides.github.com/activities/contributing-to-open-source/index.html). For demo links, please use things like [CodePen](https://codepen.io/), [JSFiddle](https://jsfiddle.net/), or [JS Bin](https://jsbin.com/) to create reduced test cases. For more best practices when contributing, check out [html5boilerplate's guide](https://github.com/h5bp/html5-boilerplate/blob/master/CONTRIBUTING.md).
 
 Without a reduced test case, your issue may be closed.
 

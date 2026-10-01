@@ -6,6 +6,7 @@
 There is [a collection of CodePen demos](https://codepen.io/collection/AWGLbd). They're also embedded in these pages:
 
 - [basic layout](./basic-layout.mdx)
+- [css grid-lanes layout](./css-layout.mdx)
 - [homepage demo](./homepage-demo.mdx)
 - [compound filters](./compound-filters.mdx)
 - [images](./images.mdx)
