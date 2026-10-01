@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="color-scheme" content="light" />
+    <title>GridLanes visual fixture</title>
+    <link rel="stylesheet" href="/dist/shuffle-lanes.css" />
+    <style>
+      /* Text-free fixture: solid blocks only, so baselines are
+         byte-comparable across operating systems and fonts. */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+      }
+      #controls {
+        display: flex;
+        gap: 8px;
+        padding: 16px 24px 0;
+      }
+      #grid {
+        display: grid;
+        grid-template-columns: repeat(3, 200px);
+        gap: 16px;
+        padding: 16px 24px;
+        align-items: start;
+      }
+      .block {
+        width: 200px;
+        height: 140px;
+      }
+      .block--tall {
+        height: 296px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="controls">
+      <button type="button">Design</button>
+      <button type="button">All</button>
+      <button type="button">Sort</button>
+    </div>
+    <div id="grid">
+      <div class="block" style="background: #e74c3c" data-groups="design" data-sort-value="3"></div>
+      <div class="block" style="background: #3498db" data-groups="design" data-sort-value="1"></div>
+      <div class="block block--tall" style="background: #2ecc71" data-groups="ux" data-sort-value="2"></div>
+      <div class="block" style="background: #f39c12" data-groups="design" data-sort-value="4"></div>
+      <div class="block" style="background: #9b59b6" data-groups="ux" data-sort-value="5"></div>
+      <div class="block" style="background: #1abc9c" data-groups="ux" data-sort-value="6"></div>
+    </div>
+    <script type="module">
+      import GridLanes from '/dist/shuffle-lanes.mjs';
+
+      window.__layouts = 0;
+      const grid = new GridLanes('#grid', { itemSelector: '.block' });
+      grid.on('shuffle:layout', () => {
+        window.__layouts += 1;
+      });
+      window.__grid = grid;
+
+      const [filterDesign, filterAll, sort] = document.querySelectorAll('#controls button');
+      filterDesign.addEventListener('click', () => {
+        grid.filter('design');
+      });
+      filterAll.addEventListener('click', () => {
+        grid.filter('all');
+      });
+      sort.addEventListener('click', () => {
+        grid.sort({ by: (element) => Number(element.dataset.sortValue) });
+      });
+    </script>
+  </body>
+</html>

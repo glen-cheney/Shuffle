@@ -1,6 +1,7 @@
 import { Point } from './point';
-import { Classes } from './constants';
-import type { FilterSet, InlineCssStyles, ShuffleItemCss } from './types';
+import { Classes } from './core/constants';
+import type { FilterSet } from './core/types';
+import type { InlineCssStyles, ShuffleItemCss } from './types';
 
 let id = 0;
 
@@ -131,7 +132,7 @@ export class ShuffleItem {
  * Toggles the visible and hidden class names.
  * @param Object with visible and hidden arrays.
  */
-export function toggleFilterClasses({ visible, hidden }: FilterSet): void {
+export function toggleFilterClasses({ visible, hidden }: FilterSet<ShuffleItem>): void {
   for (const item of visible) {
     item.show();
   }

@@ -1,9 +1,10 @@
-import { defineConfig } from 'vitest/config';
+import { defaultExclude, defineConfig } from 'vitest/config';
 import { playwright } from '@vitest/browser-playwright';
 
 export default defineConfig({
   test: {
-    globals: true,
+    // Playwright specs live alongside the package but run under `yarn test:e2e`.
+    exclude: [...defaultExclude, '**/visual/**'],
     browser: {
       enabled: true,
       provider: playwright(),

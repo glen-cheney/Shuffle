@@ -1,0 +1,88 @@
+.pictureItemInner {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  color: var(--ifm-color-primary-contrast-foreground);
+  background: var(--ifm-color-primary-contrast-background);
+}
+
+:global([data-theme='dark']) .pictureItemInner {
+  color: var(--ifm-color-secondary-contrast-foreground);
+  background: var(--ifm-color-secondary-contrast-background);
+}
+
+.pictureItemImage {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+
+@supports (object-fit: cover) {
+  .pictureItemImage {
+    max-width: none;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.pictureItemDetails {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px;
+  width: 100%;
+  padding: 1em;
+}
+
+.pictureItemDescription {
+  width: 100%;
+  padding: 0 2em 1em 1em;
+  margin: 0;
+}
+
+.pictureItemTitle {
+  flex-shrink: 0;
+}
+
+.pictureItemTags {
+  flex-shrink: 1;
+  text-align: right;
+  margin: 0;
+}
+
+@media screen and (min-width: 768px) {
+  /* Image overlays use hardcoded white text color for consistent contrast on photo backgrounds
+     Theme variables are not appropriate here since images don't adapt to light/dark mode */
+  .pictureItemOverlay .pictureItemDetails {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    backdrop-filter: blur(7px);
+    color: white;
+    overflow: hidden;
+  }
+
+  .pictureItemOverlay .pictureItemDescription {
+    display: none;
+  }
+
+  /* Hardcoded white text on image overlays for readability (see comment above) */
+  .pictureItemOverlay :global(a) {
+    color: white;
+    text-shadow: 0 0 1px black;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .pictureItemDetails,
+  .pictureItemDescription {
+    font-size: 0.875em;
+    padding: 0.625em;
+  }
+
+  .pictureItemDescription {
+    padding-right: 0.875em;
+    padding-bottom: 1.25em;
+  }
+}

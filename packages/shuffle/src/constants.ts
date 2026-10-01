@@ -1,31 +1,5 @@
-import type { FilterModeOptions, ShuffleEventMap, ShuffleOptions } from './types';
-
-export const Classes = {
-  BASE: 'shuffle',
-  SHUFFLE_ITEM: 'shuffle-item',
-  VISIBLE: 'shuffle-item--visible',
-  HIDDEN: 'shuffle-item--hidden',
-} as const;
-
-export const ALL_ITEMS = 'all';
-
-export const FILTER_ATTRIBUTE_KEY = 'groups';
-
-export const FilterMode: {
-  ANY: 'any';
-  ALL: 'all';
-} = {
-  ANY: 'any',
-  ALL: 'all',
-} satisfies Record<string, FilterModeOptions>;
-
-export const EventType: {
-  LAYOUT: 'shuffle:layout';
-  REMOVED: 'shuffle:removed';
-} = {
-  LAYOUT: 'shuffle:layout',
-  REMOVED: 'shuffle:removed',
-} satisfies Record<string, keyof ShuffleEventMap>;
+import { ALL_ITEMS, FilterMode } from './core/constants';
+import type { ShuffleOptions } from './types';
 
 export const DEFAULT_OPTIONS: ShuffleOptions = {
   // Initial filter group.

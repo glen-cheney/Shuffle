@@ -1,0 +1,25 @@
+.my-grid-lanes {
+  --picture-item-vertical-gap: 24px;
+  margin-top: var(--picture-item-vertical-gap);
+  gap: var(--picture-item-vertical-gap) var(--double-horizontal-spacing);
+}
+
+@supports (display: grid-lanes) {
+  .my-grid-lanes {
+    display: grid-lanes;
+  }
+}
+
+.my-grid-lane-item {
+  height: 220px;
+}
+
+.my-grid-lane-item--height-2 {
+  height: calc(220px * 2 + var(--picture-item-vertical-gap));
+}
+
+@media screen and (max-width: 767px) {
+  .my-grid-lane-item--height-2 {
+    height: auto;
+  }
+}
